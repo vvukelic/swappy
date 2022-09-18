@@ -1,5 +1,7 @@
 node_modules
 .idea
+secret.json
+.DS_Store
 
 #Hardhat files
 cache
