@@ -3,7 +3,12 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract TradeFactory {
+    address public owner;
     address[] public deployedTrades;
+
+    constructor () {
+        owner = msg.sender;
+    }
 
     function createTrade(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount) public {
         address newTrade = address(new Trade(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount));
