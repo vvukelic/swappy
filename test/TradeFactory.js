@@ -1,61 +1,41 @@
-// This is an example test file. Hardhat will run every *.js file in `test/`,
-// so feel free to add new ones.
-
-// Hardhat tests are normally written with Mocha and Chai.
-
-// We import Chai to use its asserting functions here.
 const { expect } = require("chai");
+const { loadFixture, impersonateAccount, stopImpersonatingAccount } = require("@nomicfoundation/hardhat-network-helpers");
 
-// We use `loadFixture` to share common setups (or fixtures) between tests.
-// Using this simplifies your tests and makes them run faster, by taking
-// advantage or Hardhat Network's snapshot functionality.
-const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
-
-// `describe` is a Mocha function that allows you to organize your tests.
-// Having your tests organized makes debugging them easier. All Mocha
-// functions are available in the global scope.
-//
-// `describe` receives the name of a section of your test suite, and a
-// callback. The callback must define the tests of that section. This callback
-// can't be an async function.
 describe("TradeFactory contract", function () {
-  // We define a fixture to reuse the same setup in every test. We use
-  // loadFixture to run this setup once, snapshot that state, and reset Hardhat
-  // Network to that snapshot in every test.
-  async function deployTradeFactoryFixture() {
-    // Get the ContractFactory and Signers here.
-    const TradeFactory = await ethers.getContractFactory("TradeFactory");
-    const [owner, addr1, addr2] = await ethers.getSigners();
+    async function transferErc20Token(tokenAddress, srcAddress, dstAddress, amount) {
+        const erc20 = require('../frontend/src/contracts/bla.json');
+        const tokenContract = new ethers.Contract(tokenAddress, erc20, ethers.provider);
 
-    // To deploy our contract, we just have to call Token.deploy() and await
-    // for it to be deployed(), which happens onces its transaction has been
-    // mined.
-    const hardhatTradeFactory = await TradeFactory.deploy();
+        await impersonateAccount(srcAddress);
+        const srcWhale = await ethers.getSigner(srcAddress);
+        await tokenContract.connect(srcWhale).transfer(dstAddress, amount);
+        const decimals = await tokenContract.decimals();
+        const balance = await tokenContract.balanceOf(dstAddress);
+        await stopImpersonatingAccount(srcAddress);
+        console.info(ethers.utils.formatUnits(balance, decimals));
+    }
 
-    await hardhatTradeFactory.deployed();
+    async function deployTradeFactoryFixture() {
+        const TradeFactory = await ethers.getContractFactory("TradeFactory");
+        const [owner, addr1, addr2] = await ethers.getSigners();
 
-    // Fixtures can return anything you consider useful for your tests
-    return { TradeFactory, hardhatTradeFactory, owner, addr1, addr2 };
-  }
+        const hardhatTradeFactory = await TradeFactory.deploy();
 
-  // You can nest describe calls to create subsections.
+        await hardhatTradeFactory.deployed();
+
+        // transfer usdc to addr1
+        await transferErc20Token("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "0xF977814e90dA44bFA03b6295A0616a897441aceC", addr1.address, 700);
+
+        // transfer matic to addr2
+        await transferErc20Token("0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0", "0x50d669F43b484166680Ecc3670E4766cdb0945CE", addr2.address, 100);
+
+        return { TradeFactory, hardhatTradeFactory, owner, addr1, addr2 };
+    }
+
   describe("Deployment", function () {
-    // `it` is another Mocha function. This is the one you use to define your
-    // tests. It receives the test name, and a callback function.
-//
-    // If the callback function is async, Mocha will `await` it.
     it("Should set the right owner", async function () {
-      // We use loadFixture to setup our environment, and then assert that
-      // things went well
       const { hardhatTradeFactory, owner } = await loadFixture(deployTradeFactoryFixture);
 
-      console.log(await hardhatTradeFactory.owner());
-
-      // Expect receives a value and wraps it in an assertion object. These
-      // objects have a lot of utility methods to assert values.
-
-      // This test expects the owner variable stored in the contract to be
-      // equal to our Signer's owner.
       expect(await hardhatTradeFactory.owner()).to.equal(owner.address);
     });
 
