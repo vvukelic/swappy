@@ -1,10 +1,15 @@
 const { expect } = require("chai");
 const { loadFixture, impersonateAccount, stopImpersonatingAccount } = require("@nomicfoundation/hardhat-network-helpers");
+const usdcTokenAddr = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+const maticTokenAddr = "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0";
+
+async function getErc20Contract(tokenAddress) {
+    return await ethers.getContractAt("../artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20", tokenAddress);;
+}
 
 describe("TradeFactory contract", function () {
     async function transferErc20Token(tokenAddress, srcAddress, dstAddress, amount) {
-        const erc20 = require('../frontend/src/contracts/bla.json');
-        const tokenContract = new ethers.Contract(tokenAddress, erc20, ethers.provider);
+        const tokenContract = await getErc20Contract(tokenAddress)
 
         await impersonateAccount(srcAddress);
         const srcWhale = await ethers.getSigner(srcAddress);
@@ -12,7 +17,7 @@ describe("TradeFactory contract", function () {
         const decimals = await tokenContract.decimals();
         const balance = await tokenContract.balanceOf(dstAddress);
         await stopImpersonatingAccount(srcAddress);
-        console.info(ethers.utils.formatUnits(balance, decimals));
+        // console.info(ethers.utils.formatUnits(balance, decimals));
     }
 
     async function deployTradeFactoryFixture() {
@@ -24,27 +29,34 @@ describe("TradeFactory contract", function () {
         await hardhatTradeFactory.deployed();
 
         // transfer usdc to addr1
-        await transferErc20Token("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "0xF977814e90dA44bFA03b6295A0616a897441aceC", addr1.address, 700);
+        await transferErc20Token(usdcTokenAddr, "0xF977814e90dA44bFA03b6295A0616a897441aceC", addr1.address, 7000000000);
 
         // transfer matic to addr2
-        await transferErc20Token("0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0", "0x50d669F43b484166680Ecc3670E4766cdb0945CE", addr2.address, 100);
+        await transferErc20Token(maticTokenAddr, "0x50d669F43b484166680Ecc3670E4766cdb0945CE", addr2.address, 100000000000000000000n);
 
         return { TradeFactory, hardhatTradeFactory, owner, addr1, addr2 };
     }
 
-  describe("Deployment", function () {
-    it("Should set the right owner", async function () {
-      const { hardhatTradeFactory, owner } = await loadFixture(deployTradeFactoryFixture);
-
-      expect(await hardhatTradeFactory.owner()).to.equal(owner.address);
+    describe("Deployment", function () {
+        it("Right owner", async function () {
+            const { hardhatTradeFactory, owner } = await loadFixture(deployTradeFactoryFixture);
+            expect(await hardhatTradeFactory.owner()).to.equal(owner.address);
+        });
     });
 
-    // it("Should assign the total supply of tokens to the owner", async function () {
-    //   const { hardhatToken, owner } = await loadFixture(deployTokenFixture);
-    //   const ownerBalance = await hardhatToken.balanceOf(owner.address);
-    //   expect(await hardhatToken.totalSupply()).to.equal(ownerBalance);
-    // });
-  });
+    describe("Trades", function () {
+        it("Create a trade", async function () {
+            const { hardhatTradeFactory, addr1, addr2 } = await loadFixture(deployTradeFactoryFixture);
+
+            const usdcContract = getErc20Contract(usdcTokenAddr);
+            const trade = await hardhatTradeFactory.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1);
+            // console.info(trade);
+
+            [tradeAddress] = await hardhatTradeFactory.getDeployedTrades();
+            const tradeContract = await ethers.getContractAt("../artifacts/contracts/Trade.sol:Trade", tradeAddress);
+            expect(await tradeContract.srcAddress()).to.equal(addr1.address);
+        });
+    });
 
 //   describe("Transactions", function () {
 //     it("Should transfer tokens between accounts", async function () {

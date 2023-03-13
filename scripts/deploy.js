@@ -51,6 +51,13 @@ function saveFrontendFiles(tradeFactory) {
     path.join(contractsDir, "TradeFactory.json"),
     JSON.stringify(TradeFactoryArtifact, null, 2)
   );
+
+  const TradeArtifact = artifacts.readArtifactSync("Trade");
+
+  fs.writeFileSync(
+    path.join(contractsDir, "Trade.json"),
+    JSON.stringify(TradeArtifact, null, 2)
+  );
 }
 
 main()

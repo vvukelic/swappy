@@ -11,7 +11,7 @@ contract TradeFactory {
     }
 
     function createTrade(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount) public {
-        address newTrade = address(new Trade(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount));
+        address newTrade = address(new Trade(msg.sender, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount));
         deployedTrades.push(newTrade);
     }
 
@@ -31,31 +31,29 @@ contract Trade {
 
     error TransferFailed();
 
-    constructor (address srcTokenAddress, uint _srcAmount, address dstTokenAddress, uint _dstAmount) {
-        srcAddress = msg.sender;
+    constructor (address owner, address srcTokenAddress, uint _srcAmount, address dstTokenAddress, uint _dstAmount) {
+        srcAddress = owner;
 
         srcToken = ERC20(srcTokenAddress);
         srcAmount = _srcAmount;
         dstToken = ERC20(dstTokenAddress);
         dstAmount = _dstAmount;
+        console.log(srcToken.balanceOf(srcAddress));
 
-        require(srcToken.balanceOf(msg.sender) >= srcAmount);
-
-        if (!srcToken.transferFrom(msg.sender, address(this), srcAmount)) {
-            revert TransferFailed();
-        }
-    }
+        require(srcToken.balanceOf(srcAddress) >= srcAmount);
+     }
 
     function take() public payable {
-        require(dstToken.balanceOf(msg.sender) >= dstAmount);
-
         dstAddress = msg.sender;
 
-        if (!dstToken.transferFrom(msg.sender, srcAddress, dstAmount)) {
+        require(srcToken.balanceOf(srcAddress) >= srcAmount);
+        require(dstToken.balanceOf(dstAddress) >= dstAmount);
+
+        if (!dstToken.transferFrom(dstAddress, srcAddress, dstAmount)) {
             revert TransferFailed();
         }
 
-        if (!srcToken.transferFrom(address(this), dstAddress, srcAmount)) {
+        if (!srcToken.transferFrom(srcAddress, dstAddress, srcAmount)) {
             revert TransferFailed();
         }
     }
