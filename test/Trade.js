@@ -55,7 +55,7 @@ describe("TradeManager contract", function () {
             expect(await tradeContract.srcAddress()).to.equal(addr1.address);
         });
 
-        it("Take a trade", async function () {
+        it("ERC20 trade", async function () {
             const { hardhatTradeManager, addr1, addr2 } = await loadFixture(deployTradeManagerFixture);
 
             const trade = await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1);
@@ -68,13 +68,20 @@ describe("TradeManager contract", function () {
             const maticContract = await getErc20Contract(maticTokenAddr);
             await maticContract.connect(addr2).approve(hardhatTradeManager.address, 1);
 
+            const oldBalances = {
+                "usdcAddr1": await usdcContract.balanceOf(addr1.address),
+                "maticAddr1": await maticContract.balanceOf(addr1.address),
+                "usdcAddr2": await usdcContract.balanceOf(addr2.address),
+                "maticAddr2": await maticContract.balanceOf(addr2.address)
+            };
+
             await hardhatTradeManager.connect(addr2).takeTrade(tradeAddress);
 
-            expect(await usdcContract.balanceOf(addr1.address)).to.equal(99);
-            expect(await maticContract.balanceOf(addr1.address)).to.equal(1);
+            expect(await usdcContract.balanceOf(addr1.address)).to.equal(Number(oldBalances["usdcAddr1"]) - 1);
+            expect(await maticContract.balanceOf(addr1.address)).to.equal(Number(oldBalances["maticAddr1"]) + 1);
 
-            expect(await usdcContract.balanceOf(addr2.address)).to.equal(1);
-            expect(await maticContract.balanceOf(addr2.address)).to.equal(99);
+            expect(await usdcContract.balanceOf(addr2.address)).to.equal(Number(oldBalances["usdcAddr2"]) + 1);
+            expect(await maticContract.balanceOf(addr2.address)).to.equal(Number(oldBalances["maticAddr2"]) - 1);
         });
     });
 
