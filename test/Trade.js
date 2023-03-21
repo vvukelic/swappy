@@ -19,12 +19,10 @@ describe("TradeManager contract", function () {
         const decimals = await tokenContract.decimals();
         const balance = await tokenContract.balanceOf(dstAddress);
         await stopImpersonatingAccount(srcAddress);
-        // console.info(ethers.utils.formatUnits(balance, decimals));
     }
 
     async function calculateTxCost(tx) {
         const fullTxInfo = await tx.wait();
-        // console.log(fullTxInfo);
         return fullTxInfo["cumulativeGasUsed"].toBigInt() * fullTxInfo["effectiveGasPrice"].toBigInt();
     }
 

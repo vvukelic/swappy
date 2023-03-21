@@ -25,10 +25,8 @@ contract TradeManager {
             srcTokenAddress = _wethAddress;
         }
 
-        console.log(dstTokenAddress);
         address newTrade = address(new Trade(payable(msg.sender), srcTokenAddress, srcAmount, dstTokenAddress, dstAmount));
         deployedTrades.push(newTrade);
-        // console.log(newTrade);
     }
 
     function getDeployedTrades() public view returns (address[] memory) {
@@ -106,7 +104,6 @@ contract Trade {
         srcAmount = _srcAmount;
         dstTokenAddress = _dstTokenAddress;
         dstAmount = _dstAmount;
-        console.log(dstTokenAddress);
 
         require(ERC20(srcTokenAddress).balanceOf(srcAddress) >= srcAmount, "Not enough balance for this trade!");
     }
