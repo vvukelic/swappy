@@ -27,7 +27,7 @@ describe("TradeManager contract", function () {
     }
 
     async function deployTradeManagerFixture() {
-        const TradeManager = await ethers.getContractFactory("contracts/Trade.sol:TradeManager");
+        const TradeManager = await ethers.getContractFactory("contracts/TradeVar2.sol:TradeManager");
         const [owner, addr1, addr2] = await ethers.getSigners();
 
         const hardhatTradeManager = await TradeManager.deploy();
@@ -67,12 +67,13 @@ describe("TradeManager contract", function () {
             const trade = await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1);
 
             [tradeAddress] = await hardhatTradeManager.getDeployedTrades();
+            const tradeContract = await ethers.getContractAt("../artifacts/contracts/TradeVar2.sol:Trade", tradeAddress);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
-            await usdcContract.connect(addr1).approve(hardhatTradeManager.address, 1);
+            await usdcContract.connect(addr1).approve(tradeContract.address, 1);
 
             const maticContract = await getErc20Contract(maticTokenAddr);
-            await maticContract.connect(addr2).approve(hardhatTradeManager.address, 1);
+            await maticContract.connect(addr2).approve(tradeContract.address, 1);
 
             const oldBalances = {
                 "usdcAddr1": (await usdcContract.balanceOf(addr1.address)).toBigInt(),
@@ -81,7 +82,7 @@ describe("TradeManager contract", function () {
                 "maticAddr2": (await maticContract.balanceOf(addr2.address)).toBigInt()
             };
 
-            await hardhatTradeManager.connect(addr2).takeTrade(tradeAddress);
+            await tradeContract.connect(addr2).take();
 
             expect(await usdcContract.balanceOf(addr1.address)).to.equal(Number(oldBalances["usdcAddr1"]) - 1);
             expect(await maticContract.balanceOf(addr1.address)).to.equal(Number(oldBalances["maticAddr1"]) + 1);
@@ -102,16 +103,17 @@ describe("TradeManager contract", function () {
                 "usdcAddr2": (await usdcContract.balanceOf(addr2.address)).toBigInt()
             };
 
-            const approveTx = await usdcContract.connect(addr1).approve(hardhatTradeManager.address, 1);
-            let addr1SpentGas = await calculateTxCost(approveTx);
-
             const tradeEthValue = ethers.utils.parseUnits("1","ether").toBigInt();
             const tradeTx = await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, ethers.constants.AddressZero, tradeEthValue);
-            addr1SpentGas += await calculateTxCost(tradeTx);
+            let addr1SpentGas = await calculateTxCost(tradeTx);
 
             [tradeAddress] = await hardhatTradeManager.getDeployedTrades();
+            const tradeContract = await ethers.getContractAt("../artifacts/contracts/TradeVar2.sol:Trade", tradeAddress);
 
-            const takeTradeTx = await hardhatTradeManager.connect(addr2).takeTrade(tradeAddress, {value: tradeEthValue});
+            const approveTx = await usdcContract.connect(addr1).approve(tradeContract.address, 1);
+            addr1SpentGas += await calculateTxCost(approveTx);
+
+            const takeTradeTx = await tradeContract.connect(addr2).take({value: tradeEthValue});
             const addr2SpentGas = await calculateTxCost(takeTradeTx);
 
             console.log(addr1SpentGas);
@@ -136,20 +138,21 @@ describe("TradeManager contract", function () {
                 "maticAddr2": (await maticContract.balanceOf(addr2.address)).toBigInt()
             };
 
-            const approveMaticTx = await maticContract.connect(addr2).approve(hardhatTradeManager.address, 1);
-            let addr2SpentGas = await calculateTxCost(approveMaticTx);
-
             const tradeEthValue = ethers.utils.parseUnits("1","ether").toBigInt();
             const tradeTx = await hardhatTradeManager.connect(addr1).createTrade(ethers.constants.AddressZero, tradeEthValue, maticTokenAddr, 1, {value: tradeEthValue});
             let addr1SpentGas = await calculateTxCost(tradeTx);
 
             [tradeAddress] = await hardhatTradeManager.getDeployedTrades();
+            const tradeContract = await ethers.getContractAt("../artifacts/contracts/TradeVar2.sol:Trade", tradeAddress);
+
+            const approveMaticTx = await maticContract.connect(addr2).approve(tradeContract.address, 1);
+            let addr2SpentGas = await calculateTxCost(approveMaticTx);
 
             const wethContract = await getErc20Contract(wethTokenAddr);
-            const approveWethTx = await wethContract.connect(addr1).approve(hardhatTradeManager.address, tradeEthValue);
+            const approveWethTx = await wethContract.connect(addr1).approve(tradeContract.address, tradeEthValue);
             addr1SpentGas += await calculateTxCost(approveWethTx);
 
-            const takeTradeTx = await hardhatTradeManager.connect(addr2).takeTrade(tradeAddress);
+            const takeTradeTx = await tradeContract.connect(addr2).take();
             addr2SpentGas += await calculateTxCost(takeTradeTx);
 
             expect(await ethers.provider.getBalance(addr1.address)).to.equal(oldBalances["ethAddr1"] - tradeEthValue - addr1SpentGas);
