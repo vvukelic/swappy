@@ -15,6 +15,7 @@ contract TradeManager {
         uint srcAmount;
         address dstTokenAddress;
         uint dstAmount;
+        uint256 expiration;
 
         TradeStatus status;
     }
@@ -31,7 +32,7 @@ contract TradeManager {
 
     error TradeFailed();
 
-    function createTrade(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount) public payable {
+    function createTrade(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, uint256 expiration) public payable {
         if (srcTokenAddress == address(0)) {
             require(msg.value >= srcAmount, "Not enough ETH to create a trade!");
 
@@ -40,12 +41,20 @@ contract TradeManager {
             srcTokenAddress = _wethAddress;
         }
 
+        console.log(expiration);
+        console.log(block.timestamp);
+        if (expiration > 0) {
+            require(expiration > block.timestamp, "Trade expiration should be in the future!");
+        }
+
         Trade memory newTrade;
+        newTrade.status = TradeStatus.OPENED;
         newTrade.srcAddress = payable(msg.sender);
         newTrade.srcTokenAddress = srcTokenAddress;
         newTrade.srcAmount = srcAmount;
         newTrade.dstTokenAddress = dstTokenAddress;
         newTrade.dstAmount = dstAmount;
+        newTrade.expiration = expiration;
 
         uint salt = block.number;
         bytes32 newTradeKey;
@@ -65,9 +74,14 @@ contract TradeManager {
 
     function takeTrade(bytes32 index) public payable {
         address tradeManagerAddress = address(this);
-        Trade memory trade = trades[index];
+        Trade storage trade = trades[index];
 
-        require(trade.status == TradeStatus.OPENED);
+        require(trade.srcAddress != address(0), "Non existing trade!");
+        require(trade.status == TradeStatus.OPENED, "Can't take trade that is not in OPENED status!");
+        require(address(msg.sender) != trade.srcAddress, "Cannot take own trade!");
+        if (trade.expiration > 0) {
+            require(trade.expiration > block.timestamp, "Trade has expired!");
+        }
 
         address payable srcAddress = trade.srcAddress;
         address payable dstAddress = payable(msg.sender);
@@ -105,6 +119,16 @@ contract TradeManager {
         }
 
         trade.status = TradeStatus.CLOSED;
+    }
+
+    function cancelTrade(bytes32 index) public payable {
+        Trade storage trade = trades[index];
+
+        require(trade.srcAddress != address(0), "Non existing trade!");
+        require(trade.status == TradeStatus.OPENED, "Can't cancel trade that is not in OPENED status!");
+        require(address(msg.sender) == trade.srcAddress, "Only trade initiator can cancel a trade!");
+
+        trade.status = TradeStatus.CANCELED;
     }
 
     receive() external payable {}

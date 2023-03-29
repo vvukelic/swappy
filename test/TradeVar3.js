@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { loadFixture, impersonateAccount, stopImpersonatingAccount } = require("@nomicfoundation/hardhat-network-helpers");
+const { loadFixture, impersonateAccount, stopImpersonatingAccount, mine } = require("@nomicfoundation/hardhat-network-helpers");
 const { ethers } = require("hardhat");
 const { parseBytes32String } = require("ethers/lib/utils");
 const usdcTokenAddr = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
@@ -29,7 +29,7 @@ describe("TradeManager contract", function () {
 
     async function deployTradeManagerFixture() {
         const TradeManager = await ethers.getContractFactory("contracts/TradeVar3.sol:TradeManager");
-        const [owner, addr1, addr2] = await ethers.getSigners();
+        const [owner, addr1, addr2, addr3] = await ethers.getSigners();
 
         const hardhatTradeManager = await TradeManager.deploy();
 
@@ -41,7 +41,7 @@ describe("TradeManager contract", function () {
         // transfer matic to addr2
         await transferErc20Token(maticTokenAddr, "0x50d669F43b484166680Ecc3670E4766cdb0945CE", addr2.address, 100);
 
-        return { TradeManager, hardhatTradeManager, owner, addr1, addr2 };
+        return { TradeManager, hardhatTradeManager, owner, addr1, addr2, addr3 };
     }
 
     describe("Deployment", function () {
@@ -55,15 +55,8 @@ describe("TradeManager contract", function () {
         it("ERC20 -> ERC20 trade", async function () {
             const { hardhatTradeManager, addr1, addr2 } = await loadFixture(deployTradeManagerFixture);
 
-            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1);
-            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1);
-            [tradeHash, ble] = await hardhatTradeManager.getUserTrades(addr1.address);
-            const bla = await hardhatTradeManager.trades(tradeHash);
-            console.log(tradeHash);
-            console.log(bla);
-            const bli = await hardhatTradeManager.trades(ble);
-            console.log(ble);
-            console.log(bli);
+            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, 0);
+            [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
             await usdcContract.connect(addr1).approve(hardhatTradeManager.address, 1);
@@ -103,7 +96,7 @@ describe("TradeManager contract", function () {
             let addr1SpentGas = await calculateTxCost(approveTx);
 
             const tradeEthValue = ethers.utils.parseUnits("1","ether").toBigInt();
-            const tradeTx = await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, ethers.constants.AddressZero, tradeEthValue);
+            const tradeTx = await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, ethers.constants.AddressZero, tradeEthValue, 0);
             addr1SpentGas += await calculateTxCost(tradeTx);
             [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
 
@@ -133,7 +126,7 @@ describe("TradeManager contract", function () {
             let addr2SpentGas = await calculateTxCost(approveMaticTx);
 
             const tradeEthValue = ethers.utils.parseUnits("1","ether").toBigInt();
-            const tradeTx = await hardhatTradeManager.connect(addr1).createTrade(ethers.constants.AddressZero, tradeEthValue, maticTokenAddr, 1, {value: tradeEthValue});
+            const tradeTx = await hardhatTradeManager.connect(addr1).createTrade(ethers.constants.AddressZero, tradeEthValue, maticTokenAddr, 1, 0, {value: tradeEthValue});
             let addr1SpentGas = await calculateTxCost(tradeTx);
             [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
 
@@ -149,51 +142,132 @@ describe("TradeManager contract", function () {
 
             expect(await ethers.provider.getBalance(addr2.address)).to.equal(oldBalances["ethAddr2"] + tradeEthValue - addr2SpentGas);
             expect(await maticContract.balanceOf(addr2.address)).to.equal(Number(oldBalances["maticAddr2"]) - 1);
+
+            expect((await hardhatTradeManager.trades(tradeHash))["status"]).to.equal(1);
         });
+
+        it("Cancel a trade", async function () {
+            const { hardhatTradeManager, addr1, addr2 } = await loadFixture(deployTradeManagerFixture);
+
+            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, 0);
+            [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
+
+            await hardhatTradeManager.connect(addr1).cancelTrade(tradeHash);
+
+            expect((await hardhatTradeManager.trades(tradeHash))["status"]).to.equal(2);
+        });
+
+        it("Fail to take own trade", async function () {
+            const { hardhatTradeManager, addr1 } = await loadFixture(deployTradeManagerFixture);
+
+            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, 0);
+            [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
+
+            await expect(hardhatTradeManager.connect(addr1).takeTrade(tradeHash)).to.be.revertedWith("Cannot take own trade!");
+        });
+
+        it("Fail to take non-existent trade", async function () {
+            const { hardhatTradeManager, addr1 } = await loadFixture(deployTradeManagerFixture);
+
+            const nonExistentTradeHash = ethers.utils.keccak256(ethers.utils.randomBytes(32));
+
+            await expect(hardhatTradeManager.connect(addr1).takeTrade(nonExistentTradeHash)).to.be.revertedWith("Non existing trade!");
+        });
+
+        it("Fail to cancel someone else's trade", async function () {
+            const { hardhatTradeManager, addr1, addr2 } = await loadFixture(deployTradeManagerFixture);
+
+            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, 0);
+            [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
+
+            await expect(hardhatTradeManager.connect(addr2).cancelTrade(tradeHash)).to.be.revertedWith("Only trade initiator can cancel a trade!");
+        });
+
+        it("Fail to cancel non-existent trade", async function () {
+            const { hardhatTradeManager, addr1 } = await loadFixture(deployTradeManagerFixture);
+
+            const nonExistentTradeHash = ethers.utils.keccak256(ethers.utils.randomBytes(32));
+
+            await expect(hardhatTradeManager.connect(addr1).cancelTrade(nonExistentTradeHash)).to.be.revertedWith("Non existing trade!");
+        });
+
+        it("Fail to take an already taken trade", async function () {
+            const { hardhatTradeManager, addr1, addr2, addr3 } = await loadFixture(deployTradeManagerFixture);
+
+            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, 0);
+            [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
+
+            const usdcContract = await getErc20Contract(usdcTokenAddr);
+            await usdcContract.connect(addr1).approve(hardhatTradeManager.address, 1);
+            const maticContract = await getErc20Contract(maticTokenAddr);
+            await maticContract.connect(addr2).approve(hardhatTradeManager.address, 1);
+
+            await hardhatTradeManager.connect(addr2).takeTrade(tradeHash);
+
+            await expect(hardhatTradeManager.connect(addr3).takeTrade(tradeHash)).to.be.revertedWith("Can't take trade that is not in OPENED status!");
+        });
+
+        it("Fail to take a canceled trade", async function () {
+            const { hardhatTradeManager, addr1, addr2 } = await loadFixture(deployTradeManagerFixture);
+
+            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, 0);
+            [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
+
+            await hardhatTradeManager.connect(addr1).cancelTrade(tradeHash);
+
+            await expect(hardhatTradeManager.connect(addr2).takeTrade(tradeHash)).to.be.revertedWith("Can't take trade that is not in OPENED status!");
+        });
+        
+        it("Fail to cancel someone else's trade", async function () {
+            const { hardhatTradeManager, addr1, addr2 } = await loadFixture(deployTradeManagerFixture);
+
+            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, 0);
+            [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
+
+            await expect(hardhatTradeManager.connect(addr2).cancelTrade(tradeHash)).to.be.revertedWith("Only trade initiator can cancel a trade!");
+        });
+
+        it("Should not allow creating a trade with a expiration date from past", async function () {
+            const { hardhatTradeManager, addr1, addr2 } = await loadFixture(deployTradeManagerFixture);
+            const latestBlock = await hre.ethers.provider.getBlock("latest");
+
+            const expiration = latestBlock["timestamp"] - 60;
+
+            await expect(hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, expiration)).to.be.revertedWith("Trade expiration should be in the future!");
+        });
+
+        it("Should not allow taking an expired trade", async function () {
+            const { hardhatTradeManager, addr1, addr2 } = await loadFixture(deployTradeManagerFixture);
+            const latestBlock = await hre.ethers.provider.getBlock("latest");
+
+            const expiration = latestBlock["timestamp"] + 60;
+            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, expiration);
+            [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
+
+            await mine(100);
+
+            await expect(hardhatTradeManager.connect(addr2).takeTrade(tradeHash)).to.be.revertedWith("Trade has expired!");
+        });
+
+        it("Should allow taking a non-expired trade", async function () {
+            const { hardhatTradeManager, addr1, addr2 } = await loadFixture(deployTradeManagerFixture);
+            const latestBlock = await hre.ethers.provider.getBlock("latest");
+
+            const expiration = latestBlock["timestamp"] + 3600; // 1 hour from now
+            await hardhatTradeManager.connect(addr1).createTrade(usdcTokenAddr, 1, maticTokenAddr, 1, expiration);
+            [tradeHash] = await hardhatTradeManager.getUserTrades(addr1.address);
+
+            const usdcContract = await getErc20Contract(usdcTokenAddr);
+            await usdcContract.connect(addr1).approve(hardhatTradeManager.address, 1);
+
+            const maticContract = await getErc20Contract(maticTokenAddr);
+            await maticContract.connect(addr2).approve(hardhatTradeManager.address, 1);
+
+            await hardhatTradeManager.connect(addr2).takeTrade(tradeHash);
+
+            const trade = await hardhatTradeManager.trades(tradeHash);
+            expect(trade.status).to.equal(1);
+        });
+
     });
-
-//   describe("Transactions", function () {
-//     it("Should transfer tokens between accounts", async function () {
-//       const { hardhatToken, owner, addr1, addr2 } = await loadFixture(deployTokenFixture);
-//       // Transfer 50 tokens from owner to addr1
-//       await expect(hardhatToken.transfer(addr1.address, 50))
-//         .to.changeTokenBalances(hardhatToken, [owner, addr1], [-50, 50]);
-
-//       // Transfer 50 tokens from addr1 to addr2
-//       // We use .connect(signer) to send a transaction from another account
-//       await expect(hardhatToken.connect(addr1).transfer(addr2.address, 50))
-//         .to.changeTokenBalances(hardhatToken, [addr1, addr2], [-50, 50]);
-//     });
-
-//     it("should emit Transfer events", async function () {
-//       const { hardhatToken, owner, addr1, addr2 } = await loadFixture(deployTokenFixture);
-
-//       // Transfer 50 tokens from owner to addr1
-//       await expect(hardhatToken.transfer(addr1.address, 50))
-//         .to.emit(hardhatToken, "Transfer").withArgs(owner.address, addr1.address, 50)
-
-//       // Transfer 50 tokens from addr1 to addr2
-//       // We use .connect(signer) to send a transaction from another account
-//       await expect(hardhatToken.connect(addr1).transfer(addr2.address, 50))
-//         .to.emit(hardhatToken, "Transfer").withArgs(addr1.address, addr2.address, 50)
-//     });
-
-//     it("Should fail if sender doesn't have enough tokens", async function () {
-//       const { hardhatToken, owner, addr1 } = await loadFixture(deployTokenFixture);
-//       const initialOwnerBalance = await hardhatToken.balanceOf(
-//         owner.address
-//       );
-
-//       // Try to send 1 token from addr1 (0 tokens) to owner (1000 tokens).
-//       // `require` will evaluate false and revert the transaction.
-//       await expect(
-//         hardhatToken.connect(addr1).transfer(owner.address, 1)
-//       ).to.be.revertedWith("Not enough tokens");
-
-//       // Owner balance shouldn't have changed.
-//       expect(await hardhatToken.balanceOf(owner.address)).to.equal(
-//         initialOwnerBalance
-//       );
-//     });
-//   });
 });
