@@ -22,17 +22,17 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const TradeFactory = await ethers.getContractFactory("TradeFactory");
-  const tradeFactory = await TradeFactory.deploy();
-  await tradeFactory.deployed();
+  const SwapFactory = await ethers.getContractFactory("SwapManager");
+  const swapFactory = await SwapFactory.deploy();
+  await swapFactory.deployed();
 
-  console.log("TradeFactory address:", tradeFactory.address);
+  console.log("SwapManager address:", swapFactory.address);
 
   // We also save the contract's artifacts and address in the frontend directory
-  saveFrontendFiles(tradeFactory);
+  saveFrontendFiles(swapFactory);
 }
 
-function saveFrontendFiles(tradeFactory) {
+function saveFrontendFiles(swapFactory) {
   const fs = require("fs");
   const contractsDir = path.join(__dirname, "..", "frontend", "src", "contracts");
 
@@ -42,21 +42,21 @@ function saveFrontendFiles(tradeFactory) {
 
   fs.writeFileSync(
     path.join(contractsDir, "contract-address.json"),
-    JSON.stringify({ TradeFactory: tradeFactory.address }, undefined, 2)
+    JSON.stringify({ SwapFactory: swapFactory.address }, undefined, 2)
   );
 
-  const TradeFactoryArtifact = artifacts.readArtifactSync("TradeFactory");
+  const SwapFactoryArtifact = artifacts.readArtifactSync("SwapManager");
 
   fs.writeFileSync(
-    path.join(contractsDir, "TradeFactory.json"),
-    JSON.stringify(TradeFactoryArtifact, null, 2)
+    path.join(contractsDir, "Swap.json"),
+    JSON.stringify(SwapFactoryArtifact, null, 2)
   );
 
-  const TradeArtifact = artifacts.readArtifactSync("Trade");
+  const SwapArtifact = artifacts.readArtifactSync("SwapManager");
 
   fs.writeFileSync(
-    path.join(contractsDir, "Trade.json"),
-    JSON.stringify(TradeArtifact, null, 2)
+    path.join(contractsDir, "Swap.json"),
+    JSON.stringify(SwapArtifact, null, 2)
   );
 }
 

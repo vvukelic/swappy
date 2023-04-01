@@ -31,6 +31,9 @@
     "solidity-coverage": "^0.7.21"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@mui/material": "^5.11.15",
     "@openzeppelin/contracts": "^4.8.1",
     "next": "^13.2.1",
     "react": "^18.2.0",
