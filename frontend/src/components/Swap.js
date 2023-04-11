@@ -5,11 +5,11 @@ import Button from '@mui/material/Button';
 import TokenButton from './TokenButton';
 import SelectCoinModal from './SelectCoinModal';
 import ethMainnetTokens from '../data/ethMainnetTokens.json';
-import { getCoinImageUrl } from '../utils/tokens';
+import { getCoinImageUrl, getTokenByName } from '../utils/tokens';
 
 function Swap() {
-    const [selectedSrcCoin, setSelectedSrcCoin] = useState(null);
-    const [selectedDstCoin, setSelectedDstCoin] = useState(null);
+    const [selectedSrcCoin, setSelectedSrcCoin] = useState(getTokenByName('eth'));
+    const [selectedDstCoin, setSelectedDstCoin] = useState(getTokenByName('usdc'));
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
     const selectedSrcCoinImg = getCoinImageUrl(selectedSrcCoin);
