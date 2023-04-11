@@ -1,10 +1,12 @@
 import React from 'react';
+import Box from '@mui/material/Box';
 import { Button, Typography } from '@mui/material';
 import { ArrowDropDown } from '@mui/icons-material';
 
-function TokenButton({ imageSrc, text, ...props }) {
+function TokenButton({ imageSrc, text, onClick, ...props }) {
     return (
         <Button
+            onClick={onClick}
             variant='outlined'
             sx={{
                 display: 'flex',
@@ -15,16 +17,25 @@ function TokenButton({ imageSrc, text, ...props }) {
                 backgroundColor: '#2a374e',
             }}
         >
-            <img
-                src={imageSrc}
-                width='auto'
-                height='32'
+            <Box
+                component='span'
                 sx={{
+                    width: 32,
+                    height: 32,
                     borderRadius: '50%',
+                    overflow: 'hidden',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     marginRight: 1,
-                    backgroundColor: 'white',
                 }}
-            />
+            >
+                <img
+                    src={imageSrc}
+                    width='auto'
+                    height='100%'
+                />
+            </Box>
             <Typography
                 sx={{
                     color: 'white',

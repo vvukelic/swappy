@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import { Card, CardMedia } from '@mui/material';
-import { getProvider, fetchEthBalance } from '../utils';
+import { getProvider, fetchEthBalance } from '../utils/web3';
 
 function Header() {
     const [defaultAccount, setDefaultAccount] = useState(null);
