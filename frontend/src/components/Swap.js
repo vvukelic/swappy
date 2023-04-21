@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { CardContent, Grid, Typography } from '@mui/material';
+import { CardContent, Grid, Typography, TextField } from '@mui/material';
 import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
 import TokenButton from './TokenButton';
 import SelectCoinModal from './SelectCoinModal';
+import SelectCoin from './SelectCoin';
 import ethMainnetTokens from '../data/ethMainnetTokens.json';
 import { getCoinImageUrl, getTokenByName } from '../utils/tokens';
 
 function Swap() {
+    const [srcAmount, setSrcAmount] = useState('0.0');
+    const [dstAmount, setDstAmount] = useState('0.0');
     const [selectedSrcCoin, setSelectedSrcCoin] = useState(getTokenByName('eth'));
     const [selectedDstCoin, setSelectedDstCoin] = useState(getTokenByName('usdc'));
     const [modalOpen, setModalOpen] = useState(false);
@@ -53,49 +56,24 @@ function Swap() {
                         Swap
                     </Typography>
                 </Grid>
-                <Grid item xs={12}>
-                    <Card>
-                        <CardContent
-                            sx={{
-                                backgroundColor: '#1f273a',
-                                height: 60,
-                            }}
-                        >
-                            <Grid container spacing={2}>
-                                <Grid item xs={2}>
-                                    <TokenButton text={selectedSrcCoin ? selectedSrcCoin.name.toUpperCase() : ''} imageSrc={selectedSrcCoinImg} onClick={() => openModal('src')}></TokenButton>
-                                </Grid>
-                                <Grid item xs={10}>
-                                    <Typography variant='h5' sx={{ color: 'white', textAlign: 'right' }}>
-                                        0.000000
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-                        </CardContent>
-                    </Card>
-                </Grid>
 
-                <Grid item xs={12}>
-                    <Card>
-                        <CardContent
-                            sx={{
-                                backgroundColor: '#1f273a',
-                                height: 60,
-                            }}
-                        >
-                            <Grid container spacing={2}>
-                                <Grid item xs={2}>
-                                    <TokenButton text={selectedDstCoin ? selectedDstCoin.name.toUpperCase() : ''} imageSrc={selectedDstCoinImg} onClick={() => openModal('dst')}></TokenButton>
-                                </Grid>
-                                <Grid item xs={10}>
-                                    <Typography variant='h5' sx={{ color: 'white', textAlign: 'right' }}>
-                                        0.000000
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                <SelectCoin
+                    selectedCoin={selectedSrcCoin}
+                    amount={srcAmount}
+                    setAmount={setSrcAmount}
+                    selectedCoinImg={selectedSrcCoinImg}
+                    type='src'
+                    openModal={openModal}
+                ></SelectCoin>
+
+                <SelectCoin
+                    selectedCoin={selectedDstCoin}
+                    amount={dstAmount}
+                    setAmount={setDstAmount}
+                    selectedCoinImg={selectedDstCoinImg}
+                    type='dst'
+                    openModal={openModal}
+                ></SelectCoin>
 
                 <Grid item xs={12}>
                     <Button variant='outlined' sx={{ color: 'white', backgroundColor: '#f3663a' }}>
@@ -103,7 +81,13 @@ function Swap() {
                     </Button>
                 </Grid>
             </Grid>
-            <SelectCoinModal open={modalOpen} onClose={closeModal} coins={ethMainnetTokens} handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)} />
+            
+            <SelectCoinModal
+                open={modalOpen}
+                onClose={closeModal}
+                coins={ethMainnetTokens}
+                handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)}
+            />
         </>
     );
 }

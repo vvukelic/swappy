@@ -29,7 +29,7 @@ function Header() {
                                 width: '60px',
                                 height: '60px',
                             }}
-                            image='/images/ninex-logo.png'
+                            image='/images/ninex-logo-var1.png'
                         />
                     </Card>
                     <Box flexGrow={1} />
