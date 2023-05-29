@@ -1,23 +1,31 @@
-import React, { Component, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
-import { Card, CardMedia } from '@mui/material';
-import { getProvider, fetchEthBalance } from '../utils/web3';
+import { Card, CardMedia, Typography } from '@mui/material';
+import { useWalletConnect } from '../hooks/useWalletConnect';
+import { fetchEthBalance } from '../utils/web3';
 
 function Header() {
-    const [defaultAccount, setDefaultAccount] = useState(null);
-    const [connectBtnText, setConnectBtnText] = useState('connect');
+    const { defaultAccount, connectWallet } = useWalletConnect();
     const [ethBalance, setEthBalance] = useState(null);
 
-    const onConnectBtnClick = async () => {
-        try {
-            const accounts = await getProvider().send('eth_requestAccounts', []);
-            setDefaultAccount(accounts[0]);
-            setConnectBtnText(`${defaultAccount.slice(0, 6)}...${defaultAccount.slice(-4)}`);
-        } catch (error) {}
-    };
+    useEffect(() => {
+        const fetchBalance = async () => {
+            if (defaultAccount) {
+                const balance = await fetchEthBalance(defaultAccount);
+                setEthBalance(balance);
+            }
+        };
+
+        fetchBalance();
+    }, [defaultAccount]);
+
+    let connectBtnText = 'Connect';
+    if (defaultAccount) {
+        connectBtnText = `${defaultAccount.slice(0, 6)}...${defaultAccount.slice(-4)}`;
+    }
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -38,7 +46,7 @@ function Header() {
                             {ethBalance} ETH
                         </Typography>
                     )}
-                    <Button onClick={onConnectBtnClick} color='inherit'>
+                    <Button onClick={connectWallet} color='inherit'>
                         {connectBtnText}
                     </Button>
                 </Toolbar>

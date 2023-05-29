@@ -33,7 +33,7 @@ function saveFrontendFiles(swapFactory) {
         fs.mkdirSync(contractsDir);
     }
 
-    fs.writeFileSync(path.join(contractsDir, 'contract-address.json'), JSON.stringify({ SwapFactory: swapFactory.address }, undefined, 2));
+    fs.writeFileSync(path.join(contractsDir, 'contract-address.json'), JSON.stringify({ SwapManager: swapFactory.address }, undefined, 2));
 
     const SwapFactoryArtifact = artifacts.readArtifactSync('SwapManager');
 

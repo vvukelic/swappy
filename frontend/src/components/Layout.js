@@ -1,11 +1,12 @@
 import React from 'react';
 import Header from './Header';
+import { AccountProvider } from '../context/AccountContext';
 
 export default (props) => {
     return (
-        <div>
+        <AccountProvider>
             <Header></Header>
             {props.children}
-        </div>
+        </AccountProvider>
     );
 };

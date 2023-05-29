@@ -25,11 +25,22 @@ export const fetchEthBalance = async (account) => {
     if (!account) return null;
 
     try {
-        const balance = await provider.send('eth_getBalance', [account, 'latest']);
-        const ethBalance = provider.utils.fromWei(balance, 'ether');
-        return parseFloat(ethBalance).toFixed(2);
+        let balance = await getProvider().getBalance(account);
+        balance = ethers.utils.formatEther(balance);
+        return parseFloat(balance).toFixed(2);
     } catch (error) {
         console.error('Error fetching ETH balance:', error);
         return null;
     }
 };
+
+export async function getAllowance(tokenContractAddress, ownerAddress, spenderAddress) {
+    try {
+        const erc20ABI = require('../contracts/Erc20.json');
+        const tokenContract = new ethers.Contract(tokenContractAddress, erc20ABI, getProvider());
+        
+        return await tokenContract.allowance(ownerAddress, spenderAddress);
+    } catch (error) {
+        console.error('Error checking allowance:', error);
+    }
+}
