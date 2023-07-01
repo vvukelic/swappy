@@ -5,6 +5,10 @@
         "logo": "images/eth-logo.png"
     },
     {
+        "name": "weth",
+        "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+    },
+    {
         "name": "leo",
         "address": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3"
     },
@@ -21,7 +25,7 @@
         "address": "0x75231F58b43240C9718Dd58B4967c5114342a86c"
     },
     {
-        "name": "shib", 
+        "name": "shib",
         "address": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE"
     },
     {

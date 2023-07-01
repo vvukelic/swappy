@@ -43,6 +43,7 @@ contract SwapManager {
 
         console.log(expiration);
         console.log(block.timestamp);
+        
         if (expiration > 0) {
             require(expiration > block.timestamp, "Swap expiration should be in the future!");
         }
@@ -79,6 +80,7 @@ contract SwapManager {
         require(swap.srcAddress != address(0), "Non existing swap!");
         require(swap.status == SwapStatus.OPENED, "Can't take swap that is not in OPENED status!");
         require(address(msg.sender) != swap.srcAddress, "Cannot take own swap!");
+
         if (swap.expiration > 0) {
             require(swap.expiration > block.timestamp, "Swap has expired!");
         }

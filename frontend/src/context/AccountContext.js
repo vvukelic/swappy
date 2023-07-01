@@ -14,7 +14,7 @@ export function useAccount() {
 
 export function AccountProvider({ children }) {
     const [defaultAccount, setDefaultAccount] = useState(null);
-    const [walletConnected, setWalletConnected] = useState(false);
+    const [network, setNetwork] = useState(null);
 
-    return <AccountContext.Provider value={{ defaultAccount, setDefaultAccount, walletConnected, setWalletConnected }}>{children}</AccountContext.Provider>;
+    return <AccountContext.Provider value={{ defaultAccount, setDefaultAccount, network, setNetwork }}>{children}</AccountContext.Provider>;
 }

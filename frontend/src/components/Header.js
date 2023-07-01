@@ -5,11 +5,12 @@ import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import { Card, CardMedia, Typography } from '@mui/material';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { fetchEthBalance } from '../utils/web3';
+import { fetchEthBalance, getNetworkName } from '../utils/web3';
 
 function Header() {
-    const { defaultAccount, connectWallet } = useWalletConnect();
+    const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [ethBalance, setEthBalance] = useState(null);
+    const [networkName, setNetworkName] = useState(null);
 
     useEffect(() => {
         const fetchBalance = async () => {
@@ -20,7 +21,18 @@ function Header() {
         };
 
         fetchBalance();
-    }, [defaultAccount]);
+    }, [defaultAccount, network]);
+
+    useEffect(() => {
+        const updateNetworkName = async () => {
+            if (network) {
+                const name = await getNetworkName(network);
+                setNetworkName(name);
+            }
+        };
+
+        updateNetworkName();
+    }, [network]);
 
     let connectBtnText = 'Connect';
     if (defaultAccount) {
@@ -44,6 +56,11 @@ function Header() {
                     {ethBalance !== null && (
                         <Typography sx={{ marginRight: '10px' }} variant='h6' color='inherit'>
                             {ethBalance} ETH
+                        </Typography>
+                    )}
+                    {network !== null && (
+                        <Typography sx={{ marginRight: '10px' }} variant='h6' color='inherit'>
+                            {networkName}
                         </Typography>
                     )}
                     <Button onClick={connectWallet} color='inherit'>

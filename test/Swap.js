@@ -35,11 +35,17 @@ describe('SwapManager contract', function () {
 
         await hardhatSwapManager.deployed();
 
+        console.log('deployed');
+
         // transfer usdc to addr1
         await transferErc20Token(usdcTokenAddr, '0xF977814e90dA44bFA03b6295A0616a897441aceC', addr1.address, 100);
 
+        console.log('first');
+
         // transfer matic to addr2
         await transferErc20Token(maticTokenAddr, '0x50d669F43b484166680Ecc3670E4766cdb0945CE', addr2.address, 100);
+
+        console.log('second');
 
         return { SwapManager, hardhatSwapManager, owner, addr1, addr2, addr3 };
     }

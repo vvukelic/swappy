@@ -5,7 +5,7 @@ import SelectCoinModal from './SelectCoinModal';
 import SelectCoin from './SelectCoin';
 import ethMainnetTokens from '../data/ethMainnetTokens.json';
 import { getCoinImageUrl, getTokenByName } from '../utils/tokens';
-import { getAllowance } from '../utils/web3';
+import { getAllowance, approveToken } from '../utils/web3';
 import { useAccount } from '../context/AccountContext';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 
@@ -33,17 +33,13 @@ function Swap() {
         setModalOpen(false);
     };
 
-    // React.useEffect(() => {
-    //     setWalletConnected(defaultAccount !== null);
-    // }, [defaultAccount]);
-
     const handleCoinSelection = async (coin, type) => {
         if (type === 'src') {
             if (coin === selectedSrcCoin) {
                 return;
             }
 
-            const allowance = await getAllowance(coin['address'], defaultAccount, contractAddresses['SwapManager']);
+            const allowance = await getAllowance(coin.address, defaultAccount, contractAddresses['SwapManager']);
 
             setTokenApproved(allowance > 0);
 
@@ -66,7 +62,13 @@ function Swap() {
         if (!defaultAccount) {
             connectWallet();
         } else if (!tokenApproved) {
-            // Approve token functionality here
+            const approved = await approveToken(selectedSrcCoin.address, contractAddresses['SwapManager']);
+
+            if (approved) {
+                setTokenApproved(true);
+            } else {
+                // Handle error in UI, approval failed
+            }
         } else {
             // Swap functionality here
         }
