@@ -12,7 +12,7 @@ import { useWalletConnect } from '../hooks/useWalletConnect';
 const contractAddresses = require('../contracts/contract-address.json');
 
 function Swap() {
-    const { defaultAccount, connectWallet } = useWalletConnect();
+    const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [srcAmount, setSrcAmount] = useState('0.0');
     const [dstAmount, setDstAmount] = useState('0.0');
     const [selectedSrcCoin, setSelectedSrcCoin] = useState(getTokenByName('eth'));
@@ -39,7 +39,7 @@ function Swap() {
                 return;
             }
 
-            const allowance = await getAllowance(coin.address, defaultAccount, contractAddresses['SwapManager']);
+            const allowance = await getAllowance(coin.address, defaultAccount, contractAddresses.SwapManager[network]);
 
             setTokenApproved(allowance > 0);
 
@@ -58,11 +58,11 @@ function Swap() {
         }
     }
 
-    const handleButtonClick = async () => {
+    const handleSwapButtonClick = async () => {
         if (!defaultAccount) {
             connectWallet();
         } else if (!tokenApproved) {
-            const approved = await approveToken(selectedSrcCoin.address, contractAddresses['SwapManager']);
+            const approved = await approveToken(selectedSrcCoin.address, contractAddresses.SwapManager[network]);
 
             if (approved) {
                 setTokenApproved(true);
@@ -100,7 +100,7 @@ function Swap() {
                 <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} type='dst' openModal={openModal}></SelectCoin>
 
                 <Grid item xs={12}>
-                    <Button onClick={handleButtonClick} variant='outlined' sx={{ color: 'white', backgroundColor: '#f3663a' }}>
+                    <Button onClick={handleSwapButtonClick} variant='outlined' sx={{ color: 'white', backgroundColor: '#f3663a' }}>
                         {swapButtonText}
                     </Button>
                 </Grid>
