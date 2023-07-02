@@ -1,5 +1,8 @@
 import { ethers } from 'ethers';
 
+const erc20Abi = require('../contracts/Erc20.json');
+const swapManagerAbi = require('../contracts/Swap.json');
+
 export const getProvider = () => {
     let provider;
 
@@ -68,8 +71,7 @@ export const fetchEthBalance = async (account) => {
 
 export async function getAllowance(tokenContractAddress, ownerAddress, spenderAddress) {
     try {
-        const erc20ABI = require('../contracts/Erc20.json');
-        const tokenContract = new ethers.Contract(tokenContractAddress, erc20ABI, getProvider());
+        const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, getProvider());
         
         return await tokenContract.allowance(ownerAddress, spenderAddress);
     } catch (error) {
@@ -77,10 +79,22 @@ export async function getAllowance(tokenContractAddress, ownerAddress, spenderAd
     }
 }
 
+export async function getTokenDecimals(tokenContractAddress) {
+    const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, getProvider());
+    let decimals;
+
+    try {
+        decimals = await tokenContract.decimals();
+    } catch (error) {
+        console.error('Error getting token decimals:', error);
+        throw error;
+    }
+
+    return decimals;
+}
 
 export const approveToken = async (tokenContractAddress, spenderAddress) => {
-    const erc20ABI = require('../contracts/Erc20.json');
-    const tokenContract = new ethers.Contract(tokenContractAddress, erc20ABI, getProvider().getSigner());
+    const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, getProvider().getSigner());
 
     try {
         const tx = await tokenContract.approve(spenderAddress, ethers.constants.MaxUint256);
@@ -93,19 +107,17 @@ export const approveToken = async (tokenContractAddress, spenderAddress) => {
     }
 };
 
-
-async function createSwap(contractAddress, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, expiration) {
+export async function createSwap(contractAddress, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, expiration) {
     const signer = getProvider().getSigner();
+    const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
+    let ethValue = 0;
 
-    // instantiate the contract
-    const swapManagerContract = new ethers.Contract(contractAddress, yourContractAbi, signer);
+    if (srcTokenAddress === ethers.constants.AddressZero) {
+        ethValue = srcAmount;
+    }
 
-    // call the createSwap function
-    const result = await swapManagerContract.createSwap(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, expiration);
-
-    // wait for the transaction to be mined
+    const result = await swapManagerContract.createSwap(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, expiration, { value: ethValue });
     const receipt = await result.wait();
 
     return receipt;
 }
-

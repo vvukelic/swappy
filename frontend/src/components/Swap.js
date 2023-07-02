@@ -5,9 +5,9 @@ import SelectCoinModal from './SelectCoinModal';
 import SelectCoin from './SelectCoin';
 import ethMainnetTokens from '../data/ethMainnetTokens.json';
 import { getCoinImageUrl, getTokenByName } from '../utils/tokens';
-import { getAllowance, approveToken } from '../utils/web3';
-import { useAccount } from '../context/AccountContext';
+import { getAllowance, approveToken, createSwap } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
+import { toSmallestUnit } from '../utils/general';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
@@ -70,7 +70,23 @@ function Swap() {
                 // Handle error in UI, approval failed
             }
         } else {
-            // Swap functionality here
+            const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcCoin.address);
+            const dstAmountInt = await toSmallestUnit(dstAmount, selectedDstCoin.address);
+
+            const receipt = await createSwap(contractAddresses.SwapManager[network], selectedSrcCoin.address, srcAmountInt, selectedDstCoin.address, dstAmountInt, 0);
+
+            if (receipt.status === 1) {
+                const swapCreatedEvent = receipt.events?.find(e => e.event === "SwapCreated");
+
+                if (swapCreatedEvent) {
+                    const swapHash = swapCreatedEvent.args[1];
+                    console.log('Swap hash:', swapHash);
+                } else {
+                    console.error("Couldn't find SwapCreated event in transaction receipt");
+                }
+            } else {
+                // The transaction failed
+            }
         }
     };
 

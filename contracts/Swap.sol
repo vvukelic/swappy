@@ -32,6 +32,8 @@ contract SwapManager {
 
     error SwapFailed();
 
+    event SwapCreated(address indexed creator, bytes32 swapHash);
+
     function createSwap(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, uint256 expiration) public payable {
         if (srcTokenAddress == address(0)) {
             require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
@@ -67,6 +69,8 @@ contract SwapManager {
 
         swaps[newSwapKey] = newSwap;
         userSwaps[address(msg.sender)].push(newSwapKey);
+
+        emit SwapCreated(msg.sender, newSwapKey);
     }
 
     function getUserSwaps(address userAddress) public view returns (bytes32[] memory) {

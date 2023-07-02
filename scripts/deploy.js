@@ -64,7 +64,7 @@ function saveFrontendFiles(swapFactory) {
 
     const SwapFactoryArtifact = artifacts.readArtifactSync('SwapManager');
 
-    fs.writeFileSync(path.join(contractsDir, 'Swap.json'), JSON.stringify(SwapFactoryArtifact, null, 2));
+    fs.writeFileSync(path.join(contractsDir, 'Swap.json'), JSON.stringify(SwapFactoryArtifact.abi, null, 2));
 }
 
 
