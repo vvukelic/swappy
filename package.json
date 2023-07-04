@@ -4,7 +4,7 @@
   "description": "A boilerplate repository to get you started with Hardhat and Ethereum development",
   "scripts": {
     "test": "hardhat test --network localhost",
-    "dev": "next dev ./frontend"
+    "dev": "node ./src/server.js"
   },
   "repository": {
     "type": "git",
@@ -24,11 +24,17 @@
     "@nomicfoundation/hardhat-toolbox": "^1.0.1",
     "@nomiclabs/hardhat-ethers": "^2.0.0",
     "@nomiclabs/hardhat-etherscan": "^3.0.0",
+    "@typechain/ethers-v5": "^10.2.1",
+    "@typechain/hardhat": "^6.1.6",
+    "@types/mocha": "^9.1.1",
     "chai": "^4.2.0",
     "ethers": "^5.7.2",
     "hardhat": "^2.11.0",
     "hardhat-gas-reporter": "^1.0.8",
-    "solidity-coverage": "^0.7.21"
+    "solidity-coverage": "^0.7.21",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.2.0",
+    "typescript": "^5.1.6"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
@@ -37,6 +43,7 @@
     "@mui/material": "^5.11.15",
     "@openzeppelin/contracts": "^4.8.1",
     "next": "^13.2.1",
+    "next-routes": "^1.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   }
