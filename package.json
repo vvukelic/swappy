@@ -4,7 +4,7 @@
   "description": "A boilerplate repository to get you started with Hardhat and Ethereum development",
   "scripts": {
     "test": "hardhat test --network localhost",
-    "dev": "node ./src/server.js"
+    "dev": "next dev"
   },
   "repository": {
     "type": "git",
