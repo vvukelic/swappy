@@ -73,6 +73,10 @@ contract SwapManager {
         emit SwapCreated(msg.sender, newSwapKey);
     }
 
+    function getSwap(bytes32 swapHash) public view returns (Swap memory) {
+        return swaps[swapHash];
+    }
+
     function getUserSwaps(address userAddress) public view returns (bytes32[] memory) {
         return userSwaps[userAddress];
     }

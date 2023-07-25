@@ -274,5 +274,34 @@ describe('SwapManager contract', function () {
             const swap = await hardhatSwapManager.swaps(swapHash);
             expect(swap.status).to.equal(1);
         });
+
+        it('Retrieve swap details', async function () {
+            const { hardhatSwapManager, addr1 } = await loadFixture(deploySwapManagerFixture);
+
+            let swapDetails = {
+                srcToken: usdcTokenAddr,
+                srcAmount: 1,
+                dstToken: maticTokenAddr,
+                dstAmount: 1,
+            };
+
+            if (swapDetails.srcToken === ethers.constants.AddressZero) {
+                swapDetails.srcToken = wethTokenAddr;
+            }
+
+            const createSwapTx = await hardhatSwapManager.connect(addr1).createSwap(swapDetails.srcToken, swapDetails.srcAmount, swapDetails.dstToken, swapDetails.dstAmount, 0);
+            await createSwapTx.wait();
+            const [swapHash] = await hardhatSwapManager.getUserSwaps(addr1.address);
+
+            const swapObj = await hardhatSwapManager.getSwap(swapHash);
+
+            expect(swapObj['srcTokenAddress']).to.equal(swapDetails.srcToken);
+            expect(swapObj['srcAddress']).to.equal(addr1.address);
+            expect(swapObj['srcAmount'].toString()).to.equal(swapDetails.srcAmount.toString());
+            expect(swapObj['dstTokenAddress']).to.equal(swapDetails.dstToken);
+            expect(swapObj['dstAmount'].toString()).to.equal(swapDetails.dstAmount.toString());
+            expect(swapObj['status']).to.equal(0); // 0 - OPEN status
+        });
+
     });
 });
