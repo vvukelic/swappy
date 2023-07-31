@@ -121,3 +121,10 @@ export async function createSwap(contractAddress, srcTokenAddress, srcAmount, ds
 
     return receipt;
 }
+
+export async function getSwap(contractAddress, swapHash) {
+    const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
+    const swap = await swapManagerContract.getSwap(swapHash);
+
+    return swap;
+}
