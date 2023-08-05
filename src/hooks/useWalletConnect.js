@@ -7,13 +7,29 @@ export const useWalletConnect = () => {
     const provider = getProvider();
 
     useEffect(() => {
+        const savedAccount = localStorage.getItem('defaultAccount');
+        const savedNetwork = localStorage.getItem('network');
+
+        if (savedAccount && savedNetwork) {
+            setDefaultAccount(savedAccount);
+            setNetwork(savedNetwork);
+        }
+    }, []);
+
+    useEffect(() => {
         const handleAccountsChanged = async (accounts) => {
             const signer = provider.getSigner();
-            setDefaultAccount(await signer.getAddress());
+            const account = await signer.getAddress();
+
+            setDefaultAccount(account);
+            localStorage.setItem('defaultAccount', account);
         };
 
         const handleChainChanged = async (chainId) => {
-            setNetwork(await getNetworkName());
+            const networkName = await getNetworkName();
+
+            setNetwork(networkName);
+            localStorage.setItem('network', networkName);
         };
 
         if (window.ethereum) {
@@ -33,8 +49,13 @@ export const useWalletConnect = () => {
         try {
             const signer = provider.getSigner();
             const accounts = await provider.send('eth_requestAccounts');
-            setDefaultAccount(await signer.getAddress());
-            setNetwork(await getNetworkName());
+            const account = await signer.getAddress();
+            setDefaultAccount(account);
+            const networkName = await getNetworkName();
+            setNetwork(networkName);
+
+            localStorage.setItem('defaultAccount', account);
+            localStorage.setItem('network', networkName);
         } catch (error) {
             console.error('Failed to connect wallet', error);
         }
