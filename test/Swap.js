@@ -302,6 +302,5 @@ describe('SwapManager contract', function () {
             expect(swapObj['dstAmount'].toString()).to.equal(swapDetails.dstAmount.toString());
             expect(swapObj['status']).to.equal(0); // 0 - OPEN status
         });
-
     });
 });

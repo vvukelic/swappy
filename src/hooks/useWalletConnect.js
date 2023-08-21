@@ -37,7 +37,6 @@ export const useWalletConnect = () => {
             window.ethereum.on('chainChanged', handleChainChanged);
         }
 
-        // Optionally, include a cleanup function if the provider supports removing listeners
         return () => {
             if (window.ethereum && window.ethereum.removeListener) {
                 window.ethereum.removeListener('accountsChanged', handleAccountsChanged);

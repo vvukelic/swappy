@@ -56,23 +56,21 @@ export const getNetworkName = async () => {
     return networkName;
 };
 
-export const fetchEthBalance = async (account) => {
-    if (!account) return null;
+export const getEthBalance = async (address) => {
+    if (!address) return null;
 
     try {
-        let balance = await getProvider().getBalance(account);
-        balance = ethers.utils.formatEther(balance);
-        return parseFloat(balance).toFixed(2);
+        let balance = await getProvider().getBalance(address);
+        return balance
     } catch (error) {
         console.error('Error fetching ETH balance:', error);
         return null;
     }
-};
+}
 
 export async function getAllowance(tokenContractAddress, ownerAddress, spenderAddress) {
     try {
         const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, getProvider());
-        
         return await tokenContract.allowance(ownerAddress, spenderAddress);
     } catch (error) {
         console.error('Error checking allowance:', error);

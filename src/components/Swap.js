@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import SelectCoinModal from './SelectCoinModal';
 import SelectCoin from './SelectCoin';
 import ethMainnetTokens from '../data/ethMainnetTokens.json';
 import { getCoinImageUrl, getTokenByName } from '../utils/tokens';
-import { getAllowance, approveToken, createSwap } from '../utils/web3';
+import { getAllowance, approveToken, createSwap, getEthBalance } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { toSmallestUnit } from '../utils/general';
+import { ethers } from 'ethers';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
@@ -15,8 +16,9 @@ function Swap() {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [srcAmount, setSrcAmount] = useState('0.0');
     const [dstAmount, setDstAmount] = useState('0.0');
-    const [selectedSrcCoin, setSelectedSrcCoin] = useState(getTokenByName('eth'));
-    const [selectedDstCoin, setSelectedDstCoin] = useState(getTokenByName('usdc'));
+    const [selectedSrcCoin, setSelectedSrcCoin] = useState(null);
+    const [selectedDstCoin, setSelectedDstCoin] = useState(null);
+    const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
@@ -39,9 +41,27 @@ function Swap() {
                 return;
             }
 
-            const allowance = await getAllowance(coin.address, defaultAccount, contractAddresses.SwapManager[network]);
+            let tokenBalance = null;
 
-            setTokenApproved(allowance > 0);
+            if (coin.address === ethers.constants.AddressZero) {
+                tokenBalance = await getEthBalance(defaultAccount);
+                setTokenApproved(tokenBalance > 0);
+            } else {
+                tokenBalance = await getAllowance(coin.address, defaultAccount, contractAddresses.SwapManager[network]);
+                setTokenApproved(tokenBalance > 0);
+            }
+
+            if (defaultAccount) {
+                if (tokenBalance > 0) {
+                    setSwapButtonText('Swap');
+                } else {
+                    if (coin.address === ethers.constants.AddressZero) {
+                        setSwapButtonText('ETH balance too low');
+                    } else if (selectedSrcCoin) {
+                        setSwapButtonText(`Approve ${coin.name} Token`);
+                    }
+                }
+            }
 
             setSelectedSrcCoin(coin);
         } else if (type === 'dst') {
@@ -49,14 +69,11 @@ function Swap() {
         }
     };
 
-    let swapButtonText = 'Connect Wallet';
-    if (defaultAccount) {
-        if (!tokenApproved) {
-            swapButtonText = `Approve ${selectedSrcCoin.name} Token`;
-        } else {
-            swapButtonText = 'Swap';
-        }
-    }
+    useEffect(() => {
+        // Selecting default source and destination coins on component mount
+        handleCoinSelection(getTokenByName('eth'), 'src');
+        handleCoinSelection(getTokenByName('usdc'), 'dst');
+    }, [defaultAccount]);
 
     const handleSwapButtonClick = async () => {
         if (!defaultAccount) {

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import { Card, CardMedia, Typography } from '@mui/material';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { fetchEthBalance, getNetworkName } from '../utils/web3';
+import { getEthBalance, getNetworkName } from '../utils/web3';
 
 function Header() {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
@@ -15,7 +16,9 @@ function Header() {
     useEffect(() => {
         const fetchBalance = async () => {
             if (defaultAccount) {
-                const balance = await fetchEthBalance(defaultAccount);
+                let balance = await getEthBalance(defaultAccount);
+                balance = ethers.utils.formatEther(balance);
+                balance = parseFloat(balance).toFixed(2);
                 setEthBalance(balance);
             }
         };
