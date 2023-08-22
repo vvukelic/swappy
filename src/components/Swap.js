@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
 import { Grid, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import SelectCoinModal from './SelectCoinModal';
@@ -8,7 +9,7 @@ import { getCoinImageUrl, getTokenByName } from '../utils/tokens';
 import { getAllowance, approveToken, createSwap, getEthBalance } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { toSmallestUnit } from '../utils/general';
-import { ethers } from 'ethers';
+import UserSwapsList from './UserSwapsList';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
@@ -97,7 +98,7 @@ function Swap() {
 
                 if (swapCreatedEvent) {
                     const swapHash = swapCreatedEvent.args[1];
-                    console.log('Swap hash:', swapHash);
+                    window.location.href = `/swap/${swapHash}`;
                 } else {
                     console.error("Couldn't find SwapCreated event in transaction receipt");
                 }
@@ -138,6 +139,8 @@ function Swap() {
                     </Button>
                 </Grid>
             </Grid>
+
+            {defaultAccount && <UserSwapsList userAddress={defaultAccount} network={network} />}
 
             <SelectCoinModal open={modalOpen} onClose={closeModal} coins={ethMainnetTokens} handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)} />
         </>

@@ -126,3 +126,14 @@ export async function getSwap(contractAddress, swapHash) {
 
     return swap;
 }
+
+export const getUserSwaps = async (contractAddress, userAddress) => {
+    try {
+        const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
+        const swapHashes = await contract.getUserSwaps(userAddress);
+        return swapHashes;
+    } catch (error) {
+        console.error('Error fetching user swaps:', error);
+        return [];
+    }
+};
