@@ -43,9 +43,6 @@ contract SwapManager {
             srcTokenAddress = _wethAddress;
         }
 
-        console.log(expiration);
-        console.log(block.timestamp);
-        
         if (expiration > 0) {
             require(expiration > block.timestamp, "Swap expiration should be in the future!");
         }

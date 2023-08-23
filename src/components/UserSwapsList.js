@@ -28,7 +28,7 @@ const UserSwapsList = ({ userAddress, network }) => {
             <ul>
                 {userSwaps.map((swap, index) => (
                     <li key={index}>
-                        <a href={`/swap/${swap.hash}`}>
+                        <a href={`/swap/${swap.hash}`} target='_blank' rel='noopener noreferrer'>
                             {getTokenByAddress(swap.details.srcTokenAddress).name}: {swap.details.srcAmount.toString()} →{getTokenByAddress(swap.details.dstTokenAddress).name}: {swap.details.dstAmount.toString()}
                             <br />
                             Status: {swap.details.status === 0 ? 'OPEN' : swap.details.status === 1 ? 'CLOSED' : 'CANCELED'}

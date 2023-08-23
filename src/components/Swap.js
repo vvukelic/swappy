@@ -42,27 +42,13 @@ function Swap() {
                 return;
             }
 
-            let tokenBalance = null;
+            let coinAddress = coin.address;
+            if (coinAddress === ethers.constants.AddressZero) {
+                coinAddress = getTokenByName('weth').address;
+            } 
 
-            if (coin.address === ethers.constants.AddressZero) {
-                tokenBalance = await getEthBalance(defaultAccount);
-                setTokenApproved(tokenBalance > 0);
-            } else {
-                tokenBalance = await getAllowance(coin.address, defaultAccount, contractAddresses.SwapManager[network]);
-                setTokenApproved(tokenBalance > 0);
-            }
-
-            if (defaultAccount) {
-                if (tokenBalance > 0) {
-                    setSwapButtonText('Swap');
-                } else {
-                    if (coin.address === ethers.constants.AddressZero) {
-                        setSwapButtonText('ETH balance too low');
-                    } else if (selectedSrcCoin) {
-                        setSwapButtonText(`Approve ${coin.name} Token`);
-                    }
-                }
-            }
+            const availableTokenBalance = await getAllowance(coinAddress, defaultAccount, contractAddresses.SwapManager[network]);
+            setTokenApproved(availableTokenBalance > 0);
 
             setSelectedSrcCoin(coin);
         } else if (type === 'dst') {
@@ -76,11 +62,26 @@ function Swap() {
         handleCoinSelection(getTokenByName('usdc'), 'dst');
     }, [defaultAccount]);
 
+    useEffect(() => {
+        if (defaultAccount) {
+            if (tokenApproved) {
+                setSwapButtonText('Swap');
+            } else {
+                setSwapButtonText(`Approve ${selectedSrcCoin.name} Token`);
+            }
+        }
+    }, [selectedSrcCoin, tokenApproved]);
+
     const handleSwapButtonClick = async () => {
         if (!defaultAccount) {
             connectWallet();
         } else if (!tokenApproved) {
-            const approved = await approveToken(selectedSrcCoin.address, contractAddresses.SwapManager[network]);
+            let coinAddress = selectedSrcCoin.address;
+            if (coinAddress === ethers.constants.AddressZero) {
+                coinAddress = getTokenByName('weth').address;
+            }
+
+            const approved = await approveToken(coinAddress, contractAddresses.SwapManager[network]);
 
             if (approved) {
                 setTokenApproved(true);
