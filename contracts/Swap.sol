@@ -34,7 +34,7 @@ contract SwapManager {
 
     event SwapCreated(address indexed creator, bytes32 swapHash);
 
-    function createSwap(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, uint256 expiration) public payable {
+    function createSwap(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiration) public payable {
         if (srcTokenAddress == address(0)) {
             require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
 
@@ -54,6 +54,7 @@ contract SwapManager {
         newSwap.srcAmount = srcAmount;
         newSwap.dstTokenAddress = dstTokenAddress;
         newSwap.dstAmount = dstAmount;
+        newSwap.dstAddress = dstAddress;
         newSwap.expiration = expiration;
 
         uint salt = block.number;
@@ -85,6 +86,10 @@ contract SwapManager {
         require(swap.srcAddress != address(0), "Non existing swap!");
         require(swap.status == SwapStatus.OPENED, "Can't take swap that is not in OPENED status!");
         require(address(msg.sender) != swap.srcAddress, "Cannot take own swap!");
+
+        if (swap.dstAddress != address(0)) {
+            require(msg.sender == swap.dstAddress, "Only the specified destination address can take this swap!");
+        }
 
         if (swap.expiration > 0) {
             require(swap.expiration > block.timestamp, "Swap has expired!");

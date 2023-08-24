@@ -105,7 +105,7 @@ export const approveToken = async (tokenContractAddress, spenderAddress) => {
     }
 };
 
-export async function createSwap(contractAddress, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, expiration) {
+export async function createSwap(contractAddress, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiration) {
     const signer = getProvider().getSigner();
     const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
     let ethValue = 0;
@@ -114,7 +114,7 @@ export async function createSwap(contractAddress, srcTokenAddress, srcAmount, ds
         ethValue = srcAmount;
     }
 
-    const result = await swapManagerContract.createSwap(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, expiration, { value: ethValue });
+    const result = await swapManagerContract.createSwap(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiration, { value: ethValue });
     const receipt = await result.wait();
 
     return receipt;

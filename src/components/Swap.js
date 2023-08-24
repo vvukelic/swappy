@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Grid, Typography } from '@mui/material';
+import { Grid, Typography, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import SelectCoinModal from './SelectCoinModal';
 import SelectCoin from './SelectCoin';
@@ -17,6 +17,7 @@ function Swap() {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [srcAmount, setSrcAmount] = useState('0.0');
     const [dstAmount, setDstAmount] = useState('0.0');
+    const [dstAddress, setDstAddress] = useState(ethers.constants.AddressZero);
     const [selectedSrcCoin, setSelectedSrcCoin] = useState(null);
     const [selectedDstCoin, setSelectedDstCoin] = useState(null);
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
@@ -77,6 +78,7 @@ function Swap() {
             connectWallet();
         } else if (!tokenApproved) {
             let coinAddress = selectedSrcCoin.address;
+
             if (coinAddress === ethers.constants.AddressZero) {
                 coinAddress = getTokenByName('weth').address;
             }
@@ -92,7 +94,15 @@ function Swap() {
             const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcCoin.address);
             const dstAmountInt = await toSmallestUnit(dstAmount, selectedDstCoin.address);
 
-            const receipt = await createSwap(contractAddresses.SwapManager[network], selectedSrcCoin.address, srcAmountInt, selectedDstCoin.address, dstAmountInt, 0);
+            const receipt = await createSwap(
+                contractAddresses.SwapManager[network],
+                selectedSrcCoin.address,
+                srcAmountInt,
+                selectedDstCoin.address,
+                dstAmountInt,
+                dstAddress,
+                0
+            );
 
             if (receipt.status === 1) {
                 const swapCreatedEvent = receipt.events?.find(e => e.event === "SwapCreated");
@@ -133,6 +143,10 @@ function Swap() {
                 <SelectCoin selectedCoin={selectedSrcCoin} amount={srcAmount} setAmount={setSrcAmount} selectedCoinImg={selectedSrcCoinImg} type='src' openModal={openModal}></SelectCoin>
 
                 <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} type='dst' openModal={openModal}></SelectCoin>
+
+                <Grid item xs={12}>
+                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth sx={{ color: 'white', backgroundColor: '#1f273a' }} />
+                </Grid>
 
                 <Grid item xs={12}>
                     <Button onClick={handleSwapButtonClick} variant='outlined' sx={{ color: 'white', backgroundColor: '#f3663a' }}>
