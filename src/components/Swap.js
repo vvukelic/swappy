@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Grid, Typography, TextField } from '@mui/material';
+import { Grid, Typography, TextField, FormControlLabel, Checkbox } from '@mui/material';
 import Button from '@mui/material/Button';
 import SelectCoinModal from './SelectCoinModal';
 import SelectCoin from './SelectCoin';
 import ethMainnetTokens from '../data/ethMainnetTokens.json';
 import { getCoinImageUrl, getTokenByName } from '../utils/tokens';
-import { getAllowance, approveToken, createSwap, getEthBalance } from '../utils/web3';
+import { getAllowance, approveToken, createSwap, getCurrentBlockTimestamp } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { toSmallestUnit } from '../utils/general';
 import UserSwapsList from './UserSwapsList';
@@ -24,6 +24,9 @@ function Swap() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
+    const [expiresInHours, setExpiresInHours] = useState(0);
+    const [expiresInMinutes, setExpiresInMinutes] = useState(0);
+    const [expirationEnabled, setExpirationEnabled] = useState(false);
     const selectedSrcCoinImg = getCoinImageUrl(selectedSrcCoin);
     const selectedDstCoinImg = getCoinImageUrl(selectedDstCoin);
 
@@ -94,6 +97,16 @@ function Swap() {
             const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcCoin.address);
             const dstAmountInt = await toSmallestUnit(dstAmount, selectedDstCoin.address);
 
+            let expiresIn = 0;
+            if (expirationEnabled) {
+                expiresIn = parseInt(expiresInHours) * 60 * 60 + parseInt(expiresInMinutes) * 60;
+            }
+
+            let _dstAddress = dstAddress;
+            if (!_dstAddress) {
+                _dstAddress = ethers.constants.AddressZero;
+            }
+
             const receipt = await createSwap(
                 contractAddresses.SwapManager[network],
                 selectedSrcCoin.address,
@@ -101,7 +114,7 @@ function Swap() {
                 selectedDstCoin.address,
                 dstAmountInt,
                 dstAddress,
-                0
+                expiresIn
             );
 
             if (receipt.status === 1) {
@@ -144,8 +157,20 @@ function Swap() {
 
                 <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} type='dst' openModal={openModal}></SelectCoin>
 
-                <Grid item xs={12}>
-                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth sx={{ color: 'white', backgroundColor: '#1f273a' }} />
+                <Grid item xs={12} container alignItems='center' sx={{ color: 'white' }}>
+                    <Grid item xs={4}>
+                        <FormControlLabel control={<Checkbox color='primary' onChange={() => setExpirationEnabled(!expirationEnabled)} checked={expirationEnabled} />} label='Expires In:' sx={{ color: 'white' }} />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <TextField label='Hours' variant='outlined' type='number' value={expiresInHours} onChange={(e) => setExpiresInHours(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <TextField label='Minutes' variant='outlined' type='number' value={expiresInMinutes} onChange={(e) => setExpiresInMinutes(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                    </Grid>
+                </Grid>
+
+                <Grid item xs={12} sx={{ color: 'white' }}>
+                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth sx={{ color: 'white', backgroundColor: '#1f273a' }} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
                 </Grid>
 
                 <Grid item xs={12}>

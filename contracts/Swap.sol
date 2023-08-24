@@ -35,17 +35,13 @@ contract SwapManager {
 
     event SwapCreated(address indexed creator, bytes32 swapHash);
 
-    function createSwap(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiration) public payable {
+    function createSwap(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiresIn) public payable {
         if (srcTokenAddress == address(0)) {
             require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
 
             _weth.deposit{value: srcAmount}();
             assert(_weth.transfer(msg.sender, srcAmount));
             srcTokenAddress = _wethAddress;
-        }
-
-        if (expiration > 0) {
-            require(expiration > block.timestamp, "Swap expiration should be in the future!");
         }
 
         Swap memory newSwap;
@@ -56,7 +52,12 @@ contract SwapManager {
         newSwap.dstTokenAddress = dstTokenAddress;
         newSwap.dstAmount = dstAmount;
         newSwap.dstAddress = dstAddress;
-        newSwap.expiration = expiration;
+
+        if (expiresIn > 0) {
+            newSwap.expiration = block.timestamp + expiresIn;
+        } else {
+            newSwap.expiration = 0;
+        }
 
         uint salt = block.number;
         bytes32 newSwapKey;
@@ -96,12 +97,12 @@ contract SwapManager {
         require(swap.status == SwapStatus.OPENED, "Can't take swap that is not in OPENED status!");
         require(address(msg.sender) != swap.srcAddress, "Cannot take own swap!");
 
-        if (swap.dstAddress != address(0)) {
-            require(msg.sender == swap.dstAddress, "Only the specified destination address can take this swap!");
-        }
-
         if (swap.expiration > 0) {
             require(swap.expiration > block.timestamp, "Swap has expired!");
+        }
+
+        if (swap.dstAddress != address(0)) {
+            require(msg.sender == swap.dstAddress, "Only the specified destination address can take this swap!");
         }
 
         address payable srcAddress = swap.srcAddress;
@@ -137,6 +138,11 @@ contract SwapManager {
             if (!srcToken.transferFrom(srcAddress, msg.sender, srcAmount)) {
                 revert SwapFailed();
             }
+        }
+
+        if (swap.dstAddress == address(0)) {
+            swap.dstAddress = msg.sender;
+            dstUserSwaps[swap.dstAddress].push(index);
         }
 
         swap.status = SwapStatus.CLOSED;

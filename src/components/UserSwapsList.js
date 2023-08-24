@@ -53,7 +53,7 @@ const UserSwapsList = ({ userAddress, network }) => {
         <div>
             <h3>Your swaps</h3>
             {renderSwaps(userSwaps)}
-            <h3>Swap offers from other users</h3>
+            <h3>Swaps from other users</h3>
             {renderSwaps(destinationSwaps)}
         </div>
     );

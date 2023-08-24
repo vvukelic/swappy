@@ -68,6 +68,12 @@ export const getEthBalance = async (address) => {
     }
 }
 
+export const getCurrentBlockTimestamp = async () => {
+    const blockNumber = await getProvider().getBlockNumber();
+    const block = await getProvider().getBlock(blockNumber);
+    return block.timestamp;
+}
+
 export async function getAllowance(tokenContractAddress, ownerAddress, spenderAddress) {
     try {
         const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, getProvider());
@@ -105,7 +111,7 @@ export const approveToken = async (tokenContractAddress, spenderAddress) => {
     }
 };
 
-export async function createSwap(contractAddress, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiration) {
+export async function createSwap(contractAddress, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn) {
     const signer = getProvider().getSigner();
     const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
     let ethValue = 0;
@@ -114,7 +120,7 @@ export async function createSwap(contractAddress, srcTokenAddress, srcAmount, ds
         ethValue = srcAmount;
     }
 
-    const result = await swapManagerContract.createSwap(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiration, { value: ethValue });
+    const result = await swapManagerContract.createSwap(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn, { value: ethValue });
     const receipt = await result.wait();
 
     return receipt;

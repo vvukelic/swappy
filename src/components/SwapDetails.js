@@ -97,6 +97,8 @@ function SwapDetails({ hash }) {
             <p>Destination Token: {getTokenByAddress(swapDetails.dstTokenAddress).name}</p>
             <p>Destination Token Address: {swapDetails.dstTokenAddress}</p>
             <p>Destination Amount: {swapDetails.dstAmount.toString()}</p>
+            <p>Destination Address: {swapDetails.dstAddress}</p>
+            <p>Expiration: {swapDetails.expiration.toString()}</p>
             {/* <p>Minimum Destination Amount: {swapDetails.minDstAmount.toString()}</p> */}
             <p>Status: {swapDetails.status === 0 ? 'OPEN' : swapDetails.status === 1 ? 'CLOSED' : 'CANCELED'}</p>
 
