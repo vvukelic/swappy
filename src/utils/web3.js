@@ -138,6 +138,17 @@ export const getUserSwaps = async (contractAddress, userAddress) => {
     }
 };
 
+export const getDstUserSwaps = async (contractAddress, userAddress) => {
+    try {
+        const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
+        const swapHashes = await contract.getDstUserSwaps(userAddress);
+        return swapHashes;
+    } catch (error) {
+        console.error('Error fetching destination user swaps:', error);
+        return [];
+    }
+};
+
 export async function takeSwap(contractAddress, swapHash) {
     try {
         const signer = getProvider().getSigner();

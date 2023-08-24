@@ -23,6 +23,7 @@ contract SwapManager {
     address public owner;
     mapping(bytes32 => Swap) public swaps;
     mapping(address => bytes32[]) public userSwaps;
+    mapping(address => bytes32[]) public dstUserSwaps;
     address constant private _wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     IWETH constant private _weth = IWETH(_wethAddress);
 
@@ -68,6 +69,10 @@ contract SwapManager {
         swaps[newSwapKey] = newSwap;
         userSwaps[address(msg.sender)].push(newSwapKey);
 
+        if (dstAddress != address(0)) {
+            dstUserSwaps[dstAddress].push(newSwapKey);
+        }
+
         emit SwapCreated(msg.sender, newSwapKey);
     }
 
@@ -77,6 +82,10 @@ contract SwapManager {
 
     function getUserSwaps(address userAddress) public view returns (bytes32[] memory) {
         return userSwaps[userAddress];
+    }
+
+    function getDstUserSwaps(address userAddress) public view returns (bytes32[] memory) {
+        return dstUserSwaps[userAddress];
     }
 
     function takeSwap(bytes32 index) public payable {

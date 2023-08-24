@@ -100,7 +100,7 @@ function SwapDetails({ hash }) {
             {/* <p>Minimum Destination Amount: {swapDetails.minDstAmount.toString()}</p> */}
             <p>Status: {swapDetails.status === 0 ? 'OPEN' : swapDetails.status === 1 ? 'CLOSED' : 'CANCELED'}</p>
 
-            {swapDetails.status === 0 && <button onClick={handleTakeSwap}>{swapButtonText}</button>}
+            {swapDetails.status === 0 && (swapDetails.dstAddress === ethers.constants.AddressZero || swapDetails.dstAddress === defaultAccount) && <button onClick={handleTakeSwap}>{swapButtonText}</button>}
         </div>
     );
 }
