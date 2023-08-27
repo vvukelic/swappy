@@ -15,7 +15,9 @@ contract SwapManager {
         uint srcAmount;
         address dstTokenAddress;
         uint dstAmount;
+        uint256 createdTime;
         uint256 expiration;
+        uint256 closedTime;
 
         SwapStatus status;
     }
@@ -52,6 +54,7 @@ contract SwapManager {
         newSwap.dstTokenAddress = dstTokenAddress;
         newSwap.dstAmount = dstAmount;
         newSwap.dstAddress = dstAddress;
+        newSwap.createdTime = block.timestamp;
 
         if (expiresIn > 0) {
             newSwap.expiration = block.timestamp + expiresIn;
@@ -145,6 +148,7 @@ contract SwapManager {
             dstUserSwaps[swap.dstAddress].push(index);
         }
 
+        swap.closedTime = block.timestamp;
         swap.status = SwapStatus.CLOSED;
     }
 
@@ -155,6 +159,7 @@ contract SwapManager {
         require(swap.status == SwapStatus.OPENED, "Can't cancel swap that is not in OPENED status!");
         require(address(msg.sender) == swap.srcAddress, "Only swap initiator can cancel a swap!");
 
+        swap.closedTime = block.timestamp;
         swap.status = SwapStatus.CANCELED;
     }
 

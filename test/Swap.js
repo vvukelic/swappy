@@ -362,5 +362,48 @@ describe('SwapManager contract', function () {
             const dstUserSwapHash = await hardhatSwapManager.dstUserSwaps(addr2.address, 0);
             expect(dstUserSwapHash).to.equal(swapHash);
         });
+
+        it('Should set createdTime on Swap creation', async function () {
+            const { hardhatSwapManager, addr1 } = await loadFixture(deploySwapManagerFixture);
+            await hardhatSwapManager.connect(addr1).createSwap(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0);
+            [swapHash] = await hardhatSwapManager.getUserSwaps(addr1.address);
+
+            const swap = await hardhatSwapManager.getSwap(swapHash);
+
+            const latestBlock = await ethers.provider.getBlock('latest');
+            expect(latestBlock.timestamp - swap.createdTime).to.be.lt(10);
+        });
+
+        it('Should set closedTime on taking Swap', async function () {
+            const { hardhatSwapManager, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            await hardhatSwapManager.connect(addr1).createSwap(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0);
+            [swapHash] = await hardhatSwapManager.getUserSwaps(addr1.address);
+
+            const usdcContract = await getErc20Contract(usdcTokenAddr);
+            await usdcContract.connect(addr1).approve(hardhatSwapManager.address, 1);
+
+            const maticContract = await getErc20Contract(maticTokenAddr);
+            await maticContract.connect(addr2).approve(hardhatSwapManager.address, 1);
+
+            await hardhatSwapManager.connect(addr2).takeSwap(swapHash);
+
+            const swap = await hardhatSwapManager.getSwap(swapHash);
+
+            const latestBlock = await ethers.provider.getBlock('latest');
+            expect(latestBlock.timestamp - swap.closedTime).to.be.lt(10);
+        });
+
+        it('Should set closedTime on canceling Swap', async function () {
+            const { hardhatSwapManager, addr1 } = await loadFixture(deploySwapManagerFixture);
+            await hardhatSwapManager.connect(addr1).createSwap(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0);
+            [swapHash] = await hardhatSwapManager.getUserSwaps(addr1.address);
+
+            await hardhatSwapManager.connect(addr1).cancelSwap(swapHash);
+
+            const swap = await hardhatSwapManager.getSwap(swapHash);
+
+            const latestBlock = await ethers.provider.getBlock('latest');
+            expect(latestBlock.timestamp - swap.closedTime).to.be.lt(10);
+        });
     });
 });
