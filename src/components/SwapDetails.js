@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { getSwap, takeSwap, approveToken, getEthBalance, getAllowance } from '../utils/web3';
+import { getSwap, takeSwap, cancelSwap, approveToken, getEthBalance, getAllowance } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getTokenByAddress } from '../utils/tokens';
 
@@ -69,6 +69,7 @@ function SwapDetails({ hash }) {
                 } else {
                     console.error('Failed to take swap');
                 }
+                window.location.reload();
             } catch (err) {
                 console.error(err);
             }
@@ -80,6 +81,21 @@ function SwapDetails({ hash }) {
             } else {
                 // Handle error in UI, approval failed
             }
+        }
+    };
+
+    const handleCancelSwap = async () => {
+        try {
+            const receipt = await cancelSwap(contractAddresses.SwapManager[network], hash);
+
+            if (receipt.status === 1) {
+                console.log('Swap canceled successfully!');
+            } else {
+                console.error('Failed to cancel swap');
+            }
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -102,7 +118,9 @@ function SwapDetails({ hash }) {
             {/* <p>Minimum Destination Amount: {swapDetails.minDstAmount.toString()}</p> */}
             <p>Status: {swapDetails.status === 0 ? 'OPEN' : swapDetails.status === 1 ? 'CLOSED' : 'CANCELED'}</p>
 
-            {swapDetails.status === 0 && (swapDetails.dstAddress === ethers.constants.AddressZero || swapDetails.dstAddress === defaultAccount) && <button onClick={handleTakeSwap}>{swapButtonText}</button>}
+            {swapDetails.status === 0 && (swapDetails.dstAddress === ethers.constants.AddressZero || swapDetails.dstAddress === defaultAccount) && swapDetails.srcAddress !== defaultAccount && <button onClick={handleTakeSwap}>{swapButtonText}</button>}
+
+            {swapDetails.status === 0 && swapDetails.srcAddress === defaultAccount && <button onClick={handleCancelSwap}>Cancel</button>}
         </div>
     );
 }

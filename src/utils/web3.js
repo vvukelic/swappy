@@ -165,7 +165,21 @@ export async function takeSwap(contractAddress, swapHash) {
         return receipt;
     } catch (error) {
         console.error('Error taking the swap:', error);
-        throw error; // You might want to handle this error appropriately in your UI
+        throw error;
+    }
+}
+
+export async function cancelSwap(contractAddress, swapHash) {
+    try {
+        const signer = getProvider().getSigner();
+        const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
+        const transaction = await swapManagerContract.cancelSwap(swapHash);
+        const receipt = await transaction.wait();
+
+        return receipt;
+    } catch (error) {
+        console.error('Error canceling the swap:', error);
+        throw error;
     }
 }
 
