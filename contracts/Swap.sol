@@ -23,6 +23,8 @@ contract SwapManager {
     }
 
     address public owner;
+    address public feeRecipient;
+    uint256 public feeRate = 50; // Fee rate in basis points (1 basis point = 0.001%)
     mapping(bytes32 => Swap) public swaps;
     mapping(address => bytes32[]) public userSwaps;
     mapping(address => bytes32[]) public dstUserSwaps;
@@ -31,6 +33,7 @@ contract SwapManager {
 
     constructor () {
         owner = msg.sender;
+        feeRecipient = msg.sender;
     }
 
     error SwapFailed();
@@ -113,34 +116,37 @@ contract SwapManager {
         address srcTokenAddress = swap.srcTokenAddress;
         ERC20 srcToken = ERC20(srcTokenAddress);
         address dstTokenAddress = swap.dstTokenAddress;
-        uint srcAmount = swap.srcAmount;
-        uint dstAmount = swap.dstAmount;
 
-        require(srcToken.allowance(srcAddress, swapManagerAddress) >= srcAmount, "Not enough allowence for source token!");
+        require(srcToken.allowance(srcAddress, swapManagerAddress) >= swap.srcAmount, "Not enough allowence for source token!");
 
         if (dstTokenAddress == address(0)) {
-            require(msg.value >= dstAmount, "Not enough ETH to take a swap!");
-            srcAddress.transfer(dstAmount);
+            require(msg.value >= swap.dstAmount, "Not enough ETH to take a swap!");
+            srcAddress.transfer(swap.dstAmount);
         } else {
             ERC20 dstToken = ERC20(dstTokenAddress);
-            require(dstToken.allowance(msg.sender, swapManagerAddress) >= dstAmount, "Not enough allowence for destination token!");
+            require(dstToken.allowance(msg.sender, swapManagerAddress) >= swap.dstAmount, "Not enough allowence for destination token!");
 
-            if (!dstToken.transferFrom(msg.sender, srcAddress, dstAmount)) {
+            if (!dstToken.transferFrom(msg.sender, srcAddress, swap.dstAmount)) {
                 revert SwapFailed();
             }
         }
 
+        // Calculate the fee
+        uint256 fee = (swap.srcAmount * feeRate) / 100000;
+
+        // Transfer fee to feeRecipient
+        require(srcToken.transferFrom(swap.srcAddress, feeRecipient, fee), "Fee transfer failed");
+
+        // Reduce the swap.srcAmount by the fee
+        swap.srcAmount = swap.srcAmount - fee;
+
         if (srcTokenAddress == _wethAddress) {
-            if (!srcToken.transferFrom(srcAddress, address(this), srcAmount)) {
-                revert SwapFailed();
-            }
+            require(srcToken.transferFrom(srcAddress, address(this), swap.srcAmount), "Source amount failed to transfer");
             
-            _weth.withdraw(srcAmount);
-            dstAddress.transfer(srcAmount);
+            _weth.withdraw(swap.srcAmount);
+            dstAddress.transfer(swap.srcAmount);
         } else {
-            if (!srcToken.transferFrom(srcAddress, msg.sender, srcAmount)) {
-                revert SwapFailed();
-            }
+            require(srcToken.transferFrom(srcAddress, msg.sender, swap.srcAmount), "Source amount failed to transfer");
         }
 
         if (swap.dstAddress == address(0)) {
@@ -161,6 +167,16 @@ contract SwapManager {
 
         swap.closedTime = block.timestamp;
         swap.status = SwapStatus.CANCELED;
+    }
+
+    function setFeeRate(uint256 newRate) external {
+        require(msg.sender == owner, "Only the contract owner can change the rate");
+        feeRate = newRate;
+    }
+
+    function setFeeRecipient(address newFeeRecipient) external {
+        require(msg.sender == owner, "Only the contract owner can change the recipient address");
+        feeRecipient = newFeeRecipient;
     }
 
     receive() external payable {}
