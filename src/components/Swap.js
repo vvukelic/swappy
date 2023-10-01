@@ -6,7 +6,7 @@ import SelectCoinModal from './SelectCoinModal';
 import SelectCoin from './SelectCoin';
 import ethMainnetTokens from '../data/ethMainnetTokens.json';
 import { getCoinImageUrl, getTokenByName } from '../utils/tokens';
-import { getAllowance, approveToken, createSwap, getCurrentBlockTimestamp } from '../utils/web3';
+import { getAllowance, approveToken, createSwap } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { toSmallestUnit } from '../utils/general';
 import UserSwapsList from './UserSwapsList';
@@ -144,7 +144,6 @@ function Swap() {
                     margin: 'auto',
                     borderRadius: 8,
                     padding: 2,
-                    marginTop: 2,
                 }}
             >
                 <Grid item xs={12}>
@@ -179,8 +178,6 @@ function Swap() {
                     </Button>
                 </Grid>
             </Grid>
-
-            {defaultAccount && <UserSwapsList userAddress={defaultAccount} network={network} />}
 
             <SelectCoinModal open={modalOpen} onClose={closeModal} coins={ethMainnetTokens} handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)} />
         </>

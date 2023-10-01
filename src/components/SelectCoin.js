@@ -3,7 +3,7 @@ import Card from '@mui/material/Card';
 import { CardContent, Grid, TextField } from '@mui/material';
 import TokenButton from './TokenButton';
 
-function SelectCoin({selectedCoin, amount, setAmount, selectedCoinImg, type, openModal}) {
+function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, openModal }) {
     return (
         <Grid item xs={12}>
             <Card>
