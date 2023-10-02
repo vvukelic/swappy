@@ -14,8 +14,10 @@ const StyledTextField = styled(TextField)`
 `;
 
 function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, openModal }) {
+    const labelText = type === 'src' ? 'You send' : 'You receive';
+
     return (
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{ padding: '0 16px' }}>
             <Card>
                 <Grid container spacing={2}>
                     <Grid item xs={4}>
@@ -28,8 +30,8 @@ function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, op
                             onInput={(e) => {
                                 e.target.value = e.target.value.replace(/[^0-9.]/g, '');
                             }}
-                            variant='standard'
-                            label='You send'
+                            variant='filled'
+                            label={labelText}
                             inputProps={{
                                 style: {
                                     textAlign: 'right',

@@ -133,7 +133,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
                 <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} type='dst' openModal={openModal}></SelectCoin>
 
-                <Grid item xs={12} container alignItems='center' sx={{ color: 'white' }}>
+                <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px' }}>
                     <Grid item xs={4}>
                         <FormControlLabel control={<Checkbox color='primary' onChange={() => setExpirationEnabled(!expirationEnabled)} checked={expirationEnabled} />} label='Expires In:' sx={{ color: 'white' }} />
                     </Grid>
@@ -145,8 +145,8 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                     </Grid>
                 </Grid>
 
-                <Grid item xs={12} sx={{ color: 'white' }}>
-                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth sx={{ color: 'white', backgroundColor: '#d9d9d9' }} InputLabelProps={{ style: { color: 'black' } }} inputProps={{ style: { color: 'white' } }} />
+                <Grid item xs={12} sx={{ color: 'white', padding: '0 16px' }}>
+                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
                 </Grid>
 
                 <Grid item xs={12}>
