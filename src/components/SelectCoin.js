@@ -3,6 +3,7 @@ import Card from '@mui/material/Card';
 import { Grid, TextField } from '@mui/material';
 import TokenButton from './TokenButton';
 import styled from '@emotion/styled';
+import BorderedSection from './BorderSection';
 
 const StyledTextField = styled(TextField)`
     color: black;
@@ -28,12 +29,9 @@ function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, op
     const labelText = type === 'src' ? 'You sell' : 'You buy';
 
     return (
-        <StyledCard variant='outlined'>
+        <BorderedSection title={labelText}>
             <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '1.6em' }}>
                 <Grid container spacing={2}>
-                    <Grid item xs={12} style={{ textAlign: 'center', color: 'white', padding: '0 16px' }}>
-                        <span>{labelText}</span>
-                    </Grid>
                     <Grid item xs={4} style={{ padding: '5px 16px' }}>
                         <TokenButton text={selectedCoin ? selectedCoin.name.toUpperCase() : ''} imageSrc={selectedCoinImg} onClick={() => openModal(type)} />
                     </Grid>
@@ -73,12 +71,12 @@ function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, op
                             type='text'
                         />
                     </Grid>
-                    <Grid item xs={12} style={{ textAlign: 'right', color: 'white', padding: '0 16px' }}>
+                    <Grid item xs={12} style={{ textAlign: 'right', color: 'white', padding: '0 4px', marginBottom: '5px' }}>
                         <span>~$1 229.12</span>
                     </Grid>
                 </Grid>
             </Grid>
-        </StyledCard>
+        </BorderedSection>
     );
 }
 
