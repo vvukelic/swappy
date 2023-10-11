@@ -8,10 +8,15 @@ const StyledButton = styled(Button)`
     color: white;
     background-color: #224e5d;
     border-radius: 0;
-    width: 140px;
+    width: 122px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    text-align: center;
+    height: 45px;
+    padding: 5px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
 
     &:hover {
         background-color: #396777;
@@ -29,22 +34,19 @@ const StyledBox = styled(Box)`
     margin-right: 1;
 `;
 
+const StyledTypography = styled(Typography)`
+    color: white;
+    flex-grow: 2;
+    text-align: center;
+`;
+
 function TokenButton({ imageSrc, text, onClick, ...props }) {
     return (
         <StyledButton onClick={onClick}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <StyledBox component='span'>
-                    <img src={imageSrc} width='auto' height='100%' />
-                </StyledBox>
-                <Typography
-                    sx={{
-                        color: 'white',
-                        marginLeft: 1,
-                    }}
-                >
-                    {text}
-                </Typography>
-            </div>
+            <StyledBox component='span'>
+                <img src={imageSrc} width='auto' height='100%' />
+            </StyledBox>
+            <StyledTypography>{text}</StyledTypography>
             <ArrowDropDown></ArrowDropDown>
         </StyledButton>
     );

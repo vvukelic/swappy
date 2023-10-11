@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Grid, Typography, TextField, FormControlLabel, Checkbox } from '@mui/material';
+import { Grid, TextField, FormControlLabel, Switch } from '@mui/material';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectCoinModal from './SelectCoinModal';
 import SelectCoin from './SelectCoin';
 import ethMainnetTokens from '../data/ethMainnetTokens.json';
@@ -9,6 +11,7 @@ import { getTokenByName } from '../utils/tokens';
 import { getAllowance, approveToken, createSwap } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { toSmallestUnit } from '../utils/general';
+import styled from '@emotion/styled';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
@@ -16,6 +19,18 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
+
+    const StyledSwitch = styled(Switch)`
+        & .MuiSwitch-switchBase.Mui-checked {
+            color: #f7b93e;
+            &:hover {
+                background-color: rgba(247, 185, 62, 0.08);
+            }
+        }
+        & .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+            background-color: #f7b93e;
+        }
+    `;
 
     const openModal = (type) => {
         setModalType(type);
@@ -115,6 +130,18 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
         }
     };
 
+    const handleSwitchCoinsButtonClick = () => {
+        // Swap coins
+        const tempCoin = selectedSrcCoin;
+        setSelectedSrcCoin(selectedDstCoin);
+        setSelectedDstCoin(tempCoin);
+
+        // Swap amounts
+        const tempAmount = srcAmount;
+        setSrcAmount(dstAmount);
+        setDstAmount(tempAmount);
+    };
+
     return (
         <>
             <Grid
@@ -129,34 +156,100 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                     padding: 2,
                 }}
             >
-                <SelectCoin selectedCoin={selectedSrcCoin} amount={srcAmount} setAmount={setSrcAmount} selectedCoinImg={selectedSrcCoinImg} type='src' openModal={openModal}></SelectCoin>
+                <SelectCoin
+                    selectedCoin={selectedSrcCoin}
+                    amount={srcAmount}
+                    setAmount={setSrcAmount}
+                    selectedCoinImg={selectedSrcCoinImg}
+                    type='src'
+                    openModal={openModal}
+                />
 
-                <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} type='dst' openModal={openModal}></SelectCoin>
+                <Grid item xs={12} container justifyContent="center" alignItems="center" sx={{ padding: '0 !important' }}>
+                    <IconButton
+                        variant='outlined'
+                        onClick={handleSwitchCoinsButtonClick}
+                        style={{
+                            transition: 'transform 0.3s ease-in-out',
+                        }}
+                        onMouseOver={(e) => {
+                            e.currentTarget.style.transform = 'rotate(180deg)';
+                        }}
+                        onMouseOut={(e) => {
+                            e.currentTarget.style.transform = 'rotate(0deg)';
+                        }}
+                        >
+                        <ArrowDownwardIcon />
+                    </IconButton>
+                </Grid>
+
+                <SelectCoin
+                    selectedCoin={selectedDstCoin}
+                    amount={dstAmount}
+                    setAmount={setDstAmount}
+                    selectedCoinImg={selectedDstCoinImg}
+                    type='dst'
+                    openModal={openModal}
+                />
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px' }}>
-                    <Grid item xs={4}>
-                        <FormControlLabel control={<Checkbox color='primary' onChange={() => setExpirationEnabled(!expirationEnabled)} checked={expirationEnabled} />} label='Expires In:' sx={{ color: 'white' }} />
+                    <Grid item xs={6}>
+                        <FormControlLabel
+                            control={<StyledSwitch onChange={() => setExpirationEnabled(!expirationEnabled)}
+                            checked={expirationEnabled} />}
+                            label='Expires In:'
+                            sx={{ color: 'white' }}
+                        />
                     </Grid>
-                    <Grid item xs={4}>
-                        <TextField label='Hours' variant='outlined' type='number' value={expiresInHours} onChange={(e) => setExpiresInHours(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                    <Grid item xs={3}>
+                        <TextField
+                            label='Hours'
+                            variant='outlined'
+                            type='number'
+                            value={expiresInHours}
+                            onChange={(e) => setExpiresInHours(e.target.value)}
+                            fullWidth disabled={!expirationEnabled}
+                            InputLabelProps={{ style: { color: 'white' } }}
+                            inputProps={{ style: { color: 'white' } }}
+                        />
                     </Grid>
-                    <Grid item xs={4}>
-                        <TextField label='Minutes' variant='outlined' type='number' value={expiresInMinutes} onChange={(e) => setExpiresInMinutes(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                    <Grid item xs={3}>
+                        <TextField
+                            label='Minutes'
+                            variant='outlined'
+                            type='number'
+                            value={expiresInMinutes}
+                            onChange={(e) => setExpiresInMinutes(e.target.value)}
+                            fullWidth disabled={!expirationEnabled}
+                            InputLabelProps={{ style: { color: 'white' } }}
+                            inputProps={{ style: { color: 'white' } }}
+                        />
                     </Grid>
                 </Grid>
 
                 <Grid item xs={12} sx={{ color: 'white', padding: '0 16px' }}>
-                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                    <TextField
+                        label='Destination Address (Optional)'
+                        variant='outlined'
+                        onChange={(e) => setDstAddress(e.target.value)}
+                        fullWidth InputLabelProps={{ style: { color: 'white' } }}
+                        inputProps={{ style: { color: 'white' } }}
+                    />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid item xs={12} sx={{ padding: '0 16px' }}>
                     <Button onClick={handleSwapButtonClick} variant='outlined' sx={{ color: 'white', backgroundColor: '#f3663a' }}>
                         {swapButtonText}
                     </Button>
                 </Grid>
             </Grid>
 
-            <SelectCoinModal open={modalOpen} onClose={closeModal} coins={ethMainnetTokens} handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)} />
+            <SelectCoinModal
+                open={modalOpen}
+                onClose={closeModal}
+                coins={ethMainnetTokens}
+                handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)}
+            />
         </>
     );
 }

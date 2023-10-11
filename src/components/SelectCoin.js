@@ -8,45 +8,77 @@ const StyledTextField = styled(TextField)`
     color: black;
     background-color: #d9d9d9;
     width: 100%;
-    height: 44px;
     box-shadow: none;
-    padding: 0;
+    underline: none;
+    height: 45px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+`;
+
+const StyledCard = styled(Card)`
+    background-color: #358a9e;
+    height: 120px;
+    border-radius: 4px;
+    border-color: #286676;
+    margin-right: 16px;
+    margin-left: 16px;
 `;
 
 function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, openModal }) {
-    const labelText = type === 'src' ? 'You send' : 'You receive';
+    const labelText = type === 'src' ? 'You sell' : 'You buy';
 
     return (
-        <Grid item xs={12} sx={{ padding: '0 16px' }}>
-            <Card>
+        <StyledCard variant='outlined'>
+            <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '1.6em' }}>
                 <Grid container spacing={2}>
-                    <Grid item xs={4}>
-                        <TokenButton text={selectedCoin ? selectedCoin.name.toUpperCase() : ''} imageSrc={selectedCoinImg} onClick={() => openModal(type)}></TokenButton>
+                    <Grid item xs={12} style={{ textAlign: 'center', color: 'white', padding: '0 16px' }}>
+                        <span>{labelText}</span>
                     </Grid>
-                    <Grid item xs={8} container justifyContent='flex-end'>
+                    <Grid item xs={4} style={{ padding: '5px 16px' }}>
+                        <TokenButton text={selectedCoin ? selectedCoin.name.toUpperCase() : ''} imageSrc={selectedCoinImg} onClick={() => openModal(type)} />
+                    </Grid>
+                    <Grid item xs={8} container justifyContent='flex-end' style={{ paddingTop: '5px', paddingLeft: '10px' }}>
                         <StyledTextField
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             onInput={(e) => {
                                 e.target.value = e.target.value.replace(/[^0-9.]/g, '');
                             }}
-                            variant='filled'
-                            label={labelText}
+                            variant='standard'
+                            sx={{
+                                '& .MuiInput-underline:after': {
+                                    borderBottom: 'none',
+                                },
+                                '& .MuiInput-underline:before': {
+                                    borderBottom: 'none',
+                                },
+                                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+                                    borderBottom: 'none',
+                                },
+                            }}
                             inputProps={{
                                 style: {
                                     textAlign: 'right',
                                     color: 'black',
                                     fontSize: '1.5rem',
                                     padding: 5,
-                                    borderRadius: 0,
+                                    borderRadius: '20px',
+                                },
+                            }}
+                            InputLabelProps={{
+                                style: {
+                                    padding: '8px',
                                 },
                             }}
                             type='text'
                         />
                     </Grid>
+                    <Grid item xs={12} style={{ textAlign: 'right', color: 'white', padding: '0 16px' }}>
+                        <span>~$1 229.12</span>
+                    </Grid>
                 </Grid>
-            </Card>
-        </Grid>
+            </Grid>
+        </StyledCard>
     );
 }
 
