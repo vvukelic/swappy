@@ -11,7 +11,7 @@ const StyledTextField = styled(TextField)`
     width: 100%;
     box-shadow: none;
     underline: none;
-    height: 45px;
+    height: 48px;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 `;
@@ -32,10 +32,10 @@ function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, op
         <BorderedSection title={labelText}>
             <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '1.6em' }}>
                 <Grid container spacing={2}>
-                    <Grid item xs={4} style={{ padding: '5px 16px' }}>
+                    <Grid item xs={4} style={{ paddingTop: 0, paddingLeft: '16px' }}>
                         <TokenButton text={selectedCoin ? selectedCoin.name.toUpperCase() : ''} imageSrc={selectedCoinImg} onClick={() => openModal(type)} />
                     </Grid>
-                    <Grid item xs={8} container justifyContent='flex-end' style={{ paddingTop: '5px', paddingLeft: '10px' }}>
+                    <Grid item xs={8} container justifyContent='flex-end' style={{ paddingTop: 0, paddingLeft: 0 }}>
                         <StyledTextField
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
@@ -59,7 +59,10 @@ function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, op
                                     textAlign: 'right',
                                     color: 'black',
                                     fontSize: '1.5rem',
-                                    padding: 5,
+                                    paddingBottom: 0,
+                                    paddingTop: 8,
+                                    paddingLeft: 0,
+                                    paddingRight: 8,
                                     borderRadius: '20px',
                                 },
                             }}
@@ -71,7 +74,7 @@ function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, op
                             type='text'
                         />
                     </Grid>
-                    <Grid item xs={12} style={{ textAlign: 'right', color: 'white', padding: '0 4px', marginBottom: '5px' }}>
+                    <Grid item xs={12} style={{ textAlign: 'right', color: 'white', padding: '0 4px', marginBottom: '5px', marginTop: '0.3em' }}>
                         <span>~$1 229.12</span>
                     </Grid>
                 </Grid>

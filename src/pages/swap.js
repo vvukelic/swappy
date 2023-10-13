@@ -7,19 +7,16 @@ import Layout from '../components/Layout';
 import Swap from '../components/Swap';
 import SwapsList from '../components/SwapsList';
 import { getCoinImageUrl } from '../utils/tokens';
+import styled from '@emotion/styled';
 
 
-const theme = createTheme({
-    components: {
-        MuiCssBaseline: {
-            styleOverrides: {
-                body: {
-                    // background: 'linear-gradient(to bottom, #1B3A47, #45BBD6)',
-                },
-            },
-        },
-    },
-});
+const theme = createTheme();
+
+const StyledBox = styled(Box)`
+    min-height: calc(100vh - 100px);
+    background: linear-gradient(to bottom, #1b3a47, #45bbd6);
+    padding-top: 3em;
+`;
 
 export default () => {
     const [activeTab, setActiveTab] = useState('createSwap');
@@ -40,7 +37,7 @@ export default () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <Layout setActiveTab={setActiveTab}>
-                <Box sx={{ minHeight: 'calc(100vh - 100px)', background: 'linear-gradient(to bottom, #1B3A47, #45BBD6)' }}>
+                <StyledBox>
                     {activeTab === 'createSwap' && (
                     <Swap
                         srcAmount={srcAmount} setSrcAmount={setSrcAmount}
@@ -57,7 +54,7 @@ export default () => {
                         selectedDstCoinImg={selectedDstCoinImg}
                     />)}
                     {activeTab === 'swapsList' && <SwapsList />}
-                </Box>
+                </StyledBox>
             </Layout>
         </ThemeProvider>
     );

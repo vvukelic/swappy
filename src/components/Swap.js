@@ -22,13 +22,13 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
     const StyledSwitch = styled(Switch)`
         & .MuiSwitch-switchBase.Mui-checked {
-            color: #f7b93e;
+            color: white;
             &:hover {
-                background-color: rgba(247, 185, 62, 0.08);
+                background-color: rgba(255, 255, 255, 0.08);
             }
         }
         & .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
-            background-color: #f7b93e;
+            background-color: white;
         }
     `;
 
@@ -149,11 +149,11 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 spacing={2}
                 sx={{
                     textAlign: 'center',
-                    maxWidth: 450,
+                    maxWidth: 500,
                     backgroundColor: '#358A9F',
                     margin: 'auto',
                     borderRadius: 8,
-                    padding: '2em 0.5em',
+                    padding: '2em 0.5em'
                 }}
             >
                 <SelectCoin selectedCoin={selectedSrcCoin} amount={srcAmount} setAmount={setSrcAmount} selectedCoinImg={selectedSrcCoinImg} type='src' openModal={openModal} />
