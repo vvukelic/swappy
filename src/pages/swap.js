@@ -36,7 +36,7 @@ export default () => {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Layout setActiveTab={setActiveTab}>
+            <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
                 <StyledBox>
                     {activeTab === 'createSwap' && (
                     <Swap

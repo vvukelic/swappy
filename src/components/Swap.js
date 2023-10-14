@@ -149,11 +149,11 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 spacing={2}
                 sx={{
                     textAlign: 'center',
-                    maxWidth: 500,
-                    backgroundColor: '#358A9F',
+                    maxWidth: { xs: '90%', sm: 500 },
                     margin: 'auto',
                     borderRadius: 8,
-                    padding: '2em 0.5em'
+                    padding: '2em 0.5em',
+                    backgroundColor: '#358A9F',
                 }}
             >
                 <SelectCoin selectedCoin={selectedSrcCoin} amount={srcAmount} setAmount={setSrcAmount} selectedCoinImg={selectedSrcCoinImg} type='src' openModal={openModal} />
@@ -195,7 +195,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 </Grid>
 
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
-                    <Button onClick={handleSwapButtonClick} variant='outlined' sx={{ color: 'black', backgroundColor: '#F7B93E' }}>
+                    <Button onClick={handleSwapButtonClick} variant='outlined' sx={{ backgroundColor: '#F7B93E', '&:hover': { backgroundColor: '#FFD684' }, color: 'black' }}>
                         {swapButtonText}
                     </Button>
                 </Grid>
