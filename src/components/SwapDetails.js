@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import { Typography } from '@mui/material';
 import { getSwap, takeSwap, cancelSwap, approveToken, getEthBalance, getAllowance } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getTokenByAddress } from '../utils/tokens';
+import MainContentContainer from './MainContentContainer';
+import BorderSection from './BorderSection';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
@@ -104,10 +107,11 @@ function SwapDetails({ hash }) {
     }
 
     return (
-        <div>
-            <h2>Swap Details</h2>
-            <p>Swap hash: {hash}</p>
-            <p>Source Token: {getTokenByAddress(swapDetails.srcTokenAddress).name}</p>
+        <MainContentContainer>
+            <BorderSection title='You get'>
+                <Typography>Source Token: {getTokenByAddress(swapDetails.srcTokenAddress).name}</Typography>
+            </BorderSection>
+
             <p>Source Token Address: {swapDetails.srcTokenAddress}</p>
             <p>Source Amount: {swapDetails.srcAmount.toString()}</p>
             <p>Destination Token: {getTokenByAddress(swapDetails.dstTokenAddress).name}</p>
@@ -121,7 +125,7 @@ function SwapDetails({ hash }) {
             {swapDetails.status === 0 && (swapDetails.dstAddress === ethers.constants.AddressZero || swapDetails.dstAddress === defaultAccount) && swapDetails.srcAddress !== defaultAccount && <button onClick={handleTakeSwap}>{swapButtonText}</button>}
 
             {swapDetails.status === 0 && swapDetails.srcAddress === defaultAccount && <button onClick={handleCancelSwap}>Cancel</button>}
-        </div>
+        </MainContentContainer>
     );
 }
 

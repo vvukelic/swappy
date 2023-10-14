@@ -10,8 +10,6 @@ import { getCoinImageUrl } from '../utils/tokens';
 import styled from '@emotion/styled';
 
 
-const theme = createTheme();
-
 const StyledBox = styled(Box)`
     min-height: calc(100vh - 100px);
     background: linear-gradient(to bottom, #1b3a47, #45bbd6);
@@ -34,28 +32,23 @@ export default () => {
     const selectedDstCoinImg = getCoinImageUrl(selectedDstCoin);
 
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-                <StyledBox>
-                    {activeTab === 'createSwap' && (
-                    <Swap
-                        srcAmount={srcAmount} setSrcAmount={setSrcAmount}
-                        dstAmount={dstAmount} setDstAmount={setDstAmount}
-                        dstAddress={dstAddress} setDstAddress={setDstAddress}
-                        selectedSrcCoin={selectedSrcCoin} setSelectedSrcCoin={setSelectedSrcCoin}
-                        selectedDstCoin={selectedDstCoin} setSelectedDstCoin={setSelectedDstCoin}
-                        swapButtonText={swapButtonText} setSwapButtonText={setSwapButtonText}
-                        tokenApproved={tokenApproved} setTokenApproved={setTokenApproved}
-                        expiresInHours={expiresInHours} setExpiresInHours={setExpiresInHours}
-                        expiresInMinutes={expiresInMinutes} setExpiresInMinutes={setExpiresInMinutes}
-                        expirationEnabled={expirationEnabled} setExpirationEnabled={setExpirationEnabled}
-                        selectedSrcCoinImg={selectedSrcCoinImg}
-                        selectedDstCoinImg={selectedDstCoinImg}
-                    />)}
-                    {activeTab === 'swapsList' && <SwapsList />}
-                </StyledBox>
-            </Layout>
-        </ThemeProvider>
+        <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+            {activeTab === 'createSwap' && (
+            <Swap
+                srcAmount={srcAmount} setSrcAmount={setSrcAmount}
+                dstAmount={dstAmount} setDstAmount={setDstAmount}
+                dstAddress={dstAddress} setDstAddress={setDstAddress}
+                selectedSrcCoin={selectedSrcCoin} setSelectedSrcCoin={setSelectedSrcCoin}
+                selectedDstCoin={selectedDstCoin} setSelectedDstCoin={setSelectedDstCoin}
+                swapButtonText={swapButtonText} setSwapButtonText={setSwapButtonText}
+                tokenApproved={tokenApproved} setTokenApproved={setTokenApproved}
+                expiresInHours={expiresInHours} setExpiresInHours={setExpiresInHours}
+                expiresInMinutes={expiresInMinutes} setExpiresInMinutes={setExpiresInMinutes}
+                expirationEnabled={expirationEnabled} setExpirationEnabled={setExpirationEnabled}
+                selectedSrcCoinImg={selectedSrcCoinImg}
+                selectedDstCoinImg={selectedDstCoinImg}
+            />)}
+            {activeTab === 'swapsList' && <SwapsList />}
+        </Layout>
     );
 };

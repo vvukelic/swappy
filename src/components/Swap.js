@@ -6,12 +6,14 @@ import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectCoinModal from './SelectCoinModal';
 import SelectCoin from './SelectCoin';
+import MainContentContainer from './MainContentContainer';
 import ethMainnetTokens from '../data/ethMainnetTokens.json';
 import { getTokenByName } from '../utils/tokens';
 import { getAllowance, approveToken, createSwap } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { toSmallestUnit } from '../utils/general';
 import styled from '@emotion/styled';
+
 
 const contractAddresses = require('../contracts/contract-address.json');
 
@@ -144,18 +146,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
     return (
         <>
-            <Grid
-                container
-                spacing={2}
-                sx={{
-                    textAlign: 'center',
-                    maxWidth: { xs: '90%', sm: 500 },
-                    margin: 'auto',
-                    borderRadius: 8,
-                    padding: '2em 0.5em',
-                    backgroundColor: '#358A9F',
-                }}
-            >
+            <MainContentContainer>
                 <SelectCoin selectedCoin={selectedSrcCoin} amount={srcAmount} setAmount={setSrcAmount} selectedCoinImg={selectedSrcCoinImg} type='src' openModal={openModal} />
 
                 <Grid item xs={12} container justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
@@ -199,7 +190,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                         {swapButtonText}
                     </Button>
                 </Grid>
-            </Grid>
+            </MainContentContainer>
 
             <SelectCoinModal open={modalOpen} onClose={closeModal} coins={ethMainnetTokens} handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)} />
         </>
