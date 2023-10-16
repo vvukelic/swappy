@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
-import { CssBaseline } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { ethers } from 'ethers';
 import Layout from '../components/Layout';
 import Swap from '../components/Swap';

@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { Typography } from '@mui/material';
-import { getSwap, takeSwap, cancelSwap, approveToken, getEthBalance, getAllowance } from '../utils/web3';
+import { Chip, Grid, Typography, Box } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import styled from '@emotion/styled';
+import { getSwap, takeSwap, cancelSwap, approveToken, getEthBalance, getAllowance, getTokenDecimals } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { getTokenByAddress } from '../utils/tokens';
+import { getTokenByAddress, getCoinImageUrl } from '../utils/tokens';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
+import SwapDetailsTokenInfo from './SwapDetailsTokenInfo';
+import { sliceAddress } from '../utils/general';
+
 
 const contractAddresses = require('../contracts/contract-address.json');
 
@@ -14,6 +20,39 @@ function SwapDetails({ hash }) {
     const [swapDetails, setSwapDetails] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
+    const [srcToken, setSrcToken] = useState(null);
+    const [srcAmount, setSrcAmount] = useState(0);
+    const [dstToken, setDstToken] = useState(null);
+    const [dstAmount, setDstAmount] = useState(0);
+    const [expirationDatetime, setExpirationDatetime] = useState(null);
+
+    const StyledChip = styled(Chip)`
+        color: white;
+    `;
+
+    const StyledBox = styled(Box)`
+        min-height: 2.5em;
+    `;
+
+    useEffect(() => {
+        async function formatSwapDetails() {
+            const srcTokoenDecimals = await getTokenDecimals(swapDetails.srcTokenAddress);
+            setSrcToken(getTokenByAddress(swapDetails.srcTokenAddress));
+            setSrcAmount(ethers.utils.formatUnits(swapDetails.srcAmount, srcTokoenDecimals));
+
+            const dstTokoenDecimals = await getTokenDecimals(swapDetails.dstTokenAddress);
+            setDstToken(getTokenByAddress(swapDetails.dstTokenAddress));
+            setDstAmount(ethers.utils.formatUnits(swapDetails.dstAmount, dstTokoenDecimals));
+
+            if (swapDetails.expiration.toString() !== '0') {
+                setExpirationDatetime(new Date(swapDetails.expiration * 1000).toLocaleString());
+            }
+        }
+
+        if (swapDetails) {
+            formatSwapDetails();
+        }
+    }, [swapDetails]);
 
     useEffect(() => {
         async function checkTokenApproved() {
@@ -107,20 +146,45 @@ function SwapDetails({ hash }) {
     }
 
     return (
-        <MainContentContainer>
-            <BorderSection title='You get'>
-                <Typography>Source Token: {getTokenByAddress(swapDetails.srcTokenAddress).name}</Typography>
-            </BorderSection>
+        <MainContentContainer sx={{ width: '100%' }}>
+            <SwapDetailsTokenInfo token={dstToken} amount={dstAmount} labelText='You send' sx={{ width: '100%' }} />
 
-            <p>Source Token Address: {swapDetails.srcTokenAddress}</p>
-            <p>Source Amount: {swapDetails.srcAmount.toString()}</p>
-            <p>Destination Token: {getTokenByAddress(swapDetails.dstTokenAddress).name}</p>
-            <p>Destination Token Address: {swapDetails.dstTokenAddress}</p>
-            <p>Destination Amount: {swapDetails.dstAmount.toString()}</p>
-            <p>Destination Address: {swapDetails.dstAddress}</p>
-            <p>Expiration: {swapDetails.expiration.toString()}</p>
-            {/* <p>Minimum Destination Amount: {swapDetails.minDstAmount.toString()}</p> */}
-            <p>Status: {swapDetails.status === 0 ? 'OPEN' : swapDetails.status === 1 ? 'CLOSED' : 'CANCELED'}</p>
+            <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
+                <IconButton variant='outlined' disabled>
+                    <ArrowDownwardIcon />
+                </IconButton>
+            </Grid>
+
+            <SwapDetailsTokenInfo token={srcToken} amount={srcAmount} labelText='You get' />
+
+            <Grid item sx={{ height: '42px' }} />
+
+            <BorderSection title='Swap details'>
+                <Grid container direction='row' alignItems='flex-start' sx={{ padding: '0.5em' }}>
+                    <Grid item xs={4} textAlign='right'>
+                        <StyledBox>
+                            <Typography>Status:</Typography>
+                        </StyledBox>
+                        <StyledBox>
+                            <Typography>Expires:</Typography>
+                        </StyledBox>
+                        <StyledBox>
+                            <Typography>Private swap:</Typography>
+                        </StyledBox>
+                    </Grid>
+                    <Grid item xs={8} textAlign='center'>
+                        <StyledBox>
+                            <StyledChip label={swapDetails.status === 0 ? 'OPEN' : swapDetails.status === 1 ? 'CLOSED' : 'CANCELED'} />
+                        </StyledBox>
+                        <StyledBox>
+                            <Typography>{expirationDatetime ? expirationDatetime : 'not defined'}</Typography>
+                        </StyledBox>
+                        <StyledBox>
+                            <Typography>{sliceAddress(swapDetails.dstAddress)}</Typography>
+                        </StyledBox>
+                    </Grid>
+                </Grid>
+            </BorderSection>
 
             {swapDetails.status === 0 && (swapDetails.dstAddress === ethers.constants.AddressZero || swapDetails.dstAddress === defaultAccount) && swapDetails.srcAddress !== defaultAccount && <button onClick={handleTakeSwap}>{swapButtonText}</button>}
 

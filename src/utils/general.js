@@ -12,3 +12,7 @@ export async function toSmallestUnit(amount, tokenContractAddress) {
 
     return ethers.utils.parseUnits(amount, decimals);
 }
+
+export function sliceAddress(address) {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}

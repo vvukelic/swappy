@@ -25,9 +25,7 @@ const StyledCard = styled(Card)`
     margin-left: 16px;
 `;
 
-function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, type, openModal }) {
-    const labelText = type === 'src' ? 'You sell' : 'You buy';
-
+function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, labelText, openModal }) {
     return (
         <BorderedSection title={labelText}>
             <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '1.6em' }}>

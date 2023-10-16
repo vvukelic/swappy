@@ -13,6 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getEthBalance, getNetworkName } from '../utils/web3';
+import { sliceAddress } from '../utils/general';
 
 
 function Header({ activeTab, setActiveTab }) {
@@ -58,17 +59,17 @@ function Header({ activeTab, setActiveTab }) {
 
     let connectBtnText = 'Connect';
     if (defaultAccount) {
-        connectBtnText = `${defaultAccount.slice(0, 6)}...${defaultAccount.slice(-4)}`;
+        connectBtnText = sliceAddress(defaultAccount);
     }
 
     const CommonHeaderItems = () => (
         <>
-            <StyledTabButton isActive={activeTab === 'createSwap'} onClick={() => setActiveTab('createSwap')}>
+            {activeTab && <StyledTabButton isActive={activeTab === 'createSwap'} onClick={() => setActiveTab('createSwap')}>
                 Create Swap
-            </StyledTabButton>
-            <StyledTabButton isActive={activeTab === 'swapsList'} onClick={() => setActiveTab('swapsList')}>
+            </StyledTabButton>}
+            {activeTab && <StyledTabButton isActive={activeTab === 'swapsList'} onClick={() => setActiveTab('swapsList')}>
                 Swaps List
-            </StyledTabButton>
+            </StyledTabButton>}
             <Box flexGrow={1} />
             {ethBalance !== null && (
                 <Typography sx={{ marginRight: '15px' }} variant='h6' color='white'>

@@ -8,6 +8,7 @@ const StyledGrid = styled(Grid)`
     border-radius: 8px;
     padding: 2em 0.5em;
     background-color: #358A9F;
+    color: white;
 
     @media (max-width: 600px) {
         max-width: 90%;
