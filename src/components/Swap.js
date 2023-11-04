@@ -13,6 +13,7 @@ import { getAllowance, approveToken, createSwap } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { toSmallestUnit } from '../utils/general';
 import styled from '@emotion/styled';
+import PrimaryButton from './PrimaryButton';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -147,7 +148,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     return (
         <>
             <MainContentContainer>
-                <SelectCoin selectedCoin={selectedSrcCoin} amount={srcAmount} setAmount={setSrcAmount} selectedCoinImg={selectedSrcCoinImg} labelText='You sell' openModal={openModal} />
+                <SelectCoin selectedCoin={selectedSrcCoin} amount={srcAmount} setAmount={setSrcAmount} selectedCoinImg={selectedSrcCoinImg} labelText='You sell' openModal={() => openModal('src')} />
 
                 <Grid item xs={12} container justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton
@@ -167,7 +168,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                     </IconButton>
                 </Grid>
 
-                <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} labelText='You buy' openModal={openModal} />
+                <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} labelText='You buy' openModal={() => openModal('dst')} />
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px', marginTop: '20px' }}>
                     <Grid item xs={6}>
@@ -186,9 +187,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 </Grid>
 
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
-                    <Button onClick={handleSwapButtonClick} variant='outlined' sx={{ backgroundColor: '#F7B93E', '&:hover': { backgroundColor: '#FFD684' }, color: 'black' }}>
-                        {swapButtonText}
-                    </Button>
+                    <PrimaryButton onClick={handleSwapButtonClick} buttonText={swapButtonText} />
                 </Grid>
             </MainContentContainer>
 

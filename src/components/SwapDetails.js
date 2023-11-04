@@ -11,6 +11,7 @@ import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
 import SwapDetailsTokenInfo from './SwapDetailsTokenInfo';
 import { sliceAddress } from '../utils/general';
+import PrimaryButton from './PrimaryButton';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -186,9 +187,17 @@ function SwapDetails({ hash }) {
                 </Grid>
             </BorderSection>
 
-            {swapDetails.status === 0 && (swapDetails.dstAddress === ethers.constants.AddressZero || swapDetails.dstAddress === defaultAccount) && swapDetails.srcAddress !== defaultAccount && <button onClick={handleTakeSwap}>{swapButtonText}</button>}
+            {swapDetails.status === 0 && (swapDetails.dstAddress === ethers.constants.AddressZero || swapDetails.dstAddress === defaultAccount) && swapDetails.srcAddress !== defaultAccount && (
+                <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
+                    <PrimaryButton onClick={handleTakeSwap} buttonText={swapButtonText} />
+                </Grid>
+            )}
 
-            {swapDetails.status === 0 && swapDetails.srcAddress === defaultAccount && <button onClick={handleCancelSwap}>Cancel</button>}
+            {swapDetails.status === 0 && swapDetails.srcAddress === defaultAccount && (
+                <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
+                    <PrimaryButton onClick={handleTakeSwap} buttonText='Cancel' />
+                </Grid>
+            )}
         </MainContentContainer>
     );
 }
