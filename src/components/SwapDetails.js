@@ -10,7 +10,7 @@ import { getTokenByAddress, getCoinImageUrl } from '../utils/tokens';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
 import SwapDetailsTokenInfo from './SwapDetailsTokenInfo';
-import { sliceAddress } from '../utils/general';
+import { sliceAddress, toBaseUnit } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
 
 
@@ -37,13 +37,13 @@ function SwapDetails({ hash }) {
 
     useEffect(() => {
         async function formatSwapDetails() {
-            const srcTokoenDecimals = await getTokenDecimals(swapDetails.srcTokenAddress);
+            const srcTokenAmount = await toBaseUnit(swapDetails.srcAmount, swapDetails.srcTokenAddress);
+            setSrcAmount(srcTokenAmount);
             setSrcToken(getTokenByAddress(swapDetails.srcTokenAddress));
-            setSrcAmount(ethers.utils.formatUnits(swapDetails.srcAmount, srcTokoenDecimals));
 
-            const dstTokoenDecimals = await getTokenDecimals(swapDetails.dstTokenAddress);
+            const dstTokenAmount = await toBaseUnit(swapDetails.dstAmount, swapDetails.dstTokenAddress);
+            setDstAmount(dstTokenAmount);
             setDstToken(getTokenByAddress(swapDetails.dstTokenAddress));
-            setDstAmount(ethers.utils.formatUnits(swapDetails.dstAmount, dstTokoenDecimals));
 
             if (swapDetails.expiration.toString() !== '0') {
                 setExpirationDatetime(new Date(swapDetails.expiration * 1000).toLocaleString());

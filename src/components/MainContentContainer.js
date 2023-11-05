@@ -15,7 +15,7 @@ const StyledGrid = styled(Grid)`
     }
 
     @media (min-width: 600px) {
-        max-width: 500px;
+        max-width: 600px;
     }
 `;
 
