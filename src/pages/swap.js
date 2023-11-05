@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
 import { ethers } from 'ethers';
 import Layout from '../components/Layout';
@@ -28,6 +29,15 @@ export default () => {
     const [expirationEnabled, setExpirationEnabled] = useState(false);
     const selectedSrcCoinImg = getCoinImageUrl(selectedSrcCoin);
     const selectedDstCoinImg = getCoinImageUrl(selectedDstCoin);
+    const router = useRouter();
+
+    useEffect(() => {
+        const tab = router.query.tab;
+
+        if (tab && ['createSwap', 'swapsList'].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [router.query.tab]);
 
     return (
         <Layout activeTab={activeTab} setActiveTab={setActiveTab}>

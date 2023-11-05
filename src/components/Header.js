@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -22,6 +23,7 @@ function Header({ activeTab, setActiveTab }) {
     const [networkName, setNetworkName] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:600px)');
+    const router = useRouter();
 
     const StyledTabButton = styled(Button)`
         margin-left: 10px;
@@ -62,14 +64,22 @@ function Header({ activeTab, setActiveTab }) {
         connectBtnText = sliceAddress(defaultAccount);
     }
 
+    const handleSwapNavigationButtonClick = (newActiveTab) => {
+        if (activeTab === 'createSwap' || activeTab === 'swapsList') {
+            setActiveTab(newActiveTab);
+        } else {
+            router.push(`/swap?tab=${newActiveTab}`);
+        }
+    };
+
     const CommonHeaderItems = () => (
         <>
-            {activeTab && <StyledTabButton isActive={activeTab === 'createSwap'} onClick={() => setActiveTab('createSwap')}>
+            <StyledTabButton isActive={activeTab === 'createSwap'} onClick={() => handleSwapNavigationButtonClick('createSwap')}>
                 Create Swap
-            </StyledTabButton>}
-            {activeTab && <StyledTabButton isActive={activeTab === 'swapsList'} onClick={() => setActiveTab('swapsList')}>
+            </StyledTabButton>
+            <StyledTabButton isActive={activeTab === 'swapsList'} onClick={() => handleSwapNavigationButtonClick('swapsList')}>
                 Swaps List
-            </StyledTabButton>}
+            </StyledTabButton>
             <Box flexGrow={1} />
             {ethBalance !== null && (
                 <Typography sx={{ marginRight: '15px' }} variant='h6' color='white'>

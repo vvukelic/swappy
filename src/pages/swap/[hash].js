@@ -7,7 +7,7 @@ export default () => {
     const router = useRouter();
 
     return (
-        <Layout>
+        <Layout activeTab='swapDetails'>
             <SwapDetails hash={router.query.hash} />
         </Layout>
     );
