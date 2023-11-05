@@ -195,7 +195,7 @@ function SwapDetails({ hash }) {
 
             {swapDetails.status === 0 && swapDetails.srcAddress === defaultAccount && (
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
-                    <PrimaryButton onClick={handleTakeSwap} buttonText='Cancel' />
+                    <PrimaryButton onClick={handleCancelSwap} buttonText='Cancel' />
                 </Grid>
             )}
         </MainContentContainer>

@@ -133,7 +133,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
         }
     };
 
-    const handleSwitchCoinsButtonClick = () => {
+    const handleSwitchCoinsButtonClick = async () => {
         // Swap coins
         const tempCoin = selectedSrcCoin;
         setSelectedSrcCoin(selectedDstCoin);
@@ -143,6 +143,14 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
         const tempAmount = srcAmount;
         setSrcAmount(dstAmount);
         setDstAmount(tempAmount);
+
+        let newSrcCoinAddress = selectedDstCoin.address;
+        if (newSrcCoinAddress === ethers.constants.AddressZero) {
+            newSrcCoinAddress = getTokenByName('weth').address;
+        }
+
+        const availableTokenBalance = await getAllowance(newSrcCoinAddress, defaultAccount, contractAddresses.SwapManager[network]);
+        setTokenApproved(availableTokenBalance > 0);
     };
 
     return (
