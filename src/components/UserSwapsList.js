@@ -15,13 +15,37 @@ const UserSwapsList = ({ userAddress, network }) => {
 
     const StyledTableContainer = styled(TableContainer)`
         margin: 0 auto;
-        max-width: 100%;
+        width: 100%;
         background-color: transparent;
         padding: 0.5em;
     `;
 
+    const StyledTable = styled(Table)`
+        width: 100%;
+        table-layout: fixed;
+    `;
+
+    const StyledRow = styled(TableRow)`
+        &:nth-of-type(odd) {
+            background-color: #328094;
+        }
+        &:nth-of-type(even) {
+            background-color: #358a9e;
+        }
+        &:hover {
+            background-color: #235666;
+            cursor: pointer;
+        }
+    `;
+
     const StyledTableCell = styled(TableCell)`
         color: white;
+        text-align: center;
+        border-bottom: none;
+    `;
+
+    const StyledHeaderTableCell = styled(StyledTableCell)`
+        font-weight: bold;
     `;
 
     useEffect(() => {
@@ -61,21 +85,24 @@ const UserSwapsList = ({ userAddress, network }) => {
         fetchDestinationSwaps();
     }, [userAddress, network]);
 
+    const handleRowClick = (swapHash) => {
+        window.open(`/swap/${swapHash}`, '_blank');
+    };
+
     const renderSwapsTable = (swaps, tableTitle) => (
         <BorderedSection title={tableTitle}>
             <StyledTableContainer component={Paper}>
-                <Table aria-label='simple table'>
+                <StyledTable aria-label='simple table'>
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell>You sell</StyledTableCell>
-                            <StyledTableCell>You buy</StyledTableCell>
-                            <StyledTableCell>Status</StyledTableCell>
-                            <StyledTableCell>Details</StyledTableCell>
+                            <StyledHeaderTableCell>You sell</StyledHeaderTableCell>
+                            <StyledHeaderTableCell>You buy</StyledHeaderTableCell>
+                            <StyledHeaderTableCell>Status</StyledHeaderTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {swaps.map((swap, index) => (
-                            <TableRow key={index}>
+                            <StyledRow key={index} onClick={() => handleRowClick(swap.hash)}>
                                 <StyledTableCell align='right'>
                                     {swap.details.srcAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.srcTokenAddress).name}
                                 </StyledTableCell>
@@ -83,15 +110,10 @@ const UserSwapsList = ({ userAddress, network }) => {
                                     {swap.details.dstAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.dstTokenAddress).name}
                                 </StyledTableCell>
                                 <StyledTableCell>{swap.details.status === 0 ? 'OPEN' : swap.details.status === 1 ? 'CLOSED' : 'CANCELED'}</StyledTableCell>
-                                <StyledTableCell>
-                                    <Link href={`/swap/${swap.hash}`} target='_blank' rel='noopener noreferrer'>
-                                        View
-                                    </Link>
-                                </StyledTableCell>
-                            </TableRow>
+                            </StyledRow>
                         ))}
                     </TableBody>
-                </Table>
+                </StyledTable>
             </StyledTableContainer>
         </BorderedSection>
     );
@@ -99,7 +121,7 @@ const UserSwapsList = ({ userAddress, network }) => {
     return (
         <div>
             {renderSwapsTable(userSwaps, 'Your swaps')}
-            {renderSwapsTable(destinationSwaps, 'Swaps from other users')}
+            {/* {renderSwapsTable(destinationSwaps, 'Swaps from other users')} */}
         </div>
     );
 };

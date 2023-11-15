@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 const MainContainer = styled.div`
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: -webkit-fill-available;
 
     border-left: 1px solid #286676;
     border-bottom: 1px solid #286676;
