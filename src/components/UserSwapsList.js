@@ -9,7 +9,7 @@ import BorderedSection from './BorderSection';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
-const UserSwapsList = ({ userAddress, network }) => {
+const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
     const [userSwaps, setUserSwaps] = useState([]);
     const [destinationSwaps, setDestinationSwaps] = useState([]);
 
@@ -25,7 +25,7 @@ const UserSwapsList = ({ userAddress, network }) => {
         table-layout: fixed;
     `;
 
-    const StyledRow = styled(TableRow)`
+    const StyledTableRow = styled(TableRow)`
         &:nth-of-type(odd) {
             background-color: #328094;
         }
@@ -102,7 +102,7 @@ const UserSwapsList = ({ userAddress, network }) => {
                     </TableHead>
                     <TableBody>
                         {swaps.map((swap, index) => (
-                            <StyledRow key={index} onClick={() => handleRowClick(swap.hash)}>
+                            <StyledTableRow key={index} onClick={() => handleRowClick(swap.hash)}>
                                 <StyledTableCell align='right'>
                                     {swap.details.srcAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.srcTokenAddress).name}
                                 </StyledTableCell>
@@ -110,7 +110,7 @@ const UserSwapsList = ({ userAddress, network }) => {
                                     {swap.details.dstAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.dstTokenAddress).name}
                                 </StyledTableCell>
                                 <StyledTableCell>{swap.details.status === 0 ? 'OPEN' : swap.details.status === 1 ? 'CLOSED' : 'CANCELED'}</StyledTableCell>
-                            </StyledRow>
+                            </StyledTableRow>
                         ))}
                     </TableBody>
                 </StyledTable>
@@ -120,8 +120,8 @@ const UserSwapsList = ({ userAddress, network }) => {
 
     return (
         <div>
-            {renderSwapsTable(userSwaps, 'Your swaps')}
-            {/* {renderSwapsTable(destinationSwaps, 'Swaps from other users')} */}
+            {activeSwapsListTab === 'yourSwaps' && renderSwapsTable(userSwaps, 'Your swaps')}
+            {activeSwapsListTab === 'swapsForYou' && renderSwapsTable(destinationSwaps, 'Swaps for you')}
         </div>
     );
 };

@@ -17,6 +17,7 @@ const StyledBox = styled(Box)`
 
 export default () => {
     const [activeTab, setActiveTab] = useState('createSwap');
+    const [activeSwapsListTab, setActiveSwapsListTab] = useState(null);
     const [srcAmount, setSrcAmount] = useState('0.0');
     const [dstAmount, setDstAmount] = useState('0.0');
     const [dstAddress, setDstAddress] = useState(ethers.constants.AddressZero);
@@ -37,10 +38,16 @@ export default () => {
         if (tab && ['createSwap', 'swapsList'].includes(tab)) {
             setActiveTab(tab);
         }
+
+        const listTab = router.query.listTab;
+
+        if (listTab && ['yourSwaps', 'swapsForYou'].includes(listTab)) {
+            setActiveSwapsListTab(listTab);
+        }
     }, [router.query.tab]);
 
     return (
-        <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+        <Layout activeTab={activeTab} setActiveTab={setActiveTab} activeSwapsListTab={activeSwapsListTab} setActiveSwapsListTab={setActiveSwapsListTab}>
             {activeTab === 'createSwap' && (
             <Swap
                 srcAmount={srcAmount} setSrcAmount={setSrcAmount}
@@ -56,7 +63,7 @@ export default () => {
                 selectedSrcCoinImg={selectedSrcCoinImg}
                 selectedDstCoinImg={selectedDstCoinImg}
             />)}
-            {activeTab === 'swapsList' && <SwapsList />}
+            {activeTab === 'swapsList' && <SwapsList activeSwapsListTab={activeSwapsListTab} />}
         </Layout>
     );
 };

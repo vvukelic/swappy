@@ -5,12 +5,12 @@ import { useWalletConnect } from '../hooks/useWalletConnect';
 import UserSwapsList from './UserSwapsList';
 
 
-function SwapsList() {
+function SwapsList({ activeSwapsListTab }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
 
     return (
         <MainContentContainer>
-            <Box>{defaultAccount && <UserSwapsList userAddress={defaultAccount} network={network} />}</Box>
+            <Box>{defaultAccount && <UserSwapsList userAddress={defaultAccount} network={network} activeSwapsListTab={activeSwapsListTab} />}</Box>
         </MainContentContainer>
     );
 }
