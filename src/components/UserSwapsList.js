@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Link } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
 import { getUserSwaps, getDstUserSwaps, getSwap } from '../utils/web3';
 import { getTokenByAddress } from '../utils/tokens';
 import { toBaseUnit } from '../utils/general';
@@ -15,7 +15,7 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
 
     const StyledTableContainer = styled(TableContainer)`
         margin: 0 auto;
-        width: 100%;
+        max-width: 100%;
         background-color: transparent;
         padding: 0.5em;
     `;
@@ -23,6 +23,10 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
     const StyledTable = styled(Table)`
         width: 100%;
         table-layout: fixed;
+    `;
+
+    const StyledTableHead = styled(TableHead)`
+        border-bottom: 1px solid white;
     `;
 
     const StyledTableRow = styled(TableRow)`
@@ -46,6 +50,14 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
 
     const StyledHeaderTableCell = styled(StyledTableCell)`
         font-weight: bold;
+    `;
+
+    const StyledMessage = styled(Typography)`
+        color: white;
+        text-align: center;
+        margin-top: 20px;
+        display: block;
+        width: 100%;
     `;
 
     useEffect(() => {
@@ -89,34 +101,46 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
         window.open(`/swap/${swapHash}`, '_blank');
     };
 
-    const renderSwapsTable = (swaps, tableTitle) => (
-        <BorderedSection title={tableTitle}>
-            <StyledTableContainer component={Paper}>
-                <StyledTable aria-label='simple table'>
-                    <TableHead>
-                        <TableRow>
-                            <StyledHeaderTableCell>You sell</StyledHeaderTableCell>
-                            <StyledHeaderTableCell>You buy</StyledHeaderTableCell>
-                            <StyledHeaderTableCell>Status</StyledHeaderTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {swaps.map((swap, index) => (
-                            <StyledTableRow key={index} onClick={() => handleRowClick(swap.hash)}>
-                                <StyledTableCell align='right'>
-                                    {swap.details.srcAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.srcTokenAddress).name}
-                                </StyledTableCell>
-                                <StyledTableCell align='right'>
-                                    {swap.details.dstAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.dstTokenAddress).name}
-                                </StyledTableCell>
-                                <StyledTableCell>{swap.details.status === 0 ? 'OPEN' : swap.details.status === 1 ? 'CLOSED' : 'CANCELED'}</StyledTableCell>
-                            </StyledTableRow>
-                        ))}
-                    </TableBody>
-                </StyledTable>
-            </StyledTableContainer>
-        </BorderedSection>
-    );
+    const renderSwapsTable = (swaps, tableTitle) => {
+       return (
+           <BorderedSection title={tableTitle}>
+               <StyledTableContainer component={Paper}>
+                   <StyledTable aria-label='simple table'>
+                       <StyledTableHead>
+                           <TableRow>
+                               <StyledHeaderTableCell>You sell</StyledHeaderTableCell>
+                               <StyledHeaderTableCell>You buy</StyledHeaderTableCell>
+                               <StyledHeaderTableCell>Status</StyledHeaderTableCell>
+                           </TableRow>
+                       </StyledTableHead>
+                       <TableBody>
+                           {swaps.length === 0 ? (
+                               <TableRow>
+                                   <StyledTableCell />
+                                   <StyledTableCell>
+                                       <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
+                                   </StyledTableCell>
+                                   <StyledTableCell />
+                               </TableRow>
+                           ) : (
+                               swaps.map((swap, index) => (
+                                   <StyledTableRow key={index} onClick={() => handleRowClick(swap.hash)}>
+                                       <StyledTableCell align='right'>
+                                           {swap.details.srcAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.srcTokenAddress).name}
+                                       </StyledTableCell>
+                                       <StyledTableCell align='right'>
+                                           {swap.details.dstAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.dstTokenAddress).name}
+                                       </StyledTableCell>
+                                       <StyledTableCell>{swap.details.status === 0 ? 'OPEN' : swap.details.status === 1 ? 'CLOSED' : 'CANCELED'}</StyledTableCell>
+                                   </StyledTableRow>
+                               ))
+                           )}
+                       </TableBody>
+                   </StyledTable>
+               </StyledTableContainer>
+           </BorderedSection>
+       );
+    };
 
     return (
         <div>

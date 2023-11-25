@@ -43,6 +43,7 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
 
     const StyledHoverMenu = styled(Box)`
         position: absolute;
+        width: 170px;
         background-color: #1b3a47;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         border-radius: 4px;
@@ -125,15 +126,15 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
     const HoverMenuButtonWithMenu = () => (
         <RelativePositionContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
             <StyledTabButton isActive={activeTab === 'swapsList'} onClick={handleSwapsListClick}>
-                Swaps List
+                Swaps
             </StyledTabButton>
             <StyledHoverMenu show={showHoverMenu}>
-                <Button onClick={() => handleSwapsListTabClick('yourSwaps')} sx={{ color: activeSwapsListTab === 'yourSwaps' ? '#396777' : 'white' }}>
+                <StyledTabButton isActive={activeSwapsListTab === 'yourSwaps'} onClick={() => handleSwapsListTabClick('yourSwaps')}>
                     Your Swaps
-                </Button>
-                <Button onClick={() => handleSwapsListTabClick('swapsForYou')} sx={{ color: activeSwapsListTab === 'swapsForYou' ? '#396777' : 'white' }}>
+                </StyledTabButton>
+                <StyledTabButton isActive={activeSwapsListTab === 'swapsForYou'} onClick={() => handleSwapsListTabClick('swapsForYou')}>
                     Swaps for You
-                </Button>
+                </StyledTabButton>
             </StyledHoverMenu>
         </RelativePositionContainer>
     );
