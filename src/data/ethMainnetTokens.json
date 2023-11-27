@@ -2,7 +2,7 @@
     {
         "name": "eth",
         "address": "0x0000000000000000000000000000000000000000",
-        "logo": "images/eth-logo.png"
+        "logo": "/images/eth-logo.png"
     },
     {
         "name": "weth",
@@ -18,7 +18,8 @@
     },
     {
         "name": "matic",
-        "address": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+        "address": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+        "logo": "/images/matic-logo.png"
     },
     {
         "name": "okb",

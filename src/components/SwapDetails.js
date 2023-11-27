@@ -175,7 +175,7 @@ function SwapDetails({ hash }) {
                     </Grid>
                     <Grid item xs={8} textAlign='center'>
                         <StyledBox>
-                            <StyledChip label={swapDetails.status === 0 ? 'OPEN' : swapDetails.status === 1 ? 'CLOSED' : 'CANCELED'} />
+                            <StyledChip label={swapDetails.status === 0 ? 'OPENED' : swapDetails.status === 1 ? 'CLOSED' : 'CANCELED'} />
                         </StyledBox>
                         <StyledBox>
                             <Typography>{expirationDatetime ? expirationDatetime : 'not defined'}</Typography>

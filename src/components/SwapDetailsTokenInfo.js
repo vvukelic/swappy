@@ -25,12 +25,14 @@ const StyledAmountGrid = styled(Grid)`
 `;
 
 function SwapDetailsTokenInfo({ token, amount, labelText }) {
+    const imageUrl = getCoinImageUrl(token);
+
     return (
         <BorderSection title={labelText}>
             <StyledContainerGrid container>
                 <Grid item xs={3}>
                     <StyledAvatarBox>
-                        <Avatar src={getCoinImageUrl(token)} sx={{ width: '64px', height: '64px' }} />
+                        <Avatar src={imageUrl} sx={{ width: '64px', height: '64px' }} />
                     </StyledAvatarBox>
                 </Grid>
                 <StyledAmountGrid item xs={9}>

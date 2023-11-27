@@ -87,7 +87,17 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
             const swapsWithHash = await Promise.all(
                 swapHashes.map(async (hash) => {
                     const swapDetails = await getSwap(contractAddresses.SwapManager[network], hash);
-                    return { hash, details: swapDetails };
+                    const srcAmountInBaseUnit = await toBaseUnit(swapDetails.srcAmount, swapDetails.srcTokenAddress);
+                    const dstAmountInBaseUnit = await toBaseUnit(swapDetails.dstAmount, swapDetails.dstTokenAddress);
+
+                    return {
+                        hash,
+                        details: {
+                            ...swapDetails,
+                            srcAmountInBaseUnit: srcAmountInBaseUnit,
+                            dstAmountInBaseUnit: dstAmountInBaseUnit,
+                        },
+                    };
                 })
             );
             setDestinationSwaps(swapsWithHash);
@@ -108,8 +118,8 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
                    <StyledTable aria-label='simple table'>
                        <StyledTableHead>
                            <TableRow>
-                               <StyledHeaderTableCell>You sell</StyledHeaderTableCell>
-                               <StyledHeaderTableCell>You buy</StyledHeaderTableCell>
+                               <StyledHeaderTableCell>You send</StyledHeaderTableCell>
+                               <StyledHeaderTableCell>You get</StyledHeaderTableCell>
                                <StyledHeaderTableCell>Status</StyledHeaderTableCell>
                            </TableRow>
                        </StyledTableHead>
@@ -131,7 +141,7 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
                                        <StyledTableCell align='right'>
                                            {swap.details.dstAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.dstTokenAddress).name}
                                        </StyledTableCell>
-                                       <StyledTableCell>{swap.details.status === 0 ? 'OPEN' : swap.details.status === 1 ? 'CLOSED' : 'CANCELED'}</StyledTableCell>
+                                       <StyledTableCell>{swap.details.status === 0 ? 'OPENED' : swap.details.status === 1 ? 'CLOSED' : 'CANCELED'}</StyledTableCell>
                                    </StyledTableRow>
                                ))
                            )}

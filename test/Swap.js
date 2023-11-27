@@ -305,7 +305,7 @@ describe('SwapManager contract', function () {
             expect(swapObj['srcAmount'].toString()).to.equal(swapDetails.srcAmount.toString());
             expect(swapObj['dstTokenAddress']).to.equal(swapDetails.dstToken);
             expect(swapObj['dstAmount'].toString()).to.equal(swapDetails.dstAmount.toString());
-            expect(swapObj['status']).to.equal(0); // 0 - OPEN status
+            expect(swapObj['status']).to.equal(0); // 0 - OPENED status
         });
 
         it('Should allow taking a swap by the specified destination address', async function () {
