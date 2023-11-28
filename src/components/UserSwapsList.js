@@ -112,45 +112,59 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
     };
 
     const renderSwapsTable = (swaps, tableTitle) => {
-       return (
-           <BorderedSection title={tableTitle}>
-               <StyledTableContainer component={Paper}>
-                   <StyledTable aria-label='simple table'>
-                       <StyledTableHead>
-                           <TableRow>
-                               <StyledHeaderTableCell>You send</StyledHeaderTableCell>
-                               <StyledHeaderTableCell>You get</StyledHeaderTableCell>
-                               <StyledHeaderTableCell>Status</StyledHeaderTableCell>
-                           </TableRow>
-                       </StyledTableHead>
-                       <TableBody>
-                           {swaps.length === 0 ? (
-                               <TableRow>
-                                   <StyledTableCell />
-                                   <StyledTableCell>
-                                       <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
-                                   </StyledTableCell>
-                                   <StyledTableCell />
-                               </TableRow>
-                           ) : (
-                               swaps.map((swap, index) => (
-                                   <StyledTableRow key={index} onClick={() => handleRowClick(swap.hash)}>
-                                       <StyledTableCell align='right'>
-                                           {swap.details.srcAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.srcTokenAddress).name}
-                                       </StyledTableCell>
-                                       <StyledTableCell align='right'>
-                                           {swap.details.dstAmountInBaseUnit.toString()} {getTokenByAddress(swap.details.dstTokenAddress).name}
-                                       </StyledTableCell>
-                                       <StyledTableCell>{swap.details.status === 0 ? 'OPENED' : swap.details.status === 1 ? 'CLOSED' : 'CANCELED'}</StyledTableCell>
-                                   </StyledTableRow>
-                               ))
-                           )}
-                       </TableBody>
-                   </StyledTable>
-               </StyledTableContainer>
-           </BorderedSection>
-       );
+        return (
+            <BorderedSection title={tableTitle}>
+                <StyledTableContainer component={Paper}>
+                    <StyledTable aria-label='simple table'>
+                        <StyledTableHead>
+                            <TableRow>
+                                <StyledHeaderTableCell>You send</StyledHeaderTableCell>
+                                <StyledHeaderTableCell>You get</StyledHeaderTableCell>
+                                <StyledHeaderTableCell>Status</StyledHeaderTableCell>
+                            </TableRow>
+                        </StyledTableHead>
+                        <TableBody>
+                            {swaps.length === 0 ? (
+                                <TableRow>
+                                    <StyledTableCell />
+                                    <StyledTableCell>
+                                        <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
+                                    </StyledTableCell>
+                                    <StyledTableCell />
+                                </TableRow>
+                            ) : (
+                                swaps.map((swap, index) => {
+                                    const srcToken = getTokenByAddress(swap.details.srcTokenAddress).name;
+                                    const dstToken = getTokenByAddress(swap.details.dstTokenAddress).name;
+                                    const srcAmount = swap.details.srcAmountInBaseUnit.toString();
+                                    const dstAmount = swap.details.dstAmountInBaseUnit.toString();
+
+                                    const isSwapsForYou = activeSwapsListTab === 'swapsForYou';
+                                    const displaySrcAmount = isSwapsForYou ? dstAmount : srcAmount;
+                                    const displayDstAmount = isSwapsForYou ? srcAmount : dstAmount;
+                                    const displaySrcToken = isSwapsForYou ? dstToken : srcToken;
+                                    const displayDstToken = isSwapsForYou ? srcToken : dstToken;
+
+                                    return (
+                                        <StyledTableRow key={index} onClick={() => handleRowClick(swap.hash)}>
+                                            <StyledTableCell align='right'>
+                                                {displaySrcAmount} {displaySrcToken}
+                                            </StyledTableCell>
+                                            <StyledTableCell align='right'>
+                                                {displayDstAmount} {displayDstToken}
+                                            </StyledTableCell>
+                                            <StyledTableCell>{swap.details.status === 0 ? 'OPENED' : swap.details.status === 1 ? 'CLOSED' : 'CANCELED'}</StyledTableCell>
+                                        </StyledTableRow>
+                                    );
+                                })
+                            )}
+                        </TableBody>
+                    </StyledTable>
+                </StyledTableContainer>
+            </BorderedSection>
+        );
     };
+
 
     return (
         <div>
