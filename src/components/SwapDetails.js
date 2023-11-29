@@ -105,7 +105,7 @@ function SwapDetails({ hash }) {
     const handleTakeSwap = async () => {
         if (tokenApproved) {
             try {
-                const receipt = await takeSwap(contractAddresses.SwapManager[network], hash);
+                const receipt = await takeSwap(contractAddresses.SwapManager[network], hash, dstToken.address, dstAmount);
 
                 if (receipt.status === 1) {
                     console.log('Swap taken successfully!');
