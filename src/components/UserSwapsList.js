@@ -119,7 +119,7 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
                         <StyledTableHead>
                             <TableRow>
                                 <StyledHeaderTableCell>You send</StyledHeaderTableCell>
-                                <StyledHeaderTableCell>You get</StyledHeaderTableCell>
+                                <StyledHeaderTableCell>You receive</StyledHeaderTableCell>
                                 <StyledHeaderTableCell>Status</StyledHeaderTableCell>
                             </TableRow>
                         </StyledTableHead>

@@ -156,7 +156,7 @@ function SwapDetails({ hash }) {
                 </IconButton>
             </Grid>
 
-            <SwapDetailsTokenInfo token={srcToken} amount={srcAmount} labelText='You get' />
+            <SwapDetailsTokenInfo token={srcToken} amount={srcAmount} labelText='You receive' />
 
             <Grid item sx={{ height: '42px' }} />
 

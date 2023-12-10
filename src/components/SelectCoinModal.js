@@ -36,12 +36,15 @@ const StyledListItem = styled(ListItem)`
 `;
 
 const StyledTextField = styled(TextField)`
-    color: white;
-    min-width: 200px;
-    padding: 0 0.5em;
+    width: 275px;
+    margin: 0 auto;
+
+    & .MuiFormControl-root {
+        padding: 0 0.7em;
+    }
 `;
 
-function SelectCoinModal({ open, onClose, coins, handleCoinSelection }) {
+function SelectCoinModal({ open, onClose, coins, handleCoinSelection, title }) {
     const [searchInput, setSearchInput] = useState('');
 
     const handleSearchChange = (event) => {
@@ -60,7 +63,7 @@ function SelectCoinModal({ open, onClose, coins, handleCoinSelection }) {
 
     return (
         <StyledDialog onClose={onClose} open={open}>
-            <StyledDialogTitle>Select a Coin</StyledDialogTitle>
+            <StyledDialogTitle>{title}</StyledDialogTitle>
             <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
             <List>
                 {filteredCoins.map((coin) => (

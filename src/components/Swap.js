@@ -176,7 +176,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                     </IconButton>
                 </Grid>
 
-                <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} labelText='You get' openModal={() => openModal('dst')} />
+                <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} labelText='You receive' openModal={() => openModal('dst')} />
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px', marginTop: '20px' }}>
                     <Grid item xs={6}>
@@ -199,7 +199,13 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 </Grid>
             </MainContentContainer>
 
-            <SelectCoinModal open={modalOpen} onClose={closeModal} coins={ethMainnetTokens} handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)} />
+            <SelectCoinModal
+                open={modalOpen}
+                onClose={closeModal}
+                coins={ethMainnetTokens}
+                handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)}
+                title={modalType === 'src' ? 'Select a token to send': 'Select a token to receive'}
+            />
         </>
     );
 }
