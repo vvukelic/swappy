@@ -73,7 +73,7 @@ function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, labelTex
                         />
                     </Grid>
                     <Grid item xs={12} style={{ textAlign: 'right', color: 'white', padding: '0 4px', marginBottom: '5px', marginTop: '0.3em' }}>
-                        <span>~$1 229.12</span>
+                        {/* <span>~$1 229.12</span> */}
                     </Grid>
                 </Grid>
             </Grid>

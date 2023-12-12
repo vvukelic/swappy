@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "hardhat/console.sol";
 
 contract SwapManager {
@@ -15,6 +16,9 @@ contract SwapManager {
         uint srcAmount;
         address dstTokenAddress;
         uint dstAmount;
+
+        uint256 feeAmount;
+
         uint256 createdTime;
         uint256 expiration;
         uint256 closedTime;
@@ -23,17 +27,18 @@ contract SwapManager {
     }
 
     address public owner;
-    address public feeRecipient;
-    uint256 public feeRate = 50; // Fee rate in basis points (1 basis point = 0.001%)
+    address payable public feeAddress;
     mapping(bytes32 => Swap) public swaps;
     mapping(address => bytes32[]) public userSwaps;
     mapping(address => bytes32[]) public dstUserSwaps;
     address constant private _wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     IWETH constant private _weth = IWETH(_wethAddress);
+    AggregatorV3Interface internal priceFeed;
 
     constructor () {
         owner = msg.sender;
-        feeRecipient = msg.sender;
+        feeAddress = payable(msg.sender);
+        priceFeed = AggregatorV3Interface(0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419);
     }
 
     error SwapFailed();
@@ -58,6 +63,8 @@ contract SwapManager {
         newSwap.dstAmount = dstAmount;
         newSwap.dstAddress = dstAddress;
         newSwap.createdTime = block.timestamp;
+        newSwap.feeAmount = calculateEthFee();
+        console.log("Fee:", newSwap.feeAmount, newSwap.createdTime);
 
         if (expiresIn > 0) {
             newSwap.expiration = block.timestamp + expiresIn;
@@ -120,9 +127,11 @@ contract SwapManager {
         require(srcToken.allowance(srcAddress, swapManagerAddress) >= swap.srcAmount, "Not enough allowence for source token!");
 
         if (dstTokenAddress == address(0)) {
-            require(msg.value >= swap.dstAmount, "Not enough ETH to take a swap!");
+            require(msg.value >= (swap.dstAmount + swap.feeAmount), "Not enough ETH to take a swap!");
             srcAddress.transfer(swap.dstAmount);
         } else {
+            require(msg.value >= swap.feeAmount, "Not enough ETH to take a swap!");
+
             ERC20 dstToken = ERC20(dstTokenAddress);
             require(dstToken.allowance(msg.sender, swapManagerAddress) >= swap.dstAmount, "Not enough allowence for destination token!");
 
@@ -130,15 +139,6 @@ contract SwapManager {
                 revert SwapFailed();
             }
         }
-
-        // Calculate the fee
-        uint256 fee = (swap.srcAmount * feeRate) / 100000;
-
-        // Transfer fee to feeRecipient
-        require(srcToken.transferFrom(swap.srcAddress, feeRecipient, fee), "Fee transfer failed");
-
-        // Reduce the swap.srcAmount by the fee
-        swap.srcAmount = swap.srcAmount - fee;
 
         if (srcTokenAddress == _wethAddress) {
             require(srcToken.transferFrom(srcAddress, address(this), swap.srcAmount), "Source amount failed to transfer");
@@ -148,6 +148,8 @@ contract SwapManager {
         } else {
             require(srcToken.transferFrom(srcAddress, msg.sender, swap.srcAmount), "Source amount failed to transfer");
         }
+
+        feeAddress.transfer(swap.feeAmount);
 
         if (swap.dstAddress == address(0)) {
             swap.dstAddress = msg.sender;
@@ -169,14 +171,25 @@ contract SwapManager {
         swap.status = SwapStatus.CANCELED;
     }
 
-    function setFeeRate(uint256 newRate) external {
-        require(msg.sender == owner, "Only the contract owner can change the rate");
-        feeRate = newRate;
+    function setFeeAddress(address payable newFeeAddress) external {
+        require(msg.sender == owner, "Only the contract owner can change the fee address");
+        feeAddress = newFeeAddress;
     }
 
-    function setFeeRecipient(address newFeeRecipient) external {
-        require(msg.sender == owner, "Only the contract owner can change the recipient address");
-        feeRecipient = newFeeRecipient;
+    function setPriceFeed(address newPriceFeedAddress) external {
+        require(msg.sender == owner, "Only the contract owner can change the price feed address");
+        priceFeed = AggregatorV3Interface(newPriceFeedAddress);
+    }
+
+    function getEthUsdPrice() internal view returns (uint256) {
+        (,int price,,,) = priceFeed.latestRoundData();
+        return uint256(price / 1e8);
+    }
+
+    function calculateEthFee() internal view returns (uint256) {
+        uint256 ethUsdPrice = getEthUsdPrice();
+        uint256 feeInETH = 1e18 / ethUsdPrice; // $1 in ETH
+        return feeInETH;
     }
 
     receive() external payable {}
