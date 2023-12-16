@@ -48,8 +48,6 @@ jspm_packages
 
 .vscode
 
-src/contracts
-
 # dependencies
 /node_modules
 /.pnp
