@@ -13,7 +13,7 @@ async function main() {
     console.log('Account balance:', (await deployer.getBalance()).toString());
 
     const SwapFactory = await ethers.getContractFactory('SwapManager');
-    const swapFactory = await SwapFactory.deploy();
+    const swapFactory = await SwapFactory.deploy('0x4A0245f825446e9CaFa51F1206bB0b961538441B');
     await swapFactory.deployed();
 
     console.log('SwapManager address:', swapFactory.address);

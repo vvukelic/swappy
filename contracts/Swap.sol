@@ -35,9 +35,11 @@ contract SwapManager {
     IWETH constant private _weth = IWETH(_wethAddress);
     AggregatorV3Interface internal priceFeed;
 
-    constructor () {
+    constructor (address payable _feeAddress) {
+        require(_feeAddress != address(0), "Fee address cannot be the zero address");
+
         owner = msg.sender;
-        feeAddress = payable(msg.sender);
+        feeAddress = _feeAddress;
         priceFeed = AggregatorV3Interface(0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419);
     }
 

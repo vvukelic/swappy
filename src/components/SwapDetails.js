@@ -25,6 +25,7 @@ function SwapDetails({ hash }) {
     const [srcAmount, setSrcAmount] = useState(0);
     const [dstToken, setDstToken] = useState(null);
     const [dstAmount, setDstAmount] = useState(0);
+    const [feeAmount, setFeeAmount] = useState(0);
     const [expirationDatetime, setExpirationDatetime] = useState(null);
 
     const StyledChip = styled(Chip)`
@@ -44,6 +45,8 @@ function SwapDetails({ hash }) {
             const dstTokenAmount = await toBaseUnit(swapDetails.dstAmount, swapDetails.dstTokenAddress);
             setDstAmount(dstTokenAmount);
             setDstToken(getTokenByAddress(swapDetails.dstTokenAddress));
+
+            setFeeAmount(ethers.utils.formatUnits(swapDetails.feeAmount, 'ether'));
 
             if (swapDetails.expiration.toString() !== '0') {
                 setExpirationDatetime(new Date(swapDetails.expiration * 1000).toLocaleString());
@@ -105,7 +108,7 @@ function SwapDetails({ hash }) {
     const handleTakeSwap = async () => {
         if (tokenApproved) {
             try {
-                const receipt = await takeSwap(contractAddresses.SwapManager[network], hash, dstToken.address, dstAmount);
+                const receipt = await takeSwap(contractAddresses.SwapManager[network], hash, dstToken.address, dstAmount, swapDetails.feeAmount);
 
                 if (receipt.status === 1) {
                     console.log('Swap taken successfully!');
@@ -167,6 +170,9 @@ function SwapDetails({ hash }) {
                             <Typography>Status:</Typography>
                         </StyledBox>
                         <StyledBox>
+                            <Typography>Swappy's fee:</Typography>
+                        </StyledBox>
+                        <StyledBox>
                             <Typography>Expires:</Typography>
                         </StyledBox>
                         <StyledBox>
@@ -176,6 +182,9 @@ function SwapDetails({ hash }) {
                     <Grid item xs={8} textAlign='center'>
                         <StyledBox>
                             <StyledChip label={swapDetails.status === 0 ? 'OPENED' : swapDetails.status === 1 ? 'CLOSED' : 'CANCELED'} />
+                        </StyledBox>
+                        <StyledBox>
+                            <Typography>{feeAmount} ETH</Typography>
                         </StyledBox>
                         <StyledBox>
                             <Typography>{expirationDatetime ? expirationDatetime : 'not defined'}</Typography>

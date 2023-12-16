@@ -155,17 +155,17 @@ export const getDstUserSwaps = async (contractAddress, userAddress) => {
     }
 };
 
-export async function takeSwap(contractAddress, swapHash, dstTokenAddress, dstAmount) {
+export async function takeSwap(contractAddress, swapHash, dstTokenAddress, dstAmount, feeAmount) {
     try {
         const signer = getProvider().getSigner();
         const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
         let nativeTokenAmount = 0;
 
         if (dstTokenAddress === ethers.constants.AddressZero) {
-            nativeTokenAmount = ethers.utils.parseUnits(dstAmount, 'ether').toBigInt();
+            nativeTokenAmount = ethers.utils.parseUnits(dstAmount, 'ether');
         }
 
-        const transaction = await swapManagerContract.takeSwap(swapHash, { value: nativeTokenAmount });
+        const transaction = await swapManagerContract.takeSwap(swapHash, { value: feeAmount.add(nativeTokenAmount) });
         const receipt = await transaction.wait();
 
         return receipt;
