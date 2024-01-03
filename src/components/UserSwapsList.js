@@ -134,8 +134,8 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
                                 </TableRow>
                             ) : (
                                 swaps.map((swap, index) => {
-                                    const srcToken = getTokenByAddress(swap.details.srcTokenAddress).name;
-                                    const dstToken = getTokenByAddress(swap.details.dstTokenAddress).name;
+                                    const srcToken = getTokenByAddress(swap.details.srcTokenAddress, network).name;
+                                    const dstToken = getTokenByAddress(swap.details.dstTokenAddress, network).name;
                                     const srcAmount = swap.details.srcAmountInBaseUnit.toString();
                                     const dstAmount = swap.details.dstAmountInBaseUnit.toString();
 

@@ -1,0 +1,104 @@
+[
+    {
+        "name": "eth",
+        "networkSpecificAddress": {
+            "localhost": "0x0000000000000000000000000000000000000000",
+            "mainnet": "0x0000000000000000000000000000000000000000",
+            "goerli": "",
+            "polygon": ""
+        },
+        "logo": "/images/eth-logo.png"
+    },
+    {
+        "name": "weth",
+        "networkSpecificAddress": {
+            "localhost": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "mainnet": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "goerli": "",
+            "polygon": ""
+        }
+    },
+    {
+        "name": "leo",
+        "networkSpecificAddress": {
+            "localhost": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
+            "mainnet": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
+            "goerli": "",
+            "polygon": ""
+        }
+    },
+    {
+        "name": "link",
+        "networkSpecificAddress": {
+            "localhost": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+            "mainnet": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+            "goerli": "",
+            "polygon": ""
+        }
+    },
+    {
+        "name": "matic",
+        "networkSpecificAddress": {
+            "localhost": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+            "mainnet": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+            "goerli": "",
+            "polygon": ""
+        },
+        "logo": "/images/matic-logo.png"
+    },
+    {
+        "name": "okb",
+        "networkSpecificAddress": {
+            "localhost": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
+            "mainnet": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
+            "goerli": "",
+            "polygon": ""
+        }
+    },
+    {
+        "name": "shib",
+        "networkSpecificAddress": {
+            "localhost": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
+            "mainnet": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
+            "goerli": "",
+            "polygon": ""
+        }
+    },
+    {
+        "name": "ton",
+        "networkSpecificAddress": {
+            "localhost": "0x6a6c2adA3Ce053561C2FbC3eE211F23d9b8C520a",
+            "mainnet": "0x6a6c2adA3Ce053561C2FbC3eE211F23d9b8C520a",
+            "goerli": "",
+            "polygon": ""
+        },
+        "logo": "/images/ton-logo.svg"
+    },
+    {
+        "name": "uni",
+        "networkSpecificAddress": {
+            "localhost": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+            "mainnet": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+            "goerli": "",
+            "polygon": ""
+        }
+    },
+    {
+        "name": "usdc",
+        "networkSpecificAddress": {
+            "localhost": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "mainnet": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "goerli": "",
+            "polygon": ""
+        }
+    },
+    {
+        "name": "wbtc",
+        "networkSpecificAddress": {
+            "localhost": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+            "mainnet": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+            "goerli": "",
+            "polygon": ""
+        }
+    }
+]

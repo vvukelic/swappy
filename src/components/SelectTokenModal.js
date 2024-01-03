@@ -7,7 +7,8 @@ import ListItem from '@mui/material/ListItem';
 import { Avatar, TextField } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import styled from '@emotion/styled';
-import { getCoinImageUrl } from '../utils/tokens';
+import { getTokenImageUrl } from '../utils/tokens';
+import tokenInfo from '../data/tokenInfo.json';
 
 
 const StyledDialog = styled(Dialog)`
@@ -44,20 +45,20 @@ const StyledTextField = styled(TextField)`
     }
 `;
 
-function SelectCoinModal({ open, onClose, coins, handleCoinSelection, title }) {
+function SelectTokenModal({ open, onClose, handleTokenSelection, title, network }) {
     const [searchInput, setSearchInput] = useState('');
 
     const handleSearchChange = (event) => {
         setSearchInput(event.target.value.toLowerCase());
     };
 
-    const filteredCoins = coins.filter(coin =>
-        coin.name.toLowerCase().includes(searchInput) ||
-        (coin.address && coin.address.toLowerCase().includes(searchInput))
+    const filteredTokens = tokenInfo.filter(token =>
+        token.name.toLowerCase().includes(searchInput) ||
+        (token.networkSpecificAddress[network] && token.networkSpecificAddress[network].toLowerCase().includes(searchInput))
     );
 
-    const selectCoin = (coin) => {
-        handleCoinSelection(coin);
+    const selectToken = (token) => {
+        handleTokenSelection(token);
         onClose();
     };
 
@@ -66,10 +67,10 @@ function SelectCoinModal({ open, onClose, coins, handleCoinSelection, title }) {
             <StyledDialogTitle>{title}</StyledDialogTitle>
             <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
             <List>
-                {filteredCoins.map((coin) => (
-                    <StyledListItem onClick={() => selectCoin(coin)} key={coin.name}>
-                        <StyledAvatar src={getCoinImageUrl(coin)} />
-                        <ListItemText primary={coin.name.toUpperCase()} />
+                {filteredTokens.map((token) => (
+                    <StyledListItem onClick={() => selectToken(token)} key={token.name}>
+                        <StyledAvatar src={getTokenImageUrl(token)} />
+                        <ListItemText primary={token.name.toUpperCase()} />
                     </StyledListItem>
                 ))}
             </List>
@@ -77,4 +78,4 @@ function SelectCoinModal({ open, onClose, coins, handleCoinSelection, title }) {
     );
 }
 
-export default SelectCoinModal;
+export default SelectTokenModal;

@@ -25,13 +25,13 @@ const StyledCard = styled(Card)`
     margin-left: 16px;
 `;
 
-function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, labelText, openModal }) {
+function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, labelText, openModal }) {
     return (
         <BorderedSection title={labelText}>
             <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '1.6em' }}>
                 <Grid container spacing={2}>
                     <Grid item xs={4} style={{ paddingTop: 0, paddingLeft: '16px' }}>
-                        <TokenButton text={selectedCoin ? selectedCoin.name.toUpperCase() : ''} imageSrc={selectedCoinImg} onClick={openModal} />
+                        <TokenButton text={selectedToken ? selectedToken.name.toUpperCase() : ''} imageSrc={selectedTokenImg} onClick={openModal} />
                     </Grid>
                     <Grid item xs={8} container justifyContent='flex-end' style={{ paddingTop: 0, paddingLeft: 0 }}>
                         <StyledTextField
@@ -81,4 +81,4 @@ function SelectCoin({ selectedCoin, amount, setAmount, selectedCoinImg, labelTex
     );
 }
 
-export default SelectCoin;
+export default SelectToken;

@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { Grid, TextField, FormControlLabel, Switch } from '@mui/material';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import SelectCoinModal from './SelectCoinModal';
-import SelectCoin from './SelectCoin';
+import SelectTokenModal from './SelectTokenModal';
+import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
-import ethMainnetTokens from '../data/ethMainnetTokens.json';
 import { getTokenByName } from '../utils/tokens';
 import { getAllowance, approveToken, createSwap } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
@@ -18,7 +16,7 @@ import PrimaryButton from './PrimaryButton';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
-function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, setDstAddress, selectedSrcCoin, setSelectedSrcCoin, selectedDstCoin, setSelectedDstCoin, swapButtonText, setSwapButtonText, tokenApproved, setTokenApproved, expiresInHours, setExpiresInHours, expiresInMinutes, setExpiresInMinutes, expirationEnabled, setExpirationEnabled, selectedSrcCoinImg, selectedDstCoinImg }) {
+function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, setDstAddress, selectedSrcToken, setSelectedSrcToken, selectedDstToken, setSelectedDstToken, swapButtonText, setSwapButtonText, tokenApproved, setTokenApproved, expiresInHours, setExpiresInHours, expiresInMinutes, setExpiresInMinutes, expirationEnabled, setExpirationEnabled, selectedSrcTokenImg, selectedDstTokenImg }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
@@ -45,33 +43,33 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
         setModalOpen(false);
     };
 
-    const handleCoinSelection = async (coin, type) => {
+    const handleTokenSelection = async (token, type) => {
         if (type === 'src') {
-            if (coin === selectedSrcCoin) {
+            if (token === selectedSrcToken) {
                 return;
             }
 
-            let coinAddress = coin.address;
-            if (coinAddress === ethers.constants.AddressZero) {
-                coinAddress = getTokenByName('weth').address;
+            let tokenAddress = token.networkSpecificAddress[network];
+            if (tokenAddress === ethers.constants.AddressZero) {
+                tokenAddress = getTokenByName('weth').networkSpecificAddress[network];
             }
 
-            const availableTokenBalance = await getAllowance(coinAddress, defaultAccount, contractAddresses.SwapManager[network]);
+            const availableTokenBalance = await getAllowance(tokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
             setTokenApproved(availableTokenBalance > 0);
 
-            setSelectedSrcCoin(coin);
+            setSelectedSrcToken(token);
         } else if (type === 'dst') {
-            setSelectedDstCoin(coin);
+            setSelectedDstToken(token);
         }
     };
 
     useEffect(() => {
-        if (!selectedSrcCoin) {
-            handleCoinSelection(getTokenByName('eth'), 'src');
+        if (!selectedSrcToken) {
+            handleTokenSelection(getTokenByName('eth'), 'src');
         }
 
-        if (!selectedDstCoin) {
-            handleCoinSelection(getTokenByName('usdc'), 'dst');
+        if (!selectedDstToken) {
+            handleTokenSelection(getTokenByName('usdc'), 'dst');
         }
     }, [defaultAccount]);
 
@@ -80,22 +78,22 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
             if (tokenApproved) {
                 setSwapButtonText('Create Swap');
             } else {
-                setSwapButtonText(`Approve ${selectedSrcCoin.name} Token`);
+                setSwapButtonText(`Approve ${selectedSrcToken.name} Token`);
             }
         }
-    }, [selectedSrcCoin, tokenApproved]);
+    }, [selectedSrcToken, tokenApproved]);
 
     const handleSwapButtonClick = async () => {
         if (!defaultAccount) {
             connectWallet();
         } else if (!tokenApproved) {
-            let coinAddress = selectedSrcCoin.address;
+            let tokenAddress = selectedSrcToken.networkSpecificAddress[network];
 
-            if (coinAddress === ethers.constants.AddressZero) {
-                coinAddress = getTokenByName('weth').address;
+            if (tokenAddress === ethers.constants.AddressZero) {
+                tokenAddress = getTokenByName('weth').networkSpecificAddress[network];
             }
 
-            const approved = await approveToken(coinAddress, contractAddresses.SwapManager[network]);
+            const approved = await approveToken(tokenAddress, contractAddresses.SwapManager[network]);
 
             if (approved) {
                 setTokenApproved(true);
@@ -103,8 +101,8 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 // Handle error in UI, approval failed
             }
         } else {
-            const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcCoin.address);
-            const dstAmountInt = await toSmallestUnit(dstAmount, selectedDstCoin.address);
+            const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[network]);
+            const dstAmountInt = await toSmallestUnit(dstAmount, selectedDstToken.networkSpecificAddress[network]);
 
             let expiresIn = 0;
             if (expirationEnabled) {
@@ -116,7 +114,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 _dstAddress = ethers.constants.AddressZero;
             }
 
-            const receipt = await createSwap(contractAddresses.SwapManager[network], selectedSrcCoin.address, srcAmountInt, selectedDstCoin.address, dstAmountInt, dstAddress, expiresIn);
+            const receipt = await createSwap(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn);
 
             if (receipt.status === 1) {
                 const swapCreatedEvent = receipt.events?.find((e) => e.event === 'SwapCreated');
@@ -133,35 +131,35 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
         }
     };
 
-    const handleSwitchCoinsButtonClick = async () => {
-        // Swap coins
-        const tempCoin = selectedSrcCoin;
-        setSelectedSrcCoin(selectedDstCoin);
-        setSelectedDstCoin(tempCoin);
+    const handleSwitchTokensButtonClick = async () => {
+        // Swap tokens
+        const tempToken = selectedSrcToken;
+        setSelectedSrcToken(selectedDstToken);
+        setSelectedDstToken(tempToken);
 
         // Swap amounts
         const tempAmount = srcAmount;
         setSrcAmount(dstAmount);
         setDstAmount(tempAmount);
 
-        let newSrcCoinAddress = selectedDstCoin.address;
-        if (newSrcCoinAddress === ethers.constants.AddressZero) {
-            newSrcCoinAddress = getTokenByName('weth').address;
+        let newSrcTokenAddress = selectedDstToken.networkSpecificAddress[network];
+        if (newSrcTokenAddress === ethers.constants.AddressZero) {
+            newSrcTokenAddress = getTokenByName('weth').networkSpecificAddress[network];
         }
 
-        const availableTokenBalance = await getAllowance(newSrcCoinAddress, defaultAccount, contractAddresses.SwapManager[network]);
+        const availableTokenBalance = await getAllowance(newSrcTokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
         setTokenApproved(availableTokenBalance > 0);
     };
 
     return (
         <>
             <MainContentContainer>
-                <SelectCoin selectedCoin={selectedSrcCoin} amount={srcAmount} setAmount={setSrcAmount} selectedCoinImg={selectedSrcCoinImg} labelText='You send' openModal={() => openModal('src')} />
+                <SelectToken selectedToken={selectedSrcToken} amount={srcAmount} setAmount={setSrcAmount} selectedTokenImg={selectedSrcTokenImg} labelText='You send' openModal={() => openModal('src')} />
 
                 <Grid item xs={12} container justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton
                         variant='outlined'
-                        onClick={handleSwitchCoinsButtonClick}
+                        onClick={handleSwitchTokensButtonClick}
                         style={{
                             transition: 'transform 0.3s ease-in-out',
                         }}
@@ -176,7 +174,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                     </IconButton>
                 </Grid>
 
-                <SelectCoin selectedCoin={selectedDstCoin} amount={dstAmount} setAmount={setDstAmount} selectedCoinImg={selectedDstCoinImg} labelText='You receive' openModal={() => openModal('dst')} />
+                <SelectToken selectedToken={selectedDstToken} amount={dstAmount} setAmount={setDstAmount} selectedTokenImg={selectedDstTokenImg} labelText='You receive' openModal={() => openModal('dst')} />
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px', marginTop: '20px' }}>
                     <Grid item xs={6}>
@@ -199,12 +197,12 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 </Grid>
             </MainContentContainer>
 
-            <SelectCoinModal
+            <SelectTokenModal
                 open={modalOpen}
                 onClose={closeModal}
-                coins={ethMainnetTokens}
-                handleCoinSelection={(coin) => handleCoinSelection(coin, modalType)}
+                handleTokenSelection={(token) => handleTokenSelection(token, modalType)}
                 title={modalType === 'src' ? 'Select a token to send': 'Select a token to receive'}
+                network={network}
             />
         </>
     );

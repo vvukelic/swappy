@@ -6,7 +6,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
 import { getSwap, takeSwap, cancelSwap, approveToken, getEthBalance, getAllowance, getTokenDecimals } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { getTokenByAddress, getCoinImageUrl } from '../utils/tokens';
+import { getTokenByAddress } from '../utils/tokens';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
 import SwapDetailsTokenInfo from './SwapDetailsTokenInfo';
@@ -40,11 +40,11 @@ function SwapDetails({ hash }) {
         async function formatSwapDetails() {
             const srcTokenAmount = await toBaseUnit(swapDetails.srcAmount, swapDetails.srcTokenAddress);
             setSrcAmount(srcTokenAmount);
-            setSrcToken(getTokenByAddress(swapDetails.srcTokenAddress));
+            setSrcToken(getTokenByAddress(swapDetails.srcTokenAddress, network));
 
             const dstTokenAmount = await toBaseUnit(swapDetails.dstAmount, swapDetails.dstTokenAddress);
             setDstAmount(dstTokenAmount);
-            setDstToken(getTokenByAddress(swapDetails.dstTokenAddress));
+            setDstToken(getTokenByAddress(swapDetails.dstTokenAddress, network));
 
             setFeeAmount(ethers.utils.formatUnits(swapDetails.feeAmount, 'ether'));
 
@@ -84,7 +84,7 @@ function SwapDetails({ hash }) {
                 if (swapDetails.dstTokenAddress === ethers.constants.AddressZero) {
                     setSwapButtonText('ETH balance too low');
                 } else {
-                    setSwapButtonText(`Approve ${getTokenByAddress(swapDetails.dstTokenAddress).name} Token`);
+                    setSwapButtonText(`Approve ${getTokenByAddress(swapDetails.dstTokenAddress, network).name} Token`);
                 }
             }
         }
@@ -108,7 +108,7 @@ function SwapDetails({ hash }) {
     const handleTakeSwap = async () => {
         if (tokenApproved) {
             try {
-                const receipt = await takeSwap(contractAddresses.SwapManager[network], hash, dstToken.address, dstAmount, swapDetails.feeAmount);
+                const receipt = await takeSwap(contractAddresses.SwapManager[network], hash, dstToken.networkSpecificAddress[network], dstAmount, swapDetails.feeAmount);
 
                 if (receipt.status === 1) {
                     console.log('Swap taken successfully!');

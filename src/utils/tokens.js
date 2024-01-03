@@ -1,23 +1,23 @@
-import ethMainnetTokens from '../data/ethMainnetTokens.json';
+import tokenInfo from '../data/tokenInfo.json';
 
-const indexTokensByAddress = () => {
+const indexTokensByAddress = (network) => {
     const tokenIndex = {};
-    ethMainnetTokens.forEach((token) => {
-        tokenIndex[token.address] = token;
+    tokenInfo.forEach((token) => {
+        tokenIndex[token.networkSpecificAddress[network]] = token;
     });
     return tokenIndex;
 };
 
 const indexTokensByName = () => {
     const tokenIndex = {};
-    ethMainnetTokens.forEach((token) => {
+    tokenInfo.forEach((token) => {
         tokenIndex[token.name] = token;
     });
     return tokenIndex;
 };
 
-const getTokenByAddress = (address) => {
-    const tokensByAddress = indexTokensByAddress();
+const getTokenByAddress = (address, network) => {
+    const tokensByAddress = indexTokensByAddress(network);
     return tokensByAddress[address] || null;
 };
 
@@ -26,13 +26,13 @@ const getTokenByName = (name) => {
     return tokensByName[name] || null;
 };
 
-const getCoinImageUrl = (coin) => {
-    if (coin && coin.logo) {
-        return coin.logo;
-    } else if (coin && coin.address) {
-        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${coin.address}/logo.png`;
+const getTokenImageUrl = (token) => {
+    if (token && token.logo) {
+        return token.logo;
+    } else if (token && token.networkSpecificAddress['mainnet']) {
+        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${token.networkSpecificAddress['mainnet']}/logo.png`;
     }
     return '';
 };
 
-export { getTokenByAddress, getTokenByName, getCoinImageUrl };
+export { getTokenByAddress, getTokenByName, getTokenImageUrl };

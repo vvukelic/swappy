@@ -1,7 +1,7 @@
 import { Avatar, Grid, Typography, Box } from '@mui/material';
 import styled from '@emotion/styled';
 import BorderSection from './BorderSection';
-import { getCoinImageUrl } from '../utils/tokens';
+import { getTokenImageUrl } from '../utils/tokens';
 
 
 const StyledContainerGrid = styled(Grid)`
@@ -25,7 +25,7 @@ const StyledAmountGrid = styled(Grid)`
 `;
 
 function SwapDetailsTokenInfo({ token, amount, labelText }) {
-    const imageUrl = getCoinImageUrl(token);
+    const imageUrl = getTokenImageUrl(token);
 
     return (
         <BorderSection title={labelText}>
