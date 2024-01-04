@@ -1,3 +1,4 @@
+const { network } = require('hardhat');
 const path = require('path');
 
 async function main() {
@@ -8,11 +9,17 @@ async function main() {
 
     // ethers is available in the global scope
     const [deployer] = await ethers.getSigners();
+    console.log('Network:', network.name);
     console.log('Deploying the contracts with the account:', await deployer.getAddress());
-
     console.log('Account balance:', (await deployer.getBalance()).toString());
 
-    const SwapFactory = await ethers.getContractFactory('SwapManager');
+    let contractPath = 'contracts/Swap.sol:SwapManager';
+    
+    if (network.name !== 'localhost' && network.name !== 'mainnet') {
+        contractPath = `contracts/Swap_${network.name}.sol:SwapManager`;
+    }
+
+    const SwapFactory = await ethers.getContractFactory(contractPath);
     const swapFactory = await SwapFactory.deploy('0x4A0245f825446e9CaFa51F1206bB0b961538441B');
     await swapFactory.deployed();
 
@@ -62,7 +69,13 @@ function saveFrontendFiles(swapFactory) {
 
     fs.writeFileSync(addressFilePath, JSON.stringify(contractAddresses, undefined, 2));
 
-    const SwapFactoryArtifact = artifacts.readArtifactSync('SwapManager');
+    let contractPath = 'contracts/Swap.sol:SwapManager';
+
+    if (network.name !== 'localhost' && network.name !== 'mainnet') {
+        contractPath = `contracts/Swap_${network.name}.sol:SwapManager`;
+    }
+
+    const SwapFactoryArtifact = artifacts.readArtifactSync(contractPath);
 
     fs.writeFileSync(path.join(contractsDir, 'Swap.json'), JSON.stringify(SwapFactoryArtifact.abi, null, 2));
 }

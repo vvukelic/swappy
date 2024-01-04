@@ -4,7 +4,7 @@
         "networkSpecificAddress": {
             "localhost": "0x0000000000000000000000000000000000000000",
             "mainnet": "0x0000000000000000000000000000000000000000",
-            "goerli": "",
+            "goerli": "0x0000000000000000000000000000000000000000",
             "polygon": ""
         },
         "logo": "/images/eth-logo.png"
@@ -14,7 +14,7 @@
         "networkSpecificAddress": {
             "localhost": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
             "mainnet": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-            "goerli": "",
+            "goerli": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
             "polygon": ""
         }
     },
@@ -32,7 +32,7 @@
         "networkSpecificAddress": {
             "localhost": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
             "mainnet": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
-            "goerli": "",
+            "goerli": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
             "polygon": ""
         }
     },
@@ -41,7 +41,7 @@
         "networkSpecificAddress": {
             "localhost": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
             "mainnet": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
-            "goerli": "",
+            "goerli": "0xA108830A23A9a054FfF4470a8e6292da0886A4D4",
             "polygon": ""
         },
         "logo": "/images/matic-logo.png"
@@ -51,7 +51,7 @@
         "networkSpecificAddress": {
             "localhost": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
             "mainnet": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
-            "goerli": "",
+            "goerli": "0xBcAEE3B661663F04036af861237e534c818496d2",
             "polygon": ""
         }
     },
@@ -60,7 +60,7 @@
         "networkSpecificAddress": {
             "localhost": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
             "mainnet": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
-            "goerli": "",
+            "goerli": "0x4698ca96dd198AE04e6C45b199516c17c31DBC95",
             "polygon": ""
         }
     },
@@ -79,7 +79,7 @@
         "networkSpecificAddress": {
             "localhost": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
             "mainnet": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-            "goerli": "",
+            "goerli": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
             "polygon": ""
         }
     },
@@ -88,7 +88,7 @@
         "networkSpecificAddress": {
             "localhost": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
             "mainnet": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            "goerli": "",
+            "goerli": "0xd35CCeEAD182dcee0F148EbaC9447DA2c4D449c4",
             "polygon": ""
         }
     },
@@ -97,7 +97,7 @@
         "networkSpecificAddress": {
             "localhost": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
             "mainnet": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-            "goerli": "",
+            "goerli": "0xC04B0d3107736C32e19F1c62b2aF67BE61d63a05",
             "polygon": ""
         }
     }
