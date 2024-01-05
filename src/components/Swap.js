@@ -12,6 +12,8 @@ import { useWalletConnect } from '../hooks/useWalletConnect';
 import { toSmallestUnit } from '../utils/general';
 import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
+import useTransactionModal from '../hooks/useTransactionModal';
+import TransactionStatusModal from './TransactionStatusModal';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -20,6 +22,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
+    const { txModalOpen, txStatus, txError, startTransaction, endTransaction } = useTransactionModal();
 
     const StyledSwitch = styled(Switch)`
         & .MuiSwitch-switchBase.Mui-checked {
@@ -93,12 +96,15 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 tokenAddress = getTokenByName('weth').networkSpecificAddress[network];
             }
 
+            startTransaction();
+
             const approved = await approveToken(tokenAddress, contractAddresses.SwapManager[network]);
 
             if (approved) {
+                endTransaction(true, `You successfuly approved ${selectedSrcToken.name}!`);
                 setTokenApproved(true);
             } else {
-                // Handle error in UI, approval failed
+                endTransaction(false, `There was an error approving ${selectedSrcToken.name}`);
             }
         } else {
             const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[network]);
@@ -204,6 +210,8 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 title={modalType === 'src' ? 'Select a token to send': 'Select a token to receive'}
                 network={network}
             />
+
+            <TransactionStatusModal open={txModalOpen} status={txStatus} error={txError} />
         </>
     );
 }
