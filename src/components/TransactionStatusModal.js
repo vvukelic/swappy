@@ -1,6 +1,8 @@
 import React from 'react';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
+import { Box } from '@mui/material';
+import PrimaryButton from './PrimaryButton';
 import styled from '@emotion/styled';
 
 // Style for the overall modal background
@@ -26,15 +28,34 @@ const Title = styled(Typography)`
 `;
 
 // TransactionStatusModal Component
-function TransactionStatusModal({ open, status, error }) {
+function TransactionStatusModal({ open, status, statusTxt, errorTxt, onClose }) {
     return (
-        <StyledModal open={open} onClose={() => {}} aria-labelledby='transaction-status-modal' aria-describedby='transaction-status-description'>
+        <StyledModal
+            open={open}
+            onClose={() => {
+                onClose;
+            }}
+            aria-labelledby='transaction-status-modal'
+            aria-describedby='transaction-status-description'
+        >
             <ModalContent>
                 <Title id='transaction-status-modal' variant='h6' component='h2'>
                     Transaction Status
                 </Title>
-                {status && <Typography id='transaction-status-description'>{status}</Typography>}
-                {error && <Typography color='error'>{error}</Typography>}
+                <Box display='flex' justifyContent='center'>
+                    {status == 'mining' && (
+                        <Typography id='transaction-status-description'>{statusTxt}</Typography>
+                    )}
+                    {status == 'success' && (
+                        <Typography id='transaction-status-description'>{statusTxt}</Typography>
+                    )}
+                    {status == 'fail' && (
+                        <Typography>{errorTxt}</Typography>
+                    )}
+                </Box>
+                <Box display='flex' justifyContent='center' mt={2}>
+                    <PrimaryButton onClick={onClose} buttonText='Close' />
+                </Box>
             </ModalContent>
         </StyledModal>
     );

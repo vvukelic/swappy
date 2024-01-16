@@ -22,7 +22,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
-    const { txModalOpen, txStatus, txError, startTransaction, endTransaction } = useTransactionModal();
+    const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
 
     const StyledSwitch = styled(Switch)`
         & .MuiSwitch-switchBase.Mui-checked {
@@ -96,15 +96,15 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 tokenAddress = getTokenByName('weth').networkSpecificAddress[network];
             }
 
-            startTransaction();
+            startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
 
             const approved = await approveToken(tokenAddress, contractAddresses.SwapManager[network]);
 
             if (approved) {
-                endTransaction(true, `You successfuly approved ${selectedSrcToken.name}!`);
+                endTransaction(true, `You successfuly approved ${selectedSrcToken.name.toUpperCase()}!`);
                 setTokenApproved(true);
             } else {
-                endTransaction(false, `There was an error approving ${selectedSrcToken.name}`);
+                endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`);
             }
         } else {
             const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[network]);
@@ -211,7 +211,13 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 network={network}
             />
 
-            <TransactionStatusModal open={txModalOpen} status={txStatus} error={txError} />
+            <TransactionStatusModal
+                open={txModalOpen}
+                status={txStatus}
+                statusTxt={txStatusTxt}
+                errorTxt={txErrorTxt}
+                onClose={() => setTxModalOpen(false)}
+            />
         </>
     );
 }

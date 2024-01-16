@@ -3,26 +3,28 @@ import { useState } from 'react';
 const useTransactionModal = () => {
     const [txModalOpen, setTxModalOpen] = useState(false);
     const [txStatus, setTxStatus] = useState('');
-    const [txError, setTxError] = useState(null);
+    const [txStatusTxt, setTxStatusTxt] = useState('');
+    const [txErrorTxt, setTxErrorTxt] = useState(null);
 
-    const startTransaction = () => {
+    const startTransaction = (message) => {
         setTxModalOpen(true);
-        setTxStatus('Transaction is being processed. Please wait for confirmation...');
-        setTxError(null);
+        setTxStatus('mining');
+        setTxStatusTxt(message);
+        setTxErrorTxt(null);
     };
 
     const endTransaction = (success, message) => {
         if (success) {
-            setTxStatus(message || 'Transaction confirmed!');
+            setTxStatus('success');
+            setTxStatusTxt(message);
         } else {
-            setTxStatus('');
-            setTxError(message || 'Transaction failed. Please try again or contact support.');
+            setTxStatus('fail');
+            setTxStatusTxt('');
+            setTxErrorTxt(message);
         }
-
-        setTimeout(() => setTxModalOpen(false), 5000); // Close the modal after a delay
     };
 
-    return { txModalOpen, txStatus, txError, startTransaction, endTransaction };
+    return { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction };
 };
 
 export default useTransactionModal;
