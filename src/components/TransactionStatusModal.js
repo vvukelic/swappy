@@ -1,7 +1,9 @@
 import React from 'react';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 import PrimaryButton from './PrimaryButton';
 import styled from '@emotion/styled';
 
@@ -27,31 +29,43 @@ const Title = styled(Typography)`
     text-align: center;
 `;
 
+const StyledBox = styled(Box)`
+    margin-top: 1em;
+    margin-bottom: 1em;
+`;
+
+const StyledCheckCircleIcon = styled(CheckCircleIcon)`
+    font-size: 3em;
+`;
+
+const StyledErrorIcon = styled(ErrorIcon)`
+    font-size: 3em;
+`;
+
 // TransactionStatusModal Component
 function TransactionStatusModal({ open, status, statusTxt, errorTxt, onClose }) {
     return (
         <StyledModal
             open={open}
             onClose={() => {
-                onClose;
+                onClose();
             }}
             aria-labelledby='transaction-status-modal'
             aria-describedby='transaction-status-description'
         >
             <ModalContent>
-                <Title id='transaction-status-modal' variant='h6' component='h2'>
+                <Title id='transaction-status-modal' variant='h5' component='h2'>
                     Transaction Status
                 </Title>
+                <StyledBox display='flex' justifyContent='center'>
+                    {status === 'mining' && <CircularProgress color='inherit' />}
+                    {status === 'success' && <StyledCheckCircleIcon />}
+                    {status === 'fail' && <StyledErrorIcon />}
+                </StyledBox>
                 <Box display='flex' justifyContent='center'>
-                    {status == 'mining' && (
-                        <Typography id='transaction-status-description'>{statusTxt}</Typography>
-                    )}
-                    {status == 'success' && (
-                        <Typography id='transaction-status-description'>{statusTxt}</Typography>
-                    )}
-                    {status == 'fail' && (
-                        <Typography>{errorTxt}</Typography>
-                    )}
+                    {status === 'mining' && <Typography id='transaction-status-description'>{statusTxt}</Typography>}
+                    {status === 'success' && <Typography id='transaction-status-description'>{statusTxt}</Typography>}
+                    {status === 'fail' && <Typography>{errorTxt}</Typography>}
                 </Box>
                 <Box display='flex' justifyContent='center' mt={2}>
                     <PrimaryButton onClick={onClose} buttonText='Close' />

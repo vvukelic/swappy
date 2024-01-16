@@ -120,6 +120,8 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 _dstAddress = ethers.constants.AddressZero;
             }
 
+            startTransaction(`Please go to your wallet and confirm the transaction for the swap.`);
+
             const receipt = await createSwap(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn);
 
             if (receipt.status === 1) {
@@ -128,7 +130,9 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 if (swapCreatedEvent) {
                     const swapHash = swapCreatedEvent.args[1];
                     window.location.href = `/swap/${swapHash}`;
+                    endTransaction(true, `You successfuly created a swap!`);
                 } else {
+                    endTransaction(false, `Transaction for creating a swap failed.`);
                     console.error("Couldn't find SwapCreated event in transaction receipt");
                 }
             } else {
