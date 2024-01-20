@@ -12,12 +12,15 @@ import BorderSection from './BorderSection';
 import SwapDetailsTokenInfo from './SwapDetailsTokenInfo';
 import { sliceAddress, toBaseUnit } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
+import useTransactionModal from '../hooks/useTransactionModal';
+import TransactionStatusModal from './TransactionStatusModal';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
 
 function SwapDetails({ hash }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
+    const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const [swapDetails, setSwapDetails] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
@@ -108,11 +111,20 @@ function SwapDetails({ hash }) {
     const handleTakeSwap = async () => {
         if (tokenApproved) {
             try {
-                const receipt = await takeSwap(contractAddresses.SwapManager[network], hash, dstToken.networkSpecificAddress[network], dstAmount, swapDetails.feeAmount);
+                startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
+
+                try {
+                    const receipt = await takeSwap(contractAddresses.SwapManager[network], hash, dstToken.networkSpecificAddress[network], dstAmount, swapDetails.feeAmount);
+                } catch (error) {
+                    endTransaction(false, `Failed to take the swap.${error}`);
+                    return;
+                }
 
                 if (receipt.status === 1) {
+                    endTransaction(true, `Swap taken successfully!`);
                     console.log('Swap taken successfully!');
                 } else {
+                    endTransaction(false, `Failed to take the swap.`);
                     console.error('Failed to take swap');
                 }
                 window.location.reload();
@@ -132,12 +144,21 @@ function SwapDetails({ hash }) {
 
     const handleCancelSwap = async () => {
         try {
-            const receipt = await cancelSwap(contractAddresses.SwapManager[network], hash);
+            startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap.`);
+
+            try {
+                const receipt = await cancelSwap(contractAddresses.SwapManager[network], hash);
+            } catch (error) {
+                endTransaction(false, `Failed to cancel the swap.${error}`);
+                return;
+            }
 
             if (receipt.status === 1) {
+                endTransaction(true, `Swap canceled successfully!`);
                 console.log('Swap canceled successfully!');
             } else {
-                console.error('Failed to cancel swap');
+                endTransaction(false, `Failed to cancel the swap.`);
+                console.error('Failed to cancel the swap.');
             }
             window.location.reload();
         } catch (err) {
@@ -150,6 +171,7 @@ function SwapDetails({ hash }) {
     }
 
     return (
+        <>
         <MainContentContainer sx={{ width: '100%' }}>
             <SwapDetailsTokenInfo token={dstToken} amount={dstAmount} labelText='You send' sx={{ width: '100%' }} />
 
@@ -208,6 +230,14 @@ function SwapDetails({ hash }) {
                 </Grid>
             )}
         </MainContentContainer>
+        <TransactionStatusModal
+            open={txModalOpen}
+            status={txStatus}
+            statusTxt={txStatusTxt}
+            errorTxt={txErrorTxt}
+            onClose={() => setTxModalOpen(false)}
+        />
+        </>
     );
 }
 

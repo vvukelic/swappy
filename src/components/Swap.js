@@ -98,9 +98,14 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
             startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
 
-            const approved = await approveToken(tokenAddress, contractAddresses.SwapManager[network]);
+            try {
+                const receipt = await approveToken(tokenAddress, contractAddresses.SwapManager[network]);
+            } catch (error) {
+                endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}. ${error}`);
+                return;
+            }
 
-            if (approved) {
+            if (receipt.status === 1) {
                 endTransaction(true, `You successfuly approved ${selectedSrcToken.name.toUpperCase()}!`);
                 setTokenApproved(true);
             } else {
@@ -122,7 +127,12 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
             startTransaction(`Please go to your wallet and confirm the transaction for the swap.`);
 
-            const receipt = await createSwap(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn);
+            try {
+                const receipt = await createSwap(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn);
+            } catch (error) {
+                endTransaction(false, `Transaction for creating a swap failed. ${error}`);
+                return;
+            }
 
             if (receipt.status === 1) {
                 const swapCreatedEvent = receipt.events?.find((e) => e.event === 'SwapCreated');
@@ -136,7 +146,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                     console.error("Couldn't find SwapCreated event in transaction receipt");
                 }
             } else {
-                // The transaction failed
+                endTransaction(false, `Transaction for creating a swap failed.`);
             }
         }
     };

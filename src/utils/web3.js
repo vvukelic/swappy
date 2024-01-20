@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 const erc20Abi = require('../contracts/Erc20.json');
 const swapManagerAbi = require('../contracts/Swap.json');
 
-export const getProvider = () => {
+export function getProvider() {
     let provider;
 
     // Check if running in a browser environment with MetaMask or another web3 provider
@@ -24,7 +24,7 @@ export const getProvider = () => {
     return provider;
 };
 
-export const getNetworkName = async () => {
+export async function getNetworkName() {
     const network = await getProvider().getNetwork();
     let networkName = '';
 
@@ -56,7 +56,7 @@ export const getNetworkName = async () => {
     return networkName;
 };
 
-export const getEthBalance = async (address) => {
+export async function getEthBalance(address) {
     if (!address) return null;
 
     try {
@@ -97,17 +97,16 @@ export async function getTokenDecimals(tokenContractAddress) {
     return decimals;
 }
 
-export const approveToken = async (tokenContractAddress, spenderAddress) => {
+export async function approveToken(tokenContractAddress, spenderAddress) {
     const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, getProvider().getSigner());
 
     try {
         const tx = await tokenContract.approve(spenderAddress, ethers.constants.MaxUint256);
         const receipt = await tx.wait();
-
-        return receipt.status === 1;
+        return receipt;
     } catch (error) {
         console.error('Error approving token:', error);
-        return false;
+        throw error;
     }
 };
 
@@ -120,10 +119,14 @@ export async function createSwap(contractAddress, srcTokenAddress, srcAmount, ds
         ethValue = srcAmount;
     }
 
-    const result = await swapManagerContract.createSwap(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn, { value: ethValue });
-    const receipt = await result.wait();
-
-    return receipt;
+    try {
+        const result = await swapManagerContract.createSwap(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn, { value: ethValue });
+        const receipt = await result.wait();
+        return receipt;
+    } catch (error) {
+        console.error('Error creating swap', error);
+        throw error;
+    }
 }
 
 export async function getSwap(contractAddress, swapHash) {
@@ -133,7 +136,7 @@ export async function getSwap(contractAddress, swapHash) {
     return swap;
 }
 
-export const getUserSwaps = async (contractAddress, userAddress) => {
+export async function getUserSwaps(contractAddress, userAddress) {
     try {
         const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
         const swapHashes = await contract.getUserSwaps(userAddress);
@@ -144,7 +147,7 @@ export const getUserSwaps = async (contractAddress, userAddress) => {
     }
 };
 
-export const getDstUserSwaps = async (contractAddress, userAddress) => {
+export async function getDstUserSwaps(contractAddress, userAddress){
     try {
         const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
         const swapHashes = await contract.getDstUserSwaps(userAddress);
