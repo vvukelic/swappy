@@ -13,14 +13,14 @@ const useTransactionModal = () => {
         setTxErrorTxt(null);
     };
 
-    const endTransaction = (success, message) => {
+    const endTransaction = (success, message, error) => {
         if (success) {
             setTxStatus('success');
             setTxStatusTxt(message);
         } else {
             setTxStatus('fail');
-            setTxStatusTxt('');
-            setTxErrorTxt(message);
+            setTxStatusTxt(message);
+            setTxErrorTxt(error);
         }
     };
 

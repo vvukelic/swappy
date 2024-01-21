@@ -34,6 +34,19 @@ const StyledBox = styled(Box)`
     margin-bottom: 1em;
 `;
 
+const ErrorBox = styled(Box)`
+    max-height: 200px;
+    max-width: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-word;
+    background-color: #f9f3e6;
+    border: 1px solid;
+    border-color: divider;
+    padding: 8px;
+    margin-top: 1em;
+`;
+
 const StyledCheckCircleIcon = styled(CheckCircleIcon)`
     font-size: 3em;
 `;
@@ -62,10 +75,13 @@ function TransactionStatusModal({ open, status, statusTxt, errorTxt, onClose }) 
                     {status === 'success' && <StyledCheckCircleIcon />}
                     {status === 'fail' && <StyledErrorIcon />}
                 </StyledBox>
-                <Box display='flex' justifyContent='center'>
-                    {status === 'mining' && <Typography id='transaction-status-description'>{statusTxt}</Typography>}
-                    {status === 'success' && <Typography id='transaction-status-description'>{statusTxt}</Typography>}
-                    {status === 'fail' && <Typography>{errorTxt}</Typography>}
+                <Box display='grid' justifyContent='center'>
+                    <Typography id='transaction-status-description' textAlign='center'>{statusTxt}</Typography>
+                    {status === 'fail' && errorTxt && (
+                        <ErrorBox>
+                            <Typography color='error'>{errorTxt}</Typography>
+                        </ErrorBox>
+                    )}
                 </Box>
                 <Box display='flex' justifyContent='center' mt={2}>
                     <PrimaryButton onClick={onClose} buttonText='Close' />

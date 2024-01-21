@@ -100,16 +100,16 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
             try {
                 const receipt = await approveToken(tokenAddress, contractAddresses.SwapManager[network]);
-            } catch (error) {
-                endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}. ${error}`);
-                return;
-            }
 
-            if (receipt.status === 1) {
-                endTransaction(true, `You successfuly approved ${selectedSrcToken.name.toUpperCase()}!`);
-                setTokenApproved(true);
-            } else {
-                endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`);
+                if (receipt.status === 1) {
+                    endTransaction(true, `You successfuly approved ${selectedSrcToken.name.toUpperCase()}!`);
+                    setTokenApproved(true);
+                } else {
+                    endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`);
+                }
+            } catch (error) {
+                endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`, error.toString());
+                return;
             }
         } else {
             const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[network]);
@@ -129,24 +129,25 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
             try {
                 const receipt = await createSwap(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn);
-            } catch (error) {
-                endTransaction(false, `Transaction for creating a swap failed. ${error}`);
-                return;
-            }
+                
+                if (receipt.status === 1) {
+                    const swapCreatedEvent = receipt.events?.find((e) => e.event === 'SwapCreated');
 
-            if (receipt.status === 1) {
-                const swapCreatedEvent = receipt.events?.find((e) => e.event === 'SwapCreated');
-
-                if (swapCreatedEvent) {
-                    const swapHash = swapCreatedEvent.args[1];
-                    window.location.href = `/swap/${swapHash}`;
-                    endTransaction(true, `You successfuly created a swap!`);
+                    if (swapCreatedEvent) {
+                        const swapHash = swapCreatedEvent.args[1];
+                        window.location.href = `/swap/${swapHash}`;
+                        endTransaction(true, `You successfuly created a swap!`);
+                    } else {
+                        endTransaction(false, `Transaction for creating a swap failed.`);
+                        console.error("Couldn't find SwapCreated event in transaction receipt");
+                    }
                 } else {
                     endTransaction(false, `Transaction for creating a swap failed.`);
-                    console.error("Couldn't find SwapCreated event in transaction receipt");
                 }
-            } else {
-                endTransaction(false, `Transaction for creating a swap failed.`);
+            } catch (error) {
+                console.error(error);
+                endTransaction(false, 'Transaction for creating a swap failed.', error.toString());
+                return;
             }
         }
     };

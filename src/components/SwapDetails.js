@@ -115,18 +115,20 @@ function SwapDetails({ hash }) {
 
                 try {
                     const receipt = await takeSwap(contractAddresses.SwapManager[network], hash, dstToken.networkSpecificAddress[network], dstAmount, swapDetails.feeAmount);
+
+                    if (receipt.status === 1) {
+                        endTransaction(true, `Swap taken successfully!`);
+                        console.log('Swap taken successfully!');
+                    } else {
+                        endTransaction(false, `Failed to take the swap.`);
+                        console.error('Failed to take swap');
+                    }
                 } catch (error) {
-                    endTransaction(false, `Failed to take the swap.${error}`);
+                    endTransaction(false, 'Failed to take the swap.', error.toString());
                     return;
                 }
 
-                if (receipt.status === 1) {
-                    endTransaction(true, `Swap taken successfully!`);
-                    console.log('Swap taken successfully!');
-                } else {
-                    endTransaction(false, `Failed to take the swap.`);
-                    console.error('Failed to take swap');
-                }
+                
                 window.location.reload();
             } catch (err) {
                 console.error(err);
@@ -148,18 +150,19 @@ function SwapDetails({ hash }) {
 
             try {
                 const receipt = await cancelSwap(contractAddresses.SwapManager[network], hash);
+
+                if (receipt.status === 1) {
+                    endTransaction(true, `Swap canceled successfully!`);
+                    console.log('Swap canceled successfully!');
+                } else {
+                    endTransaction(false, `Failed to cancel the swap.`);
+                    console.error('Failed to cancel the swap.');
+                }
             } catch (error) {
-                endTransaction(false, `Failed to cancel the swap.${error}`);
+                endTransaction(false, 'Failed to cancel the swap.', error.toString());
                 return;
             }
 
-            if (receipt.status === 1) {
-                endTransaction(true, `Swap canceled successfully!`);
-                console.log('Swap canceled successfully!');
-            } else {
-                endTransaction(false, `Failed to cancel the swap.`);
-                console.error('Failed to cancel the swap.');
-            }
             window.location.reload();
         } catch (err) {
             console.error(err);
