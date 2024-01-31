@@ -34,7 +34,6 @@ export function getSwapStatus(swapDetails, currentBlockTimestamp) {
     if (swapDetails.status === 0) {
         console.debug(currentBlockTimestamp);
         return !swapDetails.expiration.isZero() && swapDetails.expiration.lt(BigNumber.from(currentBlockTimestamp)) ? 'EXPIRED' : 'OPENED';
-        // return swapDetails.expiration !== 0 && currentBlockTimestamp > swapDetails.expiration ? 'EXPIRED' : 'OPENED';
     } else if (swapDetails.status === 1) {
         return 'CLOSED';
     } else if (swapDetails.status === 2) {

@@ -5,6 +5,7 @@ import { getUserSwaps, getDstUserSwaps, getSwap, getCurrentBlockTimestamp } from
 import { getTokenByAddress } from '../utils/tokens';
 import { toBaseUnit, getSwapStatus } from '../utils/general';
 import BorderedSection from './BorderSection';
+import SwapStatusChip from './SwapStatusChip';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -54,10 +55,6 @@ const StyledMessage = styled(Typography)`
     margin-top: 20px;
     display: block;
     width: 100%;
-`;
-
-const StyledChip = styled(Chip)`
-    color: white;
 `;
 
 const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
@@ -181,7 +178,7 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
                                             <StyledTableCell align='right'>
                                                 {displayDstAmount} {displayDstToken}
                                             </StyledTableCell>
-                                            <StyledTableCell><StyledChip label={getSwapStatus(swap.details, currentBlockTimestamp)}></StyledChip></StyledTableCell>
+                                            <StyledTableCell><SwapStatusChip status={getSwapStatus(swap.details, currentBlockTimestamp)} /></StyledTableCell>
                                         </StyledTableRow>
                                     );
                                 })

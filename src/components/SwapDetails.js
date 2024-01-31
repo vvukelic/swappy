@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { Chip, Grid, Typography, Box } from '@mui/material';
+import { Grid, Typography, Box } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
@@ -14,14 +14,10 @@ import { sliceAddress, toBaseUnit, getSwapStatus } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
+import SwapStatusChip from './SwapStatusChip';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
-
-const StyledChip = styled(Chip)`
-    color: white;
-    background-color: #f45050;
-`;
 
 const StyledBox = styled(Box)`
     min-height: 2.5em;
@@ -211,7 +207,7 @@ function SwapDetails({ hash }) {
                     </Grid>
                     <Grid item xs={8} textAlign='center'>
                         <StyledBox>
-                            <StyledChip label={getSwapStatus(swapDetails, currentBlockTimestamp)} />
+                            <SwapStatusChip status={getSwapStatus(swapDetails, currentBlockTimestamp)} />
                         </StyledBox>
                         <StyledBox>
                             <Typography>{feeAmount} ETH</Typography>
