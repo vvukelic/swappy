@@ -7,7 +7,7 @@ async function mineBlocks(numberOfBlocks) {
 }
 
 async function main() {
-    const blocksToMine = 100;
+    const blocksToMine = 10;
     await mineBlocks(blocksToMine);
     console.log(`Mined ${blocksToMine} blocks!`);
 }

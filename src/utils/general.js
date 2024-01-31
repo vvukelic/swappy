@@ -1,5 +1,6 @@
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import { getTokenDecimals } from './web3';
+
 
 export async function toSmallestUnit(amount, tokenContractAddress) {
     let decimals = null;
@@ -27,4 +28,16 @@ export async function toBaseUnit(amount, tokenContractAddress) {
 
 export function sliceAddress(address) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+export function getSwapStatus(swapDetails, currentBlockTimestamp) {
+    if (swapDetails.status === 0) {
+        console.debug(currentBlockTimestamp);
+        return !swapDetails.expiration.isZero() && swapDetails.expiration.lt(BigNumber.from(currentBlockTimestamp)) ? 'EXPIRED' : 'OPENED';
+        // return swapDetails.expiration !== 0 && currentBlockTimestamp > swapDetails.expiration ? 'EXPIRED' : 'OPENED';
+    } else if (swapDetails.status === 1) {
+        return 'CLOSED';
+    } else if (swapDetails.status === 2) {
+        return 'CANCELED';
+    }
 }

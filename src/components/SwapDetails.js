@@ -4,19 +4,28 @@ import { Chip, Grid, Typography, Box } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { getSwap, takeSwap, cancelSwap, approveToken, getEthBalance, getAllowance, getTokenDecimals } from '../utils/web3';
+import { getSwap, takeSwap, cancelSwap, approveToken, getEthBalance, getAllowance, getCurrentBlockTimestamp } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getTokenByAddress } from '../utils/tokens';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
 import SwapDetailsTokenInfo from './SwapDetailsTokenInfo';
-import { sliceAddress, toBaseUnit } from '../utils/general';
+import { sliceAddress, toBaseUnit, getSwapStatus } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
+
+const StyledChip = styled(Chip)`
+    color: white;
+    background-color: #f45050;
+`;
+
+const StyledBox = styled(Box)`
+    min-height: 2.5em;
+`;
 
 function SwapDetails({ hash }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
@@ -30,14 +39,7 @@ function SwapDetails({ hash }) {
     const [dstAmount, setDstAmount] = useState(0);
     const [feeAmount, setFeeAmount] = useState(0);
     const [expirationDatetime, setExpirationDatetime] = useState(null);
-
-    const StyledChip = styled(Chip)`
-        color: white;
-    `;
-
-    const StyledBox = styled(Box)`
-        min-height: 2.5em;
-    `;
+    const [currentBlockTimestamp, setCurrentBlockTimestamp] = useState(null);
 
     useEffect(() => {
         async function formatSwapDetails() {
@@ -96,6 +98,9 @@ function SwapDetails({ hash }) {
     useEffect(() => {
         async function getSwapDetails() {
             try {
+                const currentBlockTimestamp = await getCurrentBlockTimestamp();
+                setCurrentBlockTimestamp(currentBlockTimestamp);
+
                 const swap = await getSwap(contractAddresses.SwapManager[network], hash);
                 setSwapDetails(swap);
             } catch (err) {
@@ -206,7 +211,7 @@ function SwapDetails({ hash }) {
                     </Grid>
                     <Grid item xs={8} textAlign='center'>
                         <StyledBox>
-                            <StyledChip label={swapDetails.status === 0 ? 'OPENED' : swapDetails.status === 1 ? 'CLOSED' : 'CANCELED'} />
+                            <StyledChip label={getSwapStatus(swapDetails, currentBlockTimestamp)} />
                         </StyledBox>
                         <StyledBox>
                             <Typography>{feeAmount} ETH</Typography>
@@ -221,13 +226,13 @@ function SwapDetails({ hash }) {
                 </Grid>
             </BorderSection>
 
-            {swapDetails.status === 0 && (swapDetails.dstAddress === ethers.constants.AddressZero || swapDetails.dstAddress === defaultAccount) && swapDetails.srcAddress !== defaultAccount && (
+            {getSwapStatus(swapDetails, currentBlockTimestamp) === 'OPENED' && (swapDetails.dstAddress === ethers.constants.AddressZero || swapDetails.dstAddress === defaultAccount) && swapDetails.srcAddress !== defaultAccount && (
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
                     <PrimaryButton onClick={handleTakeSwap} buttonText={swapButtonText} />
                 </Grid>
             )}
 
-            {swapDetails.status === 0 && swapDetails.srcAddress === defaultAccount && (
+            {getSwapStatus(swapDetails, currentBlockTimestamp) === 'OPENED'  && swapDetails.srcAddress === defaultAccount && (
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
                     <PrimaryButton onClick={handleCancelSwap} buttonText='Cancel' />
                 </Grid>
