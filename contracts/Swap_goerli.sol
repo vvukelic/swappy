@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract SwapManager {
-    enum SwapStatus { OPENED, CLOSED, CANCELED }
+    enum SwapStatus { OPENED, COMPLETED, CANCELED }
 
     struct Swap {
         address payable srcAddress;
@@ -19,7 +19,7 @@ contract SwapManager {
         uint256 feeAmount;
 
         uint256 createdTime;
-        uint256 expiration;
+        uint256 expirationTime;
         uint256 closedTime;
 
         SwapStatus status;
@@ -67,9 +67,9 @@ contract SwapManager {
         newSwap.feeAmount = 1000000000000;
 
         if (expiresIn > 0) {
-            newSwap.expiration = block.timestamp + expiresIn;
+            newSwap.expirationTime = block.timestamp + expiresIn;
         } else {
-            newSwap.expiration = 0;
+            newSwap.expirationTime = 0;
         }
 
         uint salt = block.number;
@@ -110,8 +110,8 @@ contract SwapManager {
         require(swap.status == SwapStatus.OPENED, "Can't take swap that is not in OPENED status!");
         require(address(msg.sender) != swap.srcAddress, "Cannot take own swap!");
 
-        if (swap.expiration > 0) {
-            require(swap.expiration > block.timestamp, "Swap has expired!");
+        if (swap.expirationTime > 0) {
+            require(swap.expirationTime > block.timestamp, "Swap has expired!");
         }
 
         if (swap.dstAddress != address(0)) {
@@ -157,7 +157,7 @@ contract SwapManager {
         }
 
         swap.closedTime = block.timestamp;
-        swap.status = SwapStatus.CLOSED;
+        swap.status = SwapStatus.COMPLETED;
     }
 
     function cancelSwap(bytes32 index) public payable {

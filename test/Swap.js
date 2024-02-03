@@ -328,7 +328,7 @@ describe('SwapManager contract', function () {
 
             // Validate that the swap has been taken successfully
             const swap = await hardhatSwapManager.swaps(swapHash);
-            expect(swap.status).to.equal(1); // CLOSED status
+            expect(swap.status).to.equal(1); // 1 - COMPLETED status
         });
 
         it('Should fail to take a swap by an unauthorized address', async function () {

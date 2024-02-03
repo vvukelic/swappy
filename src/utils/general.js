@@ -33,9 +33,9 @@ export function sliceAddress(address) {
 export function getSwapStatus(swapDetails, currentBlockTimestamp) {
     if (swapDetails.status === 0) {
         console.debug(currentBlockTimestamp);
-        return !swapDetails.expiration.isZero() && swapDetails.expiration.lt(BigNumber.from(currentBlockTimestamp)) ? 'EXPIRED' : 'OPENED';
+        return !swapDetails.expirationTime.isZero() && swapDetails.expirationTime.lt(BigNumber.from(currentBlockTimestamp)) ? 'EXPIRED' : 'OPENED';
     } else if (swapDetails.status === 1) {
-        return 'CLOSED';
+        return 'COMPLETED';
     } else if (swapDetails.status === 2) {
         return 'CANCELED';
     }

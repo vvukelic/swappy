@@ -199,7 +199,7 @@
           },
           {
             "internalType": "uint256",
-            "name": "expiration",
+            "name": "expirationTime",
             "type": "uint256"
           },
           {
@@ -331,7 +331,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "expiration",
+        "name": "expirationTime",
         "type": "uint256"
       },
       {

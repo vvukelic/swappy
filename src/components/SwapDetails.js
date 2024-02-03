@@ -49,8 +49,8 @@ function SwapDetails({ hash }) {
 
             setFeeAmount(ethers.utils.formatUnits(swapDetails.feeAmount, 'ether'));
 
-            if (swapDetails.expiration.toString() !== '0') {
-                setExpirationDatetime(new Date(swapDetails.expiration * 1000).toLocaleString());
+            if (swapDetails.expirationTime.toString() !== '0') {
+                setExpirationDatetime(new Date(swapDetails.expirationTime * 1000).toLocaleString());
             }
         }
 

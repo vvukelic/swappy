@@ -147,11 +147,9 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
                         <TableBody>
                             {swaps.length === 0 ? (
                                 <TableRow>
-                                    <StyledTableCell />
-                                    <StyledTableCell>
+                                    <StyledTableCell colSpan={4} style={{ textAlign: 'center' }}>
                                         <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
                                     </StyledTableCell>
-                                    <StyledTableCell />
                                 </TableRow>
                             ) : (
                                 swaps.map((swap, index) => {
@@ -169,16 +167,16 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
 
                                     return (
                                         <StyledTableRow key={index} onClick={() => handleRowClick(swap.hash)}>
-                                            <StyledTableCell align='right'>
-                                                {displayCreatedTime}
-                                            </StyledTableCell>
+                                            <StyledTableCell align='right'>{displayCreatedTime}</StyledTableCell>
                                             <StyledTableCell align='right'>
                                                 {displaySrcAmount} {displaySrcToken}
                                             </StyledTableCell>
                                             <StyledTableCell align='right'>
                                                 {displayDstAmount} {displayDstToken}
                                             </StyledTableCell>
-                                            <StyledTableCell><SwapStatusChip status={getSwapStatus(swap.details, currentBlockTimestamp)} /></StyledTableCell>
+                                            <StyledTableCell>
+                                                <SwapStatusChip status={getSwapStatus(swap.details, currentBlockTimestamp)} />
+                                            </StyledTableCell>
                                         </StyledTableRow>
                                     );
                                 })
