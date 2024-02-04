@@ -1,18 +1,38 @@
 import tokenInfo from '../data/tokenInfo.json';
 
+
+let tokensByAddressCache = {};
+let tokensByNameCache = {};
+
 const indexTokensByAddress = (network) => {
+    if (tokensByAddressCache[network]) {
+        return tokensByAddressCache[network];
+    }
+
     const tokenIndex = {};
+
     tokenInfo.forEach((token) => {
         tokenIndex[token.networkSpecificAddress[network]] = token;
     });
+
+    tokensByAddressCache[network] = tokenIndex;
+
     return tokenIndex;
 };
 
 const indexTokensByName = () => {
+    if (Object.keys(tokensByNameCache).length) {
+        return tokensByNameCache;
+    }
+
     const tokenIndex = {};
+
     tokenInfo.forEach((token) => {
         tokenIndex[token.name] = token;
     });
+
+    tokensByNameCache = tokenIndex;
+
     return tokenIndex;
 };
 

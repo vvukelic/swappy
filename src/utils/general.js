@@ -35,7 +35,7 @@ export function getSwapStatus(swap, currentBlockTimestamp) {
     if (swap.status === 0) {
         return !swap.expirationTime.isZero() && swap.expirationTime.lt(BigNumber.from(currentBlockTimestamp)) ? 'EXPIRED' : 'OPENED';
     } else if (swap.status === 1) {
-        return 'COMPLETED';
+        return 'SWAPPED';
     } else if (swap.status === 2) {
         return 'CANCELED';
     }
