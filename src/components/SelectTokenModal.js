@@ -5,6 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { Avatar, TextField } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import ListItemText from '@mui/material/ListItemText';
 import styled from '@emotion/styled';
 import { getTokenImageUrl } from '../utils/tokens';
@@ -50,11 +51,15 @@ const ScrollableListContainer = styled.div`
     overflow-y: auto;
 `;
 
+const isValidEthereumAddress = (address) => {
+    return /^(0x)?[0-9a-fA-F]{40}$/.test(address);
+};
+
 function SelectTokenModal({ open, onClose, handleTokenSelection, title, network }) {
     const [searchInput, setSearchInput] = useState('');
 
     const handleSearchChange = (event) => {
-        setSearchInput(event.target.value.toLowerCase());
+        setSearchInput(event.target.value);
     };
 
     const filteredTokens = tokenInfo.filter(token =>
@@ -73,12 +78,19 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
             <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
             <ScrollableListContainer>
                 <List>
-                    {filteredTokens.map((token) => (
-                        <StyledListItem onClick={() => selectToken(token)} key={token.name}>
-                            <StyledAvatar src={getTokenImageUrl(token)} />
-                            <ListItemText primary={token.name} />
-                        </StyledListItem>
-                    ))}
+                    {filteredTokens.length > 0 ? (
+                        filteredTokens.map((token) => (
+                            <StyledListItem onClick={() => selectToken(token)} key={token.name}>
+                                <StyledAvatar src={getTokenImageUrl(token)} />
+                                <ListItemText primary={token.name} />
+                            </StyledListItem>
+                        ))
+                    ) : isValidEthereumAddress(searchInput) ? (
+                        <ListItem>
+                            <AddIcon />
+                            <ListItemText primary='Add token' />
+                        </ListItem>
+                    ) : null}
                 </List>
             </ScrollableListContainer>
         </StyledDialog>
