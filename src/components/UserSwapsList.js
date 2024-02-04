@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Chip } from '@mui/material';
-import { getUserSwaps, getDstUserSwaps, getSwap, getCurrentBlockTimestamp } from '../utils/web3';
-import { getTokenByAddress } from '../utils/tokens';
-import { toBaseUnit, getSwapStatus } from '../utils/general';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import { getUserSwaps, getDstUserSwaps } from '../utils/web3';
+import { getSwap } from '../utils/general';
 import BorderedSection from './BorderSection';
 import SwapStatusChip from './SwapStatusChip';
 
@@ -60,42 +59,18 @@ const StyledMessage = styled(Typography)`
 const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
     const [userSwaps, setUserSwaps] = useState([]);
     const [destinationSwaps, setDestinationSwaps] = useState([]);
-    const [currentBlockTimestamp, setCurrentBlockTimestamp] = useState(null);
-
-    useEffect(() => {
-        async function _getCurrentBlockTimestamp() {
-            try {
-                const currentBlockTimestamp = await getCurrentBlockTimestamp();
-                setCurrentBlockTimestamp(currentBlockTimestamp);
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        if (network) {
-            _getCurrentBlockTimestamp();
-        }
-    }, [network]);
 
     useEffect(() => {
         const fetchUserSwaps = async () => {
             const swapHashes = await getUserSwaps(contractAddresses.SwapManager[network], userAddress);
 
             const swapsWithHash = await Promise.all(
-                
-
                 swapHashes.map(async (hash) => {
-                    const swapDetails = await getSwap(contractAddresses.SwapManager[network], hash);
-                    const srcAmountInBaseUnit = await toBaseUnit(swapDetails.srcAmount, swapDetails.srcTokenAddress);
-                    const dstAmountInBaseUnit = await toBaseUnit(swapDetails.dstAmount, swapDetails.dstTokenAddress);
+                    const swap = await getSwap(contractAddresses.SwapManager[network], hash, network);
 
                     return {
                         hash,
-                        details: {
-                            ...swapDetails,
-                            srcAmountInBaseUnit: srcAmountInBaseUnit,
-                            dstAmountInBaseUnit: dstAmountInBaseUnit,
-                        },
+                        ...swap,
                     };
                 })
             );
@@ -106,17 +81,11 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
             const swapHashes = await getDstUserSwaps(contractAddresses.SwapManager[network], userAddress);
             const swapsWithHash = await Promise.all(
                 swapHashes.map(async (hash) => {
-                    const swapDetails = await getSwap(contractAddresses.SwapManager[network], hash);
-                    const srcAmountInBaseUnit = await toBaseUnit(swapDetails.srcAmount, swapDetails.srcTokenAddress);
-                    const dstAmountInBaseUnit = await toBaseUnit(swapDetails.dstAmount, swapDetails.dstTokenAddress);
+                    const swap = await getSwap(contractAddresses.SwapManager[network], hash, network);
 
                     return {
                         hash,
-                        details: {
-                            ...swapDetails,
-                            srcAmountInBaseUnit: srcAmountInBaseUnit,
-                            dstAmountInBaseUnit: dstAmountInBaseUnit,
-                        },
+                        ...swap,
                     };
                 })
             );
@@ -153,29 +122,26 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
                                 </TableRow>
                             ) : (
                                 swaps.map((swap, index) => {
-                                    const srcToken = getTokenByAddress(swap.details.srcTokenAddress, network).name;
-                                    const dstToken = getTokenByAddress(swap.details.dstTokenAddress, network).name;
-                                    const srcAmount = swap.details.srcAmountInBaseUnit.toString();
-                                    const dstAmount = swap.details.dstAmountInBaseUnit.toString();
+                                    const srcAmount = swap.srcAmountInBaseUnit.toString();
+                                    const dstAmount = swap.dstAmountInBaseUnit.toString();
 
                                     const isSwapsForYou = activeSwapsListTab === 'swapsForYou';
-                                    const displayCreatedTime = new Date(swap.details.createdTime * 1000).toLocaleString();
                                     const displaySrcAmount = isSwapsForYou ? dstAmount : srcAmount;
                                     const displayDstAmount = isSwapsForYou ? srcAmount : dstAmount;
-                                    const displaySrcToken = isSwapsForYou ? dstToken : srcToken;
-                                    const displayDstToken = isSwapsForYou ? srcToken : dstToken;
+                                    const displaySrcTokenName = isSwapsForYou ? swap.dstTokenName : swap.srcTokenName;
+                                    const displayDstTokenName = isSwapsForYou ? swap.srcTokenName : swap.dstTokenName;;
 
                                     return (
                                         <StyledTableRow key={index} onClick={() => handleRowClick(swap.hash)}>
-                                            <StyledTableCell align='right'>{displayCreatedTime}</StyledTableCell>
+                                            <StyledTableCell align='right'>{swap.displayCreatedTime}</StyledTableCell>
                                             <StyledTableCell align='right'>
-                                                {displaySrcAmount} {displaySrcToken}
+                                                {displaySrcAmount} {displaySrcTokenName}
                                             </StyledTableCell>
                                             <StyledTableCell align='right'>
-                                                {displayDstAmount} {displayDstToken}
+                                                {displayDstAmount} {displayDstTokenName}
                                             </StyledTableCell>
                                             <StyledTableCell>
-                                                <SwapStatusChip status={getSwapStatus(swap.details, currentBlockTimestamp)} />
+                                                <SwapStatusChip status={swap.readableStatus} />
                                             </StyledTableCell>
                                         </StyledTableRow>
                                     );

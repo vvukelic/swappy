@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 
+
 const erc20Abi = require('../contracts/Erc20.json');
 const swapManagerAbi = require('../contracts/Swap.json');
 
@@ -129,10 +130,9 @@ export async function createSwap(contractAddress, srcTokenAddress, srcAmount, ds
     }
 }
 
-export async function getSwap(contractAddress, swapHash) {
+export async function getSwapRaw(contractAddress, swapHash) {
     const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
     const swap = await swapManagerContract.getSwap(swapHash);
-
     return swap;
 }
 
