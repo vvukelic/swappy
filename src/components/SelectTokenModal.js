@@ -45,6 +45,11 @@ const StyledTextField = styled(TextField)`
     }
 `;
 
+const ScrollableListContainer = styled.div`
+    max-height: 500px;
+    overflow-y: auto;
+`;
+
 function SelectTokenModal({ open, onClose, handleTokenSelection, title, network }) {
     const [searchInput, setSearchInput] = useState('');
 
@@ -66,14 +71,16 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
         <StyledDialog onClose={onClose} open={open}>
             <StyledDialogTitle>{title}</StyledDialogTitle>
             <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
-            <List>
-                {filteredTokens.map((token) => (
-                    <StyledListItem onClick={() => selectToken(token)} key={token.name}>
-                        <StyledAvatar src={getTokenImageUrl(token)} />
-                        <ListItemText primary={token.name} />
-                    </StyledListItem>
-                ))}
-            </List>
+            <ScrollableListContainer>
+                <List>
+                    {filteredTokens.map((token) => (
+                        <StyledListItem onClick={() => selectToken(token)} key={token.name}>
+                            <StyledAvatar src={getTokenImageUrl(token)} />
+                            <ListItemText primary={token.name} />
+                        </StyledListItem>
+                    ))}
+                </List>
+            </ScrollableListContainer>
         </StyledDialog>
     );
 }
