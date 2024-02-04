@@ -53,8 +53,8 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
     };
 
     const filteredTokens = tokenInfo.filter(token =>
-        token.name.toLowerCase().includes(searchInput) ||
-        (token.networkSpecificAddress[network] && token.networkSpecificAddress[network].toLowerCase().includes(searchInput))
+        token.name.includes(searchInput.toUpperCase()) ||
+        (token.networkSpecificAddress[network] && token.networkSpecificAddress[network].includes(searchInput))
     );
 
     const selectToken = (token) => {
@@ -70,7 +70,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
                 {filteredTokens.map((token) => (
                     <StyledListItem onClick={() => selectToken(token)} key={token.name}>
                         <StyledAvatar src={getTokenImageUrl(token)} />
-                        <ListItemText primary={token.name.toUpperCase()} />
+                        <ListItemText primary={token.name} />
                     </StyledListItem>
                 ))}
             </List>

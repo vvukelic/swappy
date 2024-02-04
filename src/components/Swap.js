@@ -54,7 +54,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
             let tokenAddress = token.networkSpecificAddress[network];
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByName('weth').networkSpecificAddress[network];
+                tokenAddress = getTokenByName('WETH').networkSpecificAddress[network];
             }
 
             const availableTokenBalance = await getAllowance(tokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
@@ -68,11 +68,11 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
     useEffect(() => {
         if (!selectedSrcToken) {
-            handleTokenSelection(getTokenByName('eth'), 'src');
+            handleTokenSelection(getTokenByName('ETH'), 'src');
         }
 
         if (!selectedDstToken) {
-            handleTokenSelection(getTokenByName('usdc'), 'dst');
+            handleTokenSelection(getTokenByName('USDC'), 'dst');
         }
     }, [defaultAccount]);
 
@@ -93,7 +93,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
             let tokenAddress = selectedSrcToken.networkSpecificAddress[network];
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByName('weth').networkSpecificAddress[network];
+                tokenAddress = getTokenByName('WETH').networkSpecificAddress[network];
             }
 
             startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
@@ -165,7 +165,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
 
         let newSrcTokenAddress = selectedDstToken.networkSpecificAddress[network];
         if (newSrcTokenAddress === ethers.constants.AddressZero) {
-            newSrcTokenAddress = getTokenByName('weth').networkSpecificAddress[network];
+            newSrcTokenAddress = getTokenByName('WETH').networkSpecificAddress[network];
         }
 
         const availableTokenBalance = await getAllowance(newSrcTokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
