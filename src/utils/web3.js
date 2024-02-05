@@ -31,7 +31,7 @@ export async function getNetworkName() {
 
     switch (network.chainId) {
         case 1:
-            networkName = 'mainnet';
+            networkName = 'ethereum';
             break;
         case 3:
             networkName = 'ropsten';
@@ -82,6 +82,34 @@ export async function getAllowance(tokenContractAddress, ownerAddress, spenderAd
     } catch (error) {
         console.error('Error checking allowance:', error);
     }
+}
+
+export async function getTokenName(tokenContractAddress) {
+    const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, getProvider());
+    let name;
+
+    try {
+        name = await tokenContract.name();
+    } catch (error) {
+        console.error('Error getting token name:', error);
+        throw error;
+    }
+
+    return name;
+}
+
+export async function getTokenSymbol(tokenContractAddress) {
+    const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, getProvider());
+    let symbol;
+
+    try {
+        symbol = await tokenContract.symbol();
+    } catch (error) {
+        console.error('Error getting token symbol:', error);
+        throw error;
+    }
+
+    return symbol;
 }
 
 export async function getTokenDecimals(tokenContractAddress) {

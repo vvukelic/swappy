@@ -1,15 +1,16 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { Avatar, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import styled from '@emotion/styled';
-import { getTokenImageUrl } from '../utils/tokens';
-import tokenInfo from '../data/tokenInfo.json';
+import { getTokenImageUrl, addCustomToken, getAllTokens } from '../utils/tokens';
+import { getTokenSymbol } from '../utils/web3';
 
 
 const StyledDialog = styled(Dialog)`
@@ -57,19 +58,50 @@ const isValidEthereumAddress = (address) => {
 
 function SelectTokenModal({ open, onClose, handleTokenSelection, title, network }) {
     const [searchInput, setSearchInput] = useState('');
+    const [customToken, setCustomToken] = useState(null);
+    const [filteredTokens, setfilteredTokens] = useState([]);
+
+    useEffect(() => {
+        async function processSearchInput() {
+            try {
+                const tokenName = await getTokenSymbol(searchInput);
+                setCustomToken({
+                    'name': tokenName,
+                    'networkSpecificAddress': {
+                        [network]: searchInput
+                    }
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        if (isValidEthereumAddress(searchInput)) {
+            processSearchInput();
+        }
+    }, [searchInput]);
+
+    useEffect(() => {
+        setfilteredTokens(
+            getAllTokens().filter(token =>
+                token.networkSpecificAddress[network] && 
+                (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[network].includes(searchInput))
+            )
+        );
+    }, [network, searchInput]);
 
     const handleSearchChange = (event) => {
         setSearchInput(event.target.value);
     };
 
-    const filteredTokens = tokenInfo.filter(token =>
-        token.name.includes(searchInput.toUpperCase()) ||
-        (token.networkSpecificAddress[network] && token.networkSpecificAddress[network].includes(searchInput))
-    );
-
     const selectToken = (token) => {
         handleTokenSelection(token);
         onClose();
+    };
+
+    const handleAddTokenClick = () => {
+        addCustomToken(customToken);
+        selectToken(customToken);
     };
 
     return (
@@ -85,9 +117,11 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
                                 <ListItemText primary={token.name} />
                             </StyledListItem>
                         ))
-                    ) : isValidEthereumAddress(searchInput) ? (
+                    ) : customToken ? (
                         <ListItem>
-                            <AddIcon />
+                            <IconButton onClick={handleAddTokenClick}>
+                                <AddIcon />
+                            </IconButton>
                             <ListItemText primary='Add token' />
                         </ListItem>
                     ) : null}

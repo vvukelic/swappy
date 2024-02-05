@@ -1,4 +1,4 @@
-import tokenInfo from '../data/tokenInfo.json';
+import commonTokens from '../data/commonTokens.json';
 
 
 let tokensByAddressCache = {};
@@ -11,7 +11,7 @@ const indexTokensByAddress = (network) => {
 
     const tokenIndex = {};
 
-    tokenInfo.forEach((token) => {
+    commonTokens.forEach((token) => {
         tokenIndex[token.networkSpecificAddress[network]] = token;
     });
 
@@ -27,7 +27,7 @@ const indexTokensByName = () => {
 
     const tokenIndex = {};
 
-    tokenInfo.forEach((token) => {
+    commonTokens.forEach((token) => {
         tokenIndex[token.name] = token;
     });
 
@@ -49,10 +49,48 @@ const getTokenByName = (name) => {
 const getTokenImageUrl = (token) => {
     if (token && token.logo) {
         return token.logo;
-    } else if (token && token.networkSpecificAddress['mainnet']) {
-        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${token.networkSpecificAddress['mainnet']}/logo.png`;
+    } else if (token && token.networkSpecificAddress['ethereum']) {
+        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${token.networkSpecificAddress['ethereum']}/logo.png`;
     }
     return '';
 };
 
-export { getTokenByAddress, getTokenByName, getTokenImageUrl };
+const saveCustomTokensList = (list) => {
+    try {
+        const serializedList = JSON.stringify(list);
+        localStorage.setItem('customTokens', serializedList);
+    } catch (error) {
+        console.error('Error saving custom tokens to local storage', error);
+    }
+};
+
+const getCustomTokensList = () => {
+    try {
+        const serializedList = localStorage.getItem('customTokens');
+
+        if (!serializedList) {
+            return [];
+        }
+
+        return JSON.parse(serializedList);
+    } catch (error) {
+        console.error('Error retrieving from local storage', error);
+        return [];
+    }
+};
+
+const addCustomToken = (customToken) => {
+    let customTokensList = getCustomTokensList();
+
+    customTokensList.push(customToken);
+    saveCustomTokensList(customTokensList);
+
+    tokensByAddressCache = {};
+    tokensByNameCache = {};
+}
+
+const getAllTokens = () => {
+    return [...commonTokens, ...getCustomTokensList()];
+}
+
+export { getTokenByAddress, getTokenByName, getTokenImageUrl, getAllTokens, addCustomToken };

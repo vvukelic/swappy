@@ -3,7 +3,7 @@
         "name": "ETH",
         "networkSpecificAddress": {
             "localhost": "0x0000000000000000000000000000000000000000",
-            "mainnet": "0x0000000000000000000000000000000000000000",
+            "ethereum": "0x0000000000000000000000000000000000000000",
             "goerli": "0x0000000000000000000000000000000000000000",
             "polygon": ""
         },
@@ -13,7 +13,7 @@
         "name": "WETH",
         "networkSpecificAddress": {
             "localhost": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-            "mainnet": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "ethereum": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
             "goerli": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
             "polygon": ""
         }
@@ -22,7 +22,7 @@
         "name": "LEO",
         "networkSpecificAddress": {
             "localhost": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
-            "mainnet": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
+            "ethereum": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
             "goerli": "",
             "polygon": ""
         }
@@ -31,7 +31,7 @@
         "name": "LINK",
         "networkSpecificAddress": {
             "localhost": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
-            "mainnet": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+            "ethereum": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
             "goerli": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
             "polygon": ""
         }
@@ -40,7 +40,7 @@
         "name": "MATIC",
         "networkSpecificAddress": {
             "localhost": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
-            "mainnet": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+            "ethereum": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
             "goerli": "0xA108830A23A9a054FfF4470a8e6292da0886A4D4",
             "polygon": ""
         },
@@ -50,7 +50,7 @@
         "name": "OKB",
         "networkSpecificAddress": {
             "localhost": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
-            "mainnet": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
+            "ethereum": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
             "goerli": "0xBcAEE3B661663F04036af861237e534c818496d2",
             "polygon": ""
         }
@@ -59,7 +59,7 @@
         "name": "SHIB",
         "networkSpecificAddress": {
             "localhost": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
-            "mainnet": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
+            "ethereum": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
             "goerli": "0x4698ca96dd198AE04e6C45b199516c17c31DBC95",
             "polygon": ""
         }
@@ -68,7 +68,7 @@
         "name": "TON",
         "networkSpecificAddress": {
             "localhost": "0x6a6c2adA3Ce053561C2FbC3eE211F23d9b8C520a",
-            "mainnet": "0x6a6c2adA3Ce053561C2FbC3eE211F23d9b8C520a",
+            "ethereum": "0x6a6c2adA3Ce053561C2FbC3eE211F23d9b8C520a",
             "goerli": "",
             "polygon": ""
         },
@@ -78,7 +78,7 @@
         "name": "UNI",
         "networkSpecificAddress": {
             "localhost": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-            "mainnet": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+            "ethereum": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
             "goerli": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
             "polygon": ""
         }
@@ -87,7 +87,7 @@
         "name": "USDC",
         "networkSpecificAddress": {
             "localhost": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            "mainnet": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "ethereum": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
             "goerli": "0xd35CCeEAD182dcee0F148EbaC9447DA2c4D449c4",
             "polygon": ""
         }
@@ -96,7 +96,7 @@
         "name": "WBTC",
         "networkSpecificAddress": {
             "localhost": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-            "mainnet": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+            "ethereum": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
             "goerli": "0xC04B0d3107736C32e19F1c62b2aF67BE61d63a05",
             "polygon": ""
         }
@@ -105,7 +105,7 @@
         "name": "DAI",
         "networkSpecificAddress": {
             "localhost": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-            "mainnet": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+            "ethereum": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
             "goerli": "",
             "polygon": ""
         }
@@ -114,7 +114,7 @@
         "name": "USDT",
         "networkSpecificAddress": {
             "localhost": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-            "mainnet": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+            "ethereum": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
             "goerli": "",
             "polygon": ""
         }
@@ -123,7 +123,7 @@
         "name": "AAVE",
         "networkSpecificAddress": {
             "localhost": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
-            "mainnet": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+            "ethereum": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
             "goerli": "",
             "polygon": ""
         }
@@ -132,7 +132,7 @@
         "name": "SNX",
         "networkSpecificAddress": {
             "localhost": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
-            "mainnet": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+            "ethereum": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
             "goerli": "",
             "polygon": ""
         }
@@ -141,7 +141,7 @@
         "name": "COMP",
         "networkSpecificAddress": {
             "localhost": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
-            "mainnet": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
+            "ethereum": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
             "goerli": "",
             "polygon": ""
         }
@@ -150,7 +150,7 @@
         "name": "MKR",
         "networkSpecificAddress": {
             "localhost": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
-            "mainnet": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
+            "ethereum": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
             "goerli": "",
             "polygon": ""
         }
@@ -159,7 +159,7 @@
         "name": "YFI",
         "networkSpecificAddress": {
             "localhost": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
-            "mainnet": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
+            "ethereum": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
             "goerli": "",
             "polygon": ""
         }
@@ -168,7 +168,7 @@
         "name": "SUSHI",
         "networkSpecificAddress": {
             "localhost": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
-            "mainnet": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
+            "ethereum": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
             "goerli": "",
             "polygon": ""
         }
@@ -177,7 +177,7 @@
         "name": "ZRX",
         "networkSpecificAddress": {
             "localhost": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
-            "mainnet": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
+            "ethereum": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
             "goerli": "",
             "polygon": ""
         }
@@ -186,7 +186,7 @@
         "name": "BAT",
         "networkSpecificAddress": {
             "localhost": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
-            "mainnet": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
+            "ethereum": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
             "goerli": "",
             "polygon": ""
         }
@@ -195,7 +195,7 @@
         "name": "UMA",
         "networkSpecificAddress": {
             "localhost": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
-            "mainnet": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
+            "ethereum": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
             "goerli": "",
             "polygon": ""
         }
@@ -204,7 +204,7 @@
         "name": "GRT",
         "networkSpecificAddress": {
             "localhost": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
-            "mainnet": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
+            "ethereum": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
             "goerli": "",
             "polygon": ""
         }
@@ -213,7 +213,7 @@
         "name": "1INCH",
         "networkSpecificAddress": {
             "localhost": "0x111111111117dC0aa78b770fA6A738034120C302",
-            "mainnet": "0x111111111117dC0aa78b770fA6A738034120C302",
+            "ethereum": "0x111111111117dC0aa78b770fA6A738034120C302",
             "goerli": "",
             "polygon": ""
         }
@@ -222,7 +222,7 @@
         "name": "ENJ",
         "networkSpecificAddress": {
             "localhost": "0xF629cBd94d3791C9250152BD8dfBDF380E2a3B9c",
-            "mainnet": "0xF629cBd94d3791C9250152BD8dfBDF380E2a3B9c",
+            "ethereum": "0xF629cBd94d3791C9250152BD8dfBDF380E2a3B9c",
             "goerli": "",
             "polygon": ""
         }
@@ -231,7 +231,7 @@
         "name": "MANA",
         "networkSpecificAddress": {
             "localhost": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
-            "mainnet": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
+            "ethereum": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
             "goerli": "",
             "polygon": ""
         }

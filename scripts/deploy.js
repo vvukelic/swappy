@@ -15,7 +15,7 @@ async function main() {
 
     let contractPath = 'contracts/Swap.sol:SwapManager';
     
-    if (network.name !== 'localhost' && network.name !== 'mainnet') {
+    if (network.name !== 'localhost' && network.name !== 'ethereum') {
         contractPath = `contracts/Swap_${network.name}.sol:SwapManager`;
     }
 
@@ -71,7 +71,7 @@ function saveFrontendFiles(swapFactory) {
 
     let contractPath = 'contracts/Swap.sol:SwapManager';
 
-    if (network.name !== 'localhost' && network.name !== 'mainnet') {
+    if (network.name !== 'localhost' && network.name !== 'ethereum') {
         contractPath = `contracts/Swap_${network.name}.sol:SwapManager`;
     }
 
