@@ -1,5 +1,14 @@
 [
     {
+        "name": "WETH",
+        "networkSpecificAddress": {
+            "localhost": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "ethereum": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "goerli": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
+            "polygon": ""
+        }
+    },
+    {
         "name": "ETH",
         "networkSpecificAddress": {
             "localhost": "0x0000000000000000000000000000000000000000",
@@ -10,11 +19,11 @@
         "logo": "/images/eth-logo.png"
     },
     {
-        "name": "WETH",
+        "name": "USDC",
         "networkSpecificAddress": {
-            "localhost": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-            "ethereum": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-            "goerli": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
+            "localhost": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "ethereum": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "goerli": "0xd35CCeEAD182dcee0F148EbaC9447DA2c4D449c4",
             "polygon": ""
         }
     },
@@ -80,15 +89,6 @@
             "localhost": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
             "ethereum": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
             "goerli": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-            "polygon": ""
-        }
-    },
-    {
-        "name": "USDC",
-        "networkSpecificAddress": {
-            "localhost": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            "ethereum": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            "goerli": "0xd35CCeEAD182dcee0F148EbaC9447DA2c4D449c4",
             "polygon": ""
         }
     },

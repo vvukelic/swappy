@@ -11,7 +11,7 @@ const indexTokensByAddress = (network) => {
 
     const tokenIndex = {};
 
-    commonTokens.forEach((token) => {
+    getAllTokens().forEach((token) => {
         tokenIndex[token.networkSpecificAddress[network]] = token;
     });
 
