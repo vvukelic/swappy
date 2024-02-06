@@ -6,7 +6,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
-import { getTokenByName } from '../utils/tokens';
+import { getTokenByName, updateCustomTokensList } from '../utils/tokens';
 import { getAllowance, approveToken, createSwap } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { toSmallestUnit } from '../utils/general';
@@ -18,23 +18,23 @@ import TransactionStatusModal from './TransactionStatusModal';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
+const StyledSwitch = styled(Switch)`
+    & .MuiSwitch-switchBase.Mui-checked {
+        color: white;
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+    }
+    & .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+        background-color: white;
+    }
+`;
+
 function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, setDstAddress, selectedSrcToken, setSelectedSrcToken, selectedDstToken, setSelectedDstToken, swapButtonText, setSwapButtonText, tokenApproved, setTokenApproved, expiresInHours, setExpiresInHours, expiresInMinutes, setExpiresInMinutes, expirationEnabled, setExpirationEnabled, selectedSrcTokenImg, selectedDstTokenImg }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
-
-    const StyledSwitch = styled(Switch)`
-        & .MuiSwitch-switchBase.Mui-checked {
-            color: white;
-            &:hover {
-                background-color: rgba(255, 255, 255, 0.08);
-            }
-        }
-        & .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
-            background-color: white;
-        }
-    `;
 
     const openModal = (type) => {
         setModalType(type);
@@ -65,6 +65,10 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
             setSelectedDstToken(token);
         }
     };
+
+    useEffect(() => {
+        updateCustomTokensList();
+    }, []);
 
     useEffect(() => {
         if (!selectedSrcToken) {

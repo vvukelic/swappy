@@ -1,14 +1,5 @@
 [
     {
-        "name": "WETH",
-        "networkSpecificAddress": {
-            "localhost": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-            "ethereum": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-            "goerli": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-            "polygon": ""
-        }
-    },
-    {
         "name": "ETH",
         "networkSpecificAddress": {
             "localhost": "0x0000000000000000000000000000000000000000",
@@ -42,6 +33,15 @@
             "localhost": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
             "ethereum": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
             "goerli": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+            "polygon": ""
+        }
+    },
+    {
+        "name": "WETH",
+        "networkSpecificAddress": {
+            "localhost": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "ethereum": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "goerli": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
             "polygon": ""
         }
     },
@@ -232,6 +232,15 @@
         "networkSpecificAddress": {
             "localhost": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
             "ethereum": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
+            "goerli": "",
+            "polygon": ""
+        }
+    },
+    {
+        "name": "CRV",
+        "networkSpecificAddress": {
+            "localhost": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+            "ethereum": "0xD533a949740bb3306d119CC777fa900bA034cd52",
             "goerli": "",
             "polygon": ""
         }

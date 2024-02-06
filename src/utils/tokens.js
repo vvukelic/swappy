@@ -93,4 +93,27 @@ const getAllTokens = () => {
     return [...commonTokens, ...getCustomTokensList()];
 }
 
-export { getTokenByAddress, getTokenByName, getTokenImageUrl, getAllTokens, addCustomToken };
+const updateCustomTokensList = () => {
+    let customTokensList = getCustomTokensList();
+    const networks = Object.keys(commonTokens[0].networkSpecificAddress);
+
+    commonTokens.forEach((commonToken) => {
+        networks.forEach((network) => {
+            const commonTokenAddress = commonToken.networkSpecificAddress[network];
+
+            // Filter out custom tokens that match the current commonToken's address on any network
+            customTokensList = customTokensList.filter((customToken) => {
+                const customTokenAddress = customToken.networkSpecificAddress[network];
+                return customTokenAddress !== commonTokenAddress;
+            });
+        });
+    });
+
+    saveCustomTokensList(customTokensList);
+
+    tokensByAddressCache = {};
+    tokensByNameCache = {};
+};
+
+
+export { getTokenByAddress, getTokenByName, getTokenImageUrl, getAllTokens, addCustomToken, updateCustomTokensList };
