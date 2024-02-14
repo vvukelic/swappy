@@ -5,7 +5,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
-import NetworkSelector from './NetworkSelector';
 import { Card, CardMedia, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Drawer from '@mui/material/Drawer';
@@ -13,9 +12,39 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { getEthBalance, getNetworkName } from '../utils/web3';
+import { getEthBalance, getNetworkName, switchNetwork } from '../utils/web3';
 import { sliceAddress } from '../utils/general';
+import networks from '../data/networks';
 
+
+const RelativePositionContainer = styled.div`
+    position: relative;
+    display: inline-block;
+`;
+
+const StyledTabButton = styled(Button)`
+    margin-left: 10px;
+    color: white;
+    background-color: ${(props) => (props.isActive ? '#396777' : 'transparent')};
+
+    &:hover {
+        background-color: ${(props) => (props.isActive ? '#396777' : '#396777')};
+    }
+`;
+
+const StyledHoverMenu = styled(Box)`
+    position: absolute;
+    width: 170px;
+    background-color: #1b3a47;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 10px;
+    display: ${(props) => (props.show ? 'flex' : 'none')};
+    flex-direction: column;
+    top: 100%; // Position the menu right below the button
+    left: 50%; // Center align the menu horizontally
+    transform: translateX(-50%); // Adjust the position to be centered under the button
+`;
 
 function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsListTab }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
@@ -24,36 +53,8 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:600px)');
     const router = useRouter();
-    const [showHoverMenu, setShowHoverMenu] = useState(false);
-
-    const RelativePositionContainer = styled.div`
-        position: relative;
-        display: inline-block;
-    `;
-
-    const StyledTabButton = styled(Button)`
-        margin-left: 10px;
-        color: white;
-        background-color: ${(props) => (props.isActive ? '#396777' : 'transparent')};
-
-        &:hover {
-            background-color: ${(props) => (props.isActive ? '#396777' : '#396777')};
-        }
-    `;
-
-    const StyledHoverMenu = styled(Box)`
-        position: absolute;
-        width: 170px;
-        background-color: #1b3a47;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
-        padding: 10px;
-        display: ${(props) => (props.show ? 'flex' : 'none')};
-        flex-direction: column;
-        top: 100%; // Position the menu right below the button
-        left: 50%; // Center align the menu horizontally
-        transform: translateX(-50%); // Adjust the position to be centered under the button
-    `;
+    const [showSwapsHoverMenu, setShowSwapsHoverMenu] = useState(false);
+    const [showNetworksHoverMenu, setShowNetworksHoverMenu] = useState(false);
 
     useEffect(() => {
         const fetchBalance = async () => {
@@ -105,17 +106,9 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
         }
     };
 
-    const handleMouseEnter = () => {
-        setShowHoverMenu(true);
-    };
-
-    const handleMouseLeave = () => {
-        setShowHoverMenu(false);
-    };
-
     const handleSwapsListTabClick = (listTab) => {
         if (activeTab === 'createSwap' || activeTab === 'swapsList') {
-            setShowHoverMenu(false);
+            setShowSwapsHoverMenu(false);
             setActiveTab('swapsList');
             setActiveSwapsListTab(listTab);
         } else {
@@ -123,12 +116,12 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
         }
     };
 
-    const HoverMenuButtonWithMenu = () => (
-        <RelativePositionContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    const SwapsListsButtonWithMenu = () => (
+        <RelativePositionContainer onMouseEnter={() => setShowSwapsHoverMenu(true)} onMouseLeave={() => setShowSwapsHoverMenu(false)}>
             <StyledTabButton isActive={activeTab === 'swapsList'} onClick={handleSwapsListClick}>
                 Swaps
             </StyledTabButton>
-            <StyledHoverMenu show={showHoverMenu}>
+            <StyledHoverMenu show={showSwapsHoverMenu}>
                 <StyledTabButton isActive={activeSwapsListTab === 'yourSwaps'} onClick={() => handleSwapsListTabClick('yourSwaps')}>
                     Your Swaps
                 </StyledTabButton>
@@ -139,21 +132,43 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
         </RelativePositionContainer>
     );
 
+    const SelectNetworkButtonWithMenu = () => {
+        const handleNetworkSelect = (networkKey) => {
+            switchNetwork(networkKey);
+            setShowNetworksHoverMenu(false);
+        };
+
+        return (
+            <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
+                <StyledTabButton>{networkName ? networkName : 'Select network'}</StyledTabButton>
+                <StyledHoverMenu show={showNetworksHoverMenu}>
+                    {Object.keys(networks).map((networkKey) => (
+                        <StyledTabButton key={networkKey} onClick={() => handleNetworkSelect(networkKey)}>
+                            {networks[networkKey].displayName}
+                        </StyledTabButton>
+                    ))}
+                </StyledHoverMenu>
+            </RelativePositionContainer>
+        );
+    };
+
+
     const CommonHeaderItems = () => (
         <>
             <StyledTabButton isActive={activeTab === 'createSwap'} onClick={() => handleSwapNavigationButtonClick('createSwap')}>
                 Create Swap
             </StyledTabButton>
-            <HoverMenuButtonWithMenu isActive={activeTab === 'swapsList'} onClick={() => setActiveTab('swapsList')} onMouseEnter={handleMouseEnter}>
+            <SwapsListsButtonWithMenu isActive={activeTab === 'swapsList'} onClick={() => setActiveTab('swapsList')} onMouseEnter={() => setShowSwapsHoverMenu(true)}>
                 Swaps List
-            </HoverMenuButtonWithMenu>
+            </SwapsListsButtonWithMenu>
             <Box flexGrow={1} />
             {ethBalance !== null && (
                 <Typography sx={{ marginRight: '15px' }} variant='h6' color='white'>
                     {ethBalance} ETH
                 </Typography>
             )}
-            {network !== null && <NetworkSelector networkName={networkName} sx={{ marginRight: '15px' }} />}
+            {/* {network !== null && <NetworkSelector networkName={networkName} sx={{ marginRight: '15px' }} />} */}
+            <SelectNetworkButtonWithMenu />
             <Button onClick={connectWallet} sx={{ backgroundColor: '#F7B93E', '&:hover': { backgroundColor: '#FFD684' }, color: 'black' }}>
                 {connectBtnText}
             </Button>

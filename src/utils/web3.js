@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import networks from '../data/networks';
 
 
 const erc20Abi = require('../contracts/Erc20.json');
@@ -25,36 +26,81 @@ export function getProvider() {
     return provider;
 };
 
-export async function getNetworkName() {
-    const network = await getProvider().getNetwork();
-    let networkName = '';
+// export async function getNetworkName() {
+//     const network = await getProvider().getNetwork();
+//     let networkName = '';
 
-    switch (network.chainId) {
-        case 1:
-            networkName = 'ethereum';
-            break;
-        case 3:
-            networkName = 'ropsten';
-            break;
-        case 4:
-            networkName = 'rinkeby';
-            break;
-        case 5:
-            networkName = 'goerli';
-            break;
-        case 42:
-            networkName = 'kovan';
-            break;
-        case 137:
-            networkName = 'polygon';
-            break;
-        case 80001:
-            networkName = 'mumbai'; // polygon testnet
-            break;
-        default:
-            networkName = 'localhost';
-    }
+//     switch (network.chainId) {
+//         case 1:
+//             networkName = 'ethereum';
+//             break;
+//         case 3:
+//             networkName = 'ropsten';
+//             break;
+//         case 4:
+//             networkName = 'rinkeby';
+//             break;
+//         case 5:
+//             networkName = 'goerli';
+//             break;
+//         case 42:
+//             networkName = 'kovan';
+//             break;
+//         case 137:
+//             networkName = 'polygon';
+//             break;
+//         case 80001:
+//             networkName = 'mumbai'; // polygon testnet
+//             break;
+//         default:
+//             networkName = 'localhost';
+//     }
+//     return networkName;
+// };
+export async function getNetworkName() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const network = await provider.getNetwork();
+    let networkName = 'Unsupported Network';
+
+    Object.keys(networks).forEach((key) => {
+        if (networks[key].chainId === ethers.utils.hexValue(network.chainId)) {
+            networkName = networks[key].displayName;
+        }
+    });
+
     return networkName;
+}
+
+export async function switchNetwork(networkKey) {
+    const network = networks[networkKey];
+
+    try {
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: network.chainId }],
+        });
+    } catch (switchError) {
+        // This error code indicates that the chain has not been added to MetaMask
+        if (switchError.code === 4902) {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [
+                        {
+                            chainId: network.chainId,
+                            chainName: network.chainName,
+                            rpcUrls: network.rpcUrls,
+                            nativeCurrency: network.nativeCurrency,
+                            blockExplorerUrls: network.blockExplorerUrls,
+                        },
+                    ],
+                });
+            } catch (addError) {
+                // Handle errors when adding a new network (e.g., user rejection)
+                console.error(addError);
+            }
+        }
+    }
 };
 
 export async function getEthBalance(address) {
