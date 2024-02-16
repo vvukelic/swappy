@@ -26,24 +26,61 @@ const StyledTabButton = styled(Button)`
     margin-left: 10px;
     color: white;
     background-color: ${(props) => (props.isActive ? '#396777' : 'transparent')};
+    border: 1px solid transparent;
 
     &:hover {
         background-color: ${(props) => (props.isActive ? '#396777' : '#396777')};
+        border-color: #ffffff;
     }
 `;
 
 const StyledHoverMenu = styled(Box)`
     position: absolute;
-    width: 170px;
+    width: ${(props) => props.width};
     background-color: #1b3a47;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     padding: 10px;
     display: ${(props) => (props.show ? 'flex' : 'none')};
     flex-direction: column;
-    top: 100%; // Position the menu right below the button
-    left: 50%; // Center align the menu horizontally
-    transform: translateX(-50%); // Adjust the position to be centered under the button
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+`;
+
+const NetworkButton = styled(Button)`
+    margin-left: 10px;
+    margin-right: 10px;
+    color: white;
+    background-color: ${(props) => props.bgColor || 'transparent'};
+    display: flex;
+    align-items: center;
+    border: 1px solid transparent;
+
+    .network-icon {
+        margin-right: 8px;
+        height: 20px; // Adjust size as needed
+    }
+
+    &:hover {
+        background-color: ${(props) => props.bgColor || 'transparent'};
+        border-color: #ffffff;
+    }
+`;
+
+
+const SelectNetworkButton = styled(StyledTabButton)`
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    margin: 5px;
+    padding: 10px;
+`;
+
+const NetworkIcon = styled.img`
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
 `;
 
 function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsListTab }) {
@@ -121,7 +158,7 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
             <StyledTabButton isActive={activeTab === 'swapsList'} onClick={handleSwapsListClick}>
                 Swaps
             </StyledTabButton>
-            <StyledHoverMenu show={showSwapsHoverMenu}>
+            <StyledHoverMenu show={showSwapsHoverMenu} width='170px'>
                 <StyledTabButton isActive={activeSwapsListTab === 'yourSwaps'} onClick={() => handleSwapsListTabClick('yourSwaps')}>
                     Your Swaps
                 </StyledTabButton>
@@ -138,20 +175,28 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
             setShowNetworksHoverMenu(false);
         };
 
+        const networkDetails = networks[networkName] || null;
+
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
-                <StyledTabButton>{networkName ? networkName : 'Select network'}</StyledTabButton>
-                <StyledHoverMenu show={showNetworksHoverMenu}>
-                    {Object.keys(networks).map((networkKey) => (
-                        <StyledTabButton key={networkKey} onClick={() => handleNetworkSelect(networkKey)}>
-                            {networks[networkKey].displayName}
-                        </StyledTabButton>
-                    ))}
+                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={networkName ? networks[networkName].color : ''}>
+                    <img src={networkName ? networks[networkName].logo : ''} alt='' className='network-icon' />
+                    {networkName ? networkName : 'Select network'}
+                </NetworkButton>
+                <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
+                    {Object.keys(networks).map((networkKey) => {
+                        const { displayName, logo } = networks[networkKey];
+                        return (
+                            <SelectNetworkButton key={networkKey} onClick={() => handleNetworkSelect(networkKey)}>
+                                <NetworkIcon src={logo} alt={`${displayName} icon`} />
+                                {displayName}
+                            </SelectNetworkButton>
+                        );
+                    })}
                 </StyledHoverMenu>
             </RelativePositionContainer>
         );
     };
-
 
     const CommonHeaderItems = () => (
         <>
