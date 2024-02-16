@@ -26,12 +26,12 @@ const networks = {
         logo: '/images/matic-logo.png',
         blockExplorerUrls: ['https://polygonscan.com'],
     },
-    bnbSmartChain: {
+    'bnb smart chain': {
         chainId: '0x38',
         chainName: 'BNB Smart Chain Mainnet',
         displayName: 'bnb smart chain',
         rpcUrls: ['https://bsc-dataseed.binance.org/'],
-        color: '#f1bb1e',
+        color: '#b98b05',
         logo: '/images/bnb-logo.png',
         nativeCurrency: {
             name: 'BNB',
@@ -52,6 +52,19 @@ const networks = {
         color: '#627EEA',
         logo: '/images/eth-logo.png',
         blockExplorerUrls: ['https://goerli.etherscan.io'],
+    },
+    localhost: {
+        chainId: '0x7a69',
+        chainName: 'localhost',
+        displayName: 'localhost',
+        rpcUrls: ['http://localhost:8545'],
+        nativeCurrency: {
+            name: 'Ether',
+            symbol: 'ETH',
+            decimals: 18,
+        },
+        color: '#627EEA',
+        logo: '/images/eth-logo.png',
     },
 };
 
