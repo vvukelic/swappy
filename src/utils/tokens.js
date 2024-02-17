@@ -1,5 +1,7 @@
-import commonTokens from '../data/commonTokens.json';
+import { ethers } from 'ethers';
 
+import commonTokens from '../data/commonTokens.json';
+import { getTokenDecimals } from './web3';
 
 let tokensByAddressCache = {};
 let tokensByNameCache = {};
@@ -36,17 +38,17 @@ const indexTokensByName = () => {
     return tokenIndex;
 };
 
-const getTokenByAddress = (address, network) => {
+export function getTokenByAddress(address, network) {
     const tokensByAddress = indexTokensByAddress(network);
     return tokensByAddress[address] || null;
 };
 
-const getTokenByName = (name) => {
+export function getTokenByName(name) {
     const tokensByName = indexTokensByName();
     return tokensByName[name] || null;
 };
 
-const getTokenImageUrl = (token) => {
+export function getTokenImageUrl(token) {
     if (token && token.logo) {
         return token.logo;
     } else if (token && token.networkSpecificAddress['ethereum']) {
@@ -79,7 +81,7 @@ const getCustomTokensList = () => {
     }
 };
 
-const addCustomToken = (customToken) => {
+export function addCustomToken(customToken) {
     let customTokensList = getCustomTokensList();
 
     customTokensList.push(customToken);
@@ -87,13 +89,13 @@ const addCustomToken = (customToken) => {
 
     tokensByAddressCache = {};
     tokensByNameCache = {};
-}
+};
 
-const getAllTokens = () => {
+export function getAllTokens() {
     return [...commonTokens, ...getCustomTokensList()];
-}
+};
 
-const updateCustomTokensList = () => {
+export function updateCustomTokensList() {
     let customTokensList = getCustomTokensList();
     const networks = Object.keys(commonTokens[0].networkSpecificAddress);
 
@@ -115,5 +117,26 @@ const updateCustomTokensList = () => {
     tokensByNameCache = {};
 };
 
+export async function toSmallestUnit(amount, tokenContractAddress) {
+    let decimals = null;
 
-export { getTokenByAddress, getTokenByName, getTokenImageUrl, getAllTokens, addCustomToken, updateCustomTokensList };
+    if (tokenContractAddress === ethers.constants.AddressZero) {
+        decimals = 18;
+    } else {
+        decimals = await getTokenDecimals(tokenContractAddress);
+    }
+
+    return ethers.utils.parseUnits(amount, decimals);
+}
+
+export async function toBaseUnit(amount, tokenContractAddress) {
+    let decimals = null;
+
+    if (tokenContractAddress === ethers.constants.AddressZero) {
+        decimals = 18;
+    } else {
+        decimals = await getTokenDecimals(tokenContractAddress);
+    }
+
+    return ethers.utils.formatUnits(amount, decimals);
+}

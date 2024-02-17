@@ -26,37 +26,6 @@ export function getProvider() {
     return provider;
 };
 
-// export async function getNetworkName() {
-//     const network = await getProvider().getNetwork();
-//     let networkName = '';
-
-//     switch (network.chainId) {
-//         case 1:
-//             networkName = 'ethereum';
-//             break;
-//         case 3:
-//             networkName = 'ropsten';
-//             break;
-//         case 4:
-//             networkName = 'rinkeby';
-//             break;
-//         case 5:
-//             networkName = 'goerli';
-//             break;
-//         case 42:
-//             networkName = 'kovan';
-//             break;
-//         case 137:
-//             networkName = 'polygon';
-//             break;
-//         case 80001:
-//             networkName = 'mumbai'; // polygon testnet
-//             break;
-//         default:
-//             networkName = 'localhost';
-//     }
-//     return networkName;
-// };
 export async function getNetworkName() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const network = await provider.getNetwork();
@@ -96,7 +65,6 @@ export async function switchNetwork(networkKey) {
                     ],
                 });
             } catch (addError) {
-                // Handle errors when adding a new network (e.g., user rejection)
                 console.error(addError);
             }
         }
@@ -112,6 +80,18 @@ export async function getEthBalance(address) {
     } catch (error) {
         console.error('Error fetching ETH balance:', error);
         return null;
+    }
+}
+
+export async function getErc20TokenBalance(tokenContractAddress, accountAddress) {
+    const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, getProvider());
+
+    try {
+        const balance = await tokenContract.balanceOf(accountAddress);
+        return balance;
+    } catch (error) {
+        console.error('Error getting ERC20 token balance:', error);
+        throw error;
     }
 }
 

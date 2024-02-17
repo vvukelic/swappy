@@ -6,10 +6,9 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
-import { getTokenByName, updateCustomTokensList } from '../utils/tokens';
-import { getAllowance, approveToken, createSwap } from '../utils/web3';
+import { getTokenByName, updateCustomTokensList, toSmallestUnit } from '../utils/tokens';
+import { getAllowance, approveToken, createSwap, getEthBalance, getErc20TokenBalance } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { toSmallestUnit } from '../utils/general';
 import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
@@ -34,6 +33,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
+    const [insufficientSrcTokenAmount, setInsufficientSrcTokenAmount] = useState(false);
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
 
     const openModal = (type) => {
@@ -81,19 +81,41 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     }, [defaultAccount]);
 
     useEffect(() => {
-        if (defaultAccount) {
-            if (tokenApproved) {
-                setSwapButtonText('Create Swap');
+        async function swapButtonText() {
+            const tokenAddress = selectedSrcToken.networkSpecificAddress[network];
+            let defaultAccountSrcTokenBalance;
+
+            if (tokenAddress === ethers.constants.AddressZero) {
+                defaultAccountSrcTokenBalance = await getEthBalance(defaultAccount);
             } else {
-                setSwapButtonText(`Approve ${selectedSrcToken.name} Token`);
+                defaultAccountSrcTokenBalance = await getErc20TokenBalance(tokenAddress, defaultAccount);
+            }
+
+            const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[network]);
+
+            if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
+                setInsufficientSrcTokenAmount(false);
+
+                if (tokenApproved) {
+                    setSwapButtonText('Create Swap');
+                } else {
+                    setSwapButtonText(`Approve ${selectedSrcToken.name} Token`);
+                }
+            } else {
+                setInsufficientSrcTokenAmount(true);
+                setSwapButtonText(`Insufficient ${selectedSrcToken.name} balance`);
             }
         }
-    }, [selectedSrcToken, tokenApproved]);
+
+        if (defaultAccount && selectedSrcToken) {
+            swapButtonText();
+        }
+    }, [network, selectedSrcToken, tokenApproved, srcAmount]);
 
     const handleSwapButtonClick = async () => {
         if (!defaultAccount) {
             connectWallet();
-        } else if (!tokenApproved) {
+        } else if (!tokenApproved && !insufficientSrcTokenAmount) {
             let tokenAddress = selectedSrcToken.networkSpecificAddress[network];
 
             if (tokenAddress === ethers.constants.AddressZero) {
@@ -115,7 +137,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`, error.toString());
                 return;
             }
-        } else {
+        } else if (!insufficientSrcTokenAmount) {
             const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[network]);
             const dstAmountInt = await toSmallestUnit(dstAmount, selectedDstToken.networkSpecificAddress[network]);
 
