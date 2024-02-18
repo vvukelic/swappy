@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid, TextField, Button } from '@mui/material';
 import TokenButton from './TokenButton';
 import styled from '@emotion/styled';
@@ -41,9 +41,38 @@ const MaxButton = styled(Button)`
 `;
 
 function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, labelText, openModal, selectedTokenAccountBalance }) {
-    function handleMaxButtonClick() {
-        setAmount(selectedTokenAccountBalance);
+    const [displayAmount, setDisplayAmount] = useState('0.0');
+
+    function handleAmountOnChange(e) {
+        const value = e.target.value.replace(/^0+/, '').replace(/(\..*?)\..*/g, '$1');
+        setDisplayAmount(value);
     }
+
+    function handleAmountOnBlur() {
+        let formattedValue = displayAmount;
+
+        if (formattedValue === '.' || formattedValue === '') {
+            formattedValue = '0.0';
+        }
+        else if (formattedValue.startsWith('.')) {
+            formattedValue = '0' + formattedValue;
+        }
+
+        setDisplayAmount(formattedValue);
+        setAmount(formattedValue);
+    }
+
+    function handleMaxButtonClick() {
+        setDisplayAmount(selectedTokenAccountBalance);
+    }
+
+    useEffect(() => {
+        if (displayAmount && displayAmount !== '.') {
+            setAmount(displayAmount);
+        } else {
+            setAmount('0.0');
+        }
+    }, [displayAmount]);
 
     return (
         <BorderedSection title={labelText}>
@@ -54,11 +83,9 @@ function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, label
                     </Grid>
                     <Grid item xs={8} container justifyContent='flex-end' style={{ paddingTop: 0, paddingLeft: 0 }}>
                         <StyledTextField
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                            onInput={(e) => {
-                                e.target.value = e.target.value.replace(/[^0-9.]/g, '');
-                            }}
+                            value={displayAmount}
+                            onChange={handleAmountOnChange}
+                            onBlur={handleAmountOnBlur}
                             variant='standard'
                             inputProps={{
                                 style: {
