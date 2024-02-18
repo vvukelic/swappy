@@ -25,6 +25,19 @@ const StyledCard = styled(Card)`
     margin-left: 16px;
 `;
 
+const MaxButton = styled(Button)`
+    background-color: #F7B93E;
+    color: black;
+    min-width: 32px;
+    height: 20px;
+    font-size: 0.75rem;
+    padding:  4px 8px;
+
+    &:hover {
+        background-color: #FFD684;
+    }
+`;
+
 function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, labelText, openModal, selectedTokenAccountBalance }) {
     function handleMaxButtonClick() {
         setAmount(selectedTokenAccountBalance);
@@ -78,10 +91,10 @@ function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, label
                     </Grid>
                     {selectedTokenAccountBalance && (
                         <Grid item xs={12} container justifyContent='flex-end' alignItems='center' style={{ paddingRight: '0', marginTop: '0.0em', color: 'white' }}>
-                            <span style={{ marginRight: '10px' }}>{selectedTokenAccountBalance}</span>
-                            <Button onClick={handleMaxButtonClick} variant='outlined' size='small' sx={{ backgroundColor: '#F7B93E', '&:hover': { backgroundColor: '#FFD684' }, color: 'black' }}>
+                            <span style={{ marginRight: '10px' }}>Balance: {selectedTokenAccountBalance}</span>
+                            <MaxButton onClick={handleMaxButtonClick} variant='outlined' size='small'>
                                 Max
-                            </Button>
+                            </MaxButton>
                         </Grid>
                     )}
                 </Grid>
