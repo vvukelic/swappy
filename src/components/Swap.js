@@ -6,8 +6,8 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
-import { getTokenByName, updateCustomTokensList, toSmallestUnit } from '../utils/tokens';
-import { getAllowance, approveToken, createSwap, getEthBalance, getErc20TokenBalance } from '../utils/web3';
+import { getTokenByName, updateCustomTokensList, toSmallestUnit, toBaseUnit, getTokenBalance } from '../utils/tokens';
+import { getAllowance, approveToken, createSwap } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
@@ -34,6 +34,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
     const [insufficientSrcTokenAmount, setInsufficientSrcTokenAmount] = useState(false);
+    const [defaultAccountSrcTokenBalance, setDefaultAccountSrcTokenBalance] = useState(null);
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
 
     const openModal = (type) => {
@@ -83,15 +84,9 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     useEffect(() => {
         async function swapButtonText() {
             const tokenAddress = selectedSrcToken.networkSpecificAddress[network];
-            let defaultAccountSrcTokenBalance;
+            const defaultAccountSrcTokenBalance = await getTokenBalance(defaultAccount, tokenAddress);
 
-            if (tokenAddress === ethers.constants.AddressZero) {
-                defaultAccountSrcTokenBalance = await getEthBalance(defaultAccount);
-            } else {
-                defaultAccountSrcTokenBalance = await getErc20TokenBalance(tokenAddress, defaultAccount);
-            }
-
-            const srcAmountInt = await toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[network]);
+            const srcAmountInt = await toSmallestUnit(srcAmount, tokenAddress);
 
             if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
                 setInsufficientSrcTokenAmount(false);
@@ -111,6 +106,18 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
             swapButtonText();
         }
     }, [network, selectedSrcToken, tokenApproved, srcAmount]);
+
+    useEffect(() => {
+        async function srcTokenHoldingsAmount() {
+            const tokenContract = selectedSrcToken.networkSpecificAddress[network];
+            const tokenBalance = await getTokenBalance(defaultAccount, tokenContract);
+            setDefaultAccountSrcTokenBalance(await toBaseUnit(tokenBalance, tokenContract));
+        }
+
+        if (defaultAccount && selectedSrcToken) {
+            srcTokenHoldingsAmount();
+        }
+    }, [network, selectedSrcToken]);
 
     const handleSwapButtonClick = async () => {
         if (!defaultAccount) {
@@ -201,7 +208,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     return (
         <>
             <MainContentContainer>
-                <SelectToken selectedToken={selectedSrcToken} amount={srcAmount} setAmount={setSrcAmount} selectedTokenImg={selectedSrcTokenImg} labelText='You send' openModal={() => openModal('src')} />
+                <SelectToken selectedToken={selectedSrcToken} amount={srcAmount} setAmount={setSrcAmount} selectedTokenImg={selectedSrcTokenImg} labelText='You send' openModal={() => openModal('src')} selectedTokenAccountBalance={defaultAccountSrcTokenBalance} />
 
                 <Grid item xs={12} container justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton

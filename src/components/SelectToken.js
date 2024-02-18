@@ -1,6 +1,6 @@
 import React from 'react';
 import Card from '@mui/material/Card';
-import { Grid, TextField } from '@mui/material';
+import { Grid, TextField, Button } from '@mui/material';
 import TokenButton from './TokenButton';
 import styled from '@emotion/styled';
 import BorderedSection from './BorderSection';
@@ -25,10 +25,14 @@ const StyledCard = styled(Card)`
     margin-left: 16px;
 `;
 
-function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, labelText, openModal }) {
+function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, labelText, openModal, selectedTokenAccountBalance }) {
+    function handleMaxButtonClick() {
+        setAmount(selectedTokenAccountBalance);
+    }
+
     return (
         <BorderedSection title={labelText}>
-            <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '1.6em' }}>
+            <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '1.6em', marginBottom: selectedTokenAccountBalance ? '0.4em' : '1.6em' }}>
                 <Grid container spacing={2}>
                     <Grid item xs={4} style={{ paddingTop: 0, paddingLeft: '16px' }}>
                         <TokenButton text={selectedToken ? selectedToken.name.toUpperCase() : ''} imageSrc={selectedTokenImg} onClick={openModal} />
@@ -72,9 +76,14 @@ function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, label
                             type='text'
                         />
                     </Grid>
-                    <Grid item xs={12} style={{ textAlign: 'right', color: 'white', padding: '0 4px', marginBottom: '5px', marginTop: '0.3em' }}>
-                        {/* <span>~$1 229.12</span> */}
-                    </Grid>
+                    {selectedTokenAccountBalance && (
+                        <Grid item xs={12} container justifyContent='flex-end' alignItems='center' style={{ paddingRight: '0', marginTop: '0.0em', color: 'white' }}>
+                            <span style={{ marginRight: '10px' }}>{selectedTokenAccountBalance}</span>
+                            <Button onClick={handleMaxButtonClick} variant='outlined' size='small' sx={{ backgroundColor: '#F7B93E', '&:hover': { backgroundColor: '#FFD684' }, color: 'black' }}>
+                                Max
+                            </Button>
+                        </Grid>
+                    )}
                 </Grid>
             </Grid>
         </BorderedSection>
