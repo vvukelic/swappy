@@ -1,5 +1,4 @@
 import React from 'react';
-import Card from '@mui/material/Card';
 import { Grid, TextField, Button } from '@mui/material';
 import TokenButton from './TokenButton';
 import styled from '@emotion/styled';
@@ -14,15 +13,18 @@ const StyledTextField = styled(TextField)`
     height: 48px;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
-`;
 
-const StyledCard = styled(Card)`
-    background-color: #358a9e;
-    height: 120px;
-    border-radius: 4px;
-    border-color: #286676;
-    margin-right: 16px;
-    margin-left: 16px;
+    & .MuiInput-underline:after {
+        border-bottom: none;
+    }
+
+    & .MuiInput-underline:before {
+        border-bottom: none;
+    }
+
+    & .MuiInput-underline:hover:not(.Mui-disabled):before {
+        border-bottom: none;
+    }
 `;
 
 const MaxButton = styled(Button)`
@@ -58,17 +60,6 @@ function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, label
                                 e.target.value = e.target.value.replace(/[^0-9.]/g, '');
                             }}
                             variant='standard'
-                            sx={{
-                                '& .MuiInput-underline:after': {
-                                    borderBottom: 'none',
-                                },
-                                '& .MuiInput-underline:before': {
-                                    borderBottom: 'none',
-                                },
-                                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-                                    borderBottom: 'none',
-                                },
-                            }}
                             inputProps={{
                                 style: {
                                     textAlign: 'right',
