@@ -40,6 +40,13 @@ const MaxButton = styled(Button)`
     }
 `;
 
+const MaxButtonGrid = styled(Grid)`
+    padding-right: 0;
+    margin-top: 0;
+    padding-top: 8px !important;
+    color: white;
+`;
+
 function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, labelText, openModal, selectedTokenAccountBalance }) {
     const [displayAmount, setDisplayAmount] = useState('0.0');
 
@@ -108,12 +115,12 @@ function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, label
                         />
                     </Grid>
                     {selectedTokenAccountBalance && (
-                        <Grid item xs={12} container justifyContent='flex-end' alignItems='center' style={{ paddingRight: '0', marginTop: '0.0em', color: 'white' }}>
+                        <MaxButtonGrid item xs={12} container justifyContent='flex-end' alignItems='center'>
                             <span style={{ marginRight: '10px' }}>Balance: {selectedTokenAccountBalance}</span>
                             <MaxButton onClick={handleMaxButtonClick} variant='outlined' size='small'>
                                 Max
                             </MaxButton>
-                        </Grid>
+                        </MaxButtonGrid>
                     )}
                 </Grid>
             </Grid>
