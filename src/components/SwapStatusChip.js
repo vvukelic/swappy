@@ -1,4 +1,5 @@
-import { Chip } from '@mui/material';
+import React from 'react';
+import { Chip, Tooltip } from '@mui/material';
 import styled from '@emotion/styled';
 
 
@@ -8,6 +9,7 @@ const StyledChip = styled(Chip)(({ status }) => {
     switch (status) {
         case 'EXPIRED':
         case 'CANCELED':
+        case 'ERROR':
             backgroundColor = '#f45050';
             break;
         case 'OPENED':
@@ -15,6 +17,7 @@ const StyledChip = styled(Chip)(({ status }) => {
             break;
         case 'SWAPPED':
             backgroundColor = '#07713d';
+            break;
     }
 
     return `
@@ -25,7 +28,9 @@ const StyledChip = styled(Chip)(({ status }) => {
 
 function SwapStatusChip({ status }) {
     return (
-        <StyledChip label={status} status={status} />
+        <Tooltip title={status === 'ERROR' && 'The creator of the swap no longer has the required token balance on their account. When this changes, the swap will be available for taking.'}>
+            <StyledChip label={status} status={status} />
+        </Tooltip>
     );
 }
 

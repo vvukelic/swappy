@@ -96,7 +96,6 @@ function SwapDetails({ hash }) {
                     return;
                 }
 
-                
                 window.location.reload();
             } catch (err) {
                 console.error(err);

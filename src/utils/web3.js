@@ -219,7 +219,7 @@ export async function takeSwap(contractAddress, swapHash, dstTokenAddress, dstAm
         let nativeTokenAmount = 0;
 
         if (dstTokenAddress === ethers.constants.AddressZero) {
-            nativeTokenAmount = ethers.utils.parseUnits(dstAmount, 'ether');
+            nativeTokenAmount = dstAmount;
         }
 
         const transaction = await swapManagerContract.takeSwap(swapHash, { value: feeAmount.add(nativeTokenAmount) });
