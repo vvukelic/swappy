@@ -508,5 +508,62 @@ describe('SwapManager contract', function () {
             const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
             expect(swapsForOffer.length).to.equal(1);
         });
+
+        it('ERC20 -> ERC20 partial swap 100% fill', async function () {
+            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const srcAmount = 93029302;
+            const dstAmount = 100000;
+
+            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, true);
+            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            expect(swapObj['status']).to.equal(0);
+
+            const usdcContract = await getErc20Contract(usdcTokenAddr);
+            await usdcContract.connect(addr1).approve(hardhatSwapManager.address, srcAmount);
+
+            const maticContract = await getErc20Contract(maticTokenAddr);
+            await maticContract.connect(addr2).approve(hardhatSwapManager.address, dstAmount);
+
+            const oldBalances = {
+                usdcAddr1: await usdcContract.balanceOf(addr1.address),
+                maticAddr1: await maticContract.balanceOf(addr1.address),
+                usdcAddr2: await usdcContract.balanceOf(addr2.address),
+                maticAddr2: await maticContract.balanceOf(addr2.address),
+                initialFeeAddrBalance: await ethers.provider.getBalance(feeAddr.address),
+            };
+
+            let partialDstAmount = 40000;
+            let expectedSrcAmount = Math.floor((partialDstAmount * srcAmount) / dstAmount);
+
+            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
+
+            partialDstAmount = 40000;
+            expectedSrcAmount = Math.floor((partialDstAmount * srcAmount) / dstAmount);
+
+            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
+
+            partialDstAmount = 20000;
+            expectedSrcAmount = Math.floor((partialDstAmount * srcAmount) / dstAmount);
+
+            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
+
+            expect(await ethers.provider.getBalance(feeAddr.address)).to.equal(oldBalances['initialFeeAddrBalance'].add(swapObj.feeAmount.mul(3)));
+
+            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const latestBlock = await ethers.provider.getBlock('latest');
+
+            expect(swapsForOffer.length).to.equal(3);
+            let srcAmountSum = ethers.BigNumber.from(0);
+            let dstAmountSum = ethers.BigNumber.from(0);
+
+            for (let i = 0; i < swapsForOffer.length; i++) {
+                srcAmountSum = srcAmountSum.add(swapsForOffer[i].srcAmount);
+                dstAmountSum = dstAmountSum.add(swapsForOffer[i].dstAmount);
+            }
+
+            expect(srcAmountSum).to.equal(srcAmount);
+            expect(dstAmountSum).to.equal(dstAmount);
+        });
     });
 });
