@@ -160,14 +160,8 @@ contract SwapManager is ReentrancyGuard {
         swap.closedTime = block.timestamp;
 
         if (partialDstAmount == remainingDstAmount) {
-            console.log('proba1');
-            console.log(partialDstAmount);
-            console.log(remainingDstAmount);
             swap.srcAmount = swapOffer.srcAmount - swapsSrcAmountSum;
         } else {
-            console.log('proba2');
-            console.log(partialDstAmount);
-            console.log(remainingDstAmount);
             swap.srcAmount = (partialDstAmount * swapOffer.srcAmount) / swapOffer.dstAmount;
         }
 
@@ -193,8 +187,6 @@ contract SwapManager is ReentrancyGuard {
         }
 
         if (srcTokenAddress == _wethAddress) {
-            console.log('blaaaaa');
-            console.log(swap.srcAmount);
             require(srcToken.transferFrom(swapOffer.srcAddress, address(this), swap.srcAmount), "Source amount failed to transfer");
             
             _weth.withdraw(swap.srcAmount);
