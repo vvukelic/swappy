@@ -2,13 +2,23 @@
 pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "hardhat/console.sol";
 
-contract SwapManager {
-    enum SwapStatus { OPENED, COMPLETED, CANCELED }
+contract SwapManager is ReentrancyGuard {
+    enum SwapStatus { OPENED, CANCELED }
 
     struct Swap {
+        address payable dstAddress;
+
+        uint srcAmount;
+        uint dstAmount;
+
+        uint256 closedTime;
+    }
+
+    struct SwapOffer {
         address payable srcAddress;
         address dstAddress;
         
@@ -21,16 +31,19 @@ contract SwapManager {
 
         uint256 createdTime;
         uint256 expirationTime;
-        uint256 closedTime;
+
+        bool partialFill;
 
         SwapStatus status;
     }
 
     address public owner;
     address payable public feeAddress;
-    mapping(bytes32 => Swap) public swaps;
-    mapping(address => bytes32[]) public userSwaps;
-    mapping(address => bytes32[]) public dstUserSwaps;
+    mapping(bytes32 => SwapOffer) public swapOffers;
+    mapping(bytes32 => Swap[]) public swaps;
+    mapping(address => bytes32[]) public userSwapOffers;
+    mapping(address => bytes32[]) public swapOffersForUser;
+    mapping(address => bytes32[]) public swapsTakenByUser;
     address constant private _wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     IWETH constant private _weth = IWETH(_wethAddress);
     AggregatorV3Interface internal priceFeed;
@@ -45,9 +58,9 @@ contract SwapManager {
 
     error SwapFailed();
 
-    event SwapCreated(address indexed creator, bytes32 swapHash);
+    event SwapOfferCreated(address indexed creator, bytes32 swapHash);
 
-    function createSwap(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiresIn) public payable {
+    function createSwapOffer(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiresIn, bool partialFill) public payable {
         if (srcTokenAddress == address(0)) {
             require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
 
@@ -56,121 +69,154 @@ contract SwapManager {
             srcTokenAddress = _wethAddress;
         }
 
-        Swap memory newSwap;
-        newSwap.status = SwapStatus.OPENED;
-        newSwap.srcAddress = payable(msg.sender);
-        newSwap.srcTokenAddress = srcTokenAddress;
-        newSwap.srcAmount = srcAmount;
-        newSwap.dstTokenAddress = dstTokenAddress;
-        newSwap.dstAmount = dstAmount;
-        newSwap.dstAddress = dstAddress;
-        newSwap.createdTime = block.timestamp;
-        newSwap.feeAmount = calculateEthFee();
-        console.log("Fee:", newSwap.feeAmount, newSwap.createdTime);
+        SwapOffer memory newSwapOffer;
+        newSwapOffer.status = SwapStatus.OPENED;
+        newSwapOffer.srcAddress = payable(msg.sender);
+        newSwapOffer.srcTokenAddress = srcTokenAddress;
+        newSwapOffer.srcAmount = srcAmount;
+        newSwapOffer.dstTokenAddress = dstTokenAddress;
+        newSwapOffer.dstAmount = dstAmount;
+        newSwapOffer.dstAddress = dstAddress;
+        newSwapOffer.createdTime = block.timestamp;
+        newSwapOffer.feeAmount = calculateEthFee();
+        newSwapOffer.partialFill = partialFill;
 
         if (expiresIn > 0) {
-            newSwap.expirationTime = block.timestamp + expiresIn;
+            newSwapOffer.expirationTime = block.timestamp + expiresIn;
         } else {
-            newSwap.expirationTime = 0;
+            newSwapOffer.expirationTime = 0;
         }
 
         uint salt = block.number;
         bytes32 newSwapKey;
 
         do {
-            newSwapKey = keccak256(abi.encode(newSwap, salt, msg.sender));
+            newSwapKey = keccak256(abi.encode(newSwapOffer, salt, msg.sender));
             salt += 1; 
-        } while (swaps[newSwapKey].srcAddress != address(0));
+        } while (swapOffers[newSwapKey].srcAddress != address(0));
 
-        swaps[newSwapKey] = newSwap;
-        userSwaps[address(msg.sender)].push(newSwapKey);
+        swapOffers[newSwapKey] = newSwapOffer;
+        userSwapOffers[address(msg.sender)].push(newSwapKey);
 
         if (dstAddress != address(0)) {
-            dstUserSwaps[dstAddress].push(newSwapKey);
+            swapOffersForUser[dstAddress].push(newSwapKey);
         }
 
-        emit SwapCreated(msg.sender, newSwapKey);
+        emit SwapOfferCreated(msg.sender, newSwapKey);
     }
 
-    function getSwap(bytes32 swapHash) public view returns (Swap memory) {
+    function getSwapOffer(bytes32 swapHash) public view returns (SwapOffer memory) {
+        return swapOffers[swapHash];
+    }
+
+    function getSwapsForOffer(bytes32 swapHash) public view returns (Swap[] memory) {
         return swaps[swapHash];
     }
 
-    function getUserSwaps(address userAddress) public view returns (bytes32[] memory) {
-        return userSwaps[userAddress];
+    function getUserSwapOffers(address userAddress) public view returns (bytes32[] memory) {
+        return userSwapOffers[userAddress];
     }
 
-    function getDstUserSwaps(address userAddress) public view returns (bytes32[] memory) {
-        return dstUserSwaps[userAddress];
+    function getSwapOffersForUser(address userAddress) public view returns (bytes32[] memory) {
+        return swapOffersForUser[userAddress];
     }
 
-    function takeSwap(bytes32 index) public payable {
+    function createSwapForOffer(bytes32 swapOfferIndex, uint partialDstAmount) public payable nonReentrant {
         address swapManagerAddress = address(this);
-        Swap storage swap = swaps[index];
+        SwapOffer storage swapOffer = swapOffers[swapOfferIndex];
+        Swap[] storage swapsForOffer = swaps[swapOfferIndex];
 
-        require(swap.srcAddress != address(0), "Non existing swap!");
-        require(swap.status == SwapStatus.OPENED, "Can't take swap that is not in OPENED status!");
-        require(address(msg.sender) != swap.srcAddress, "Cannot take own swap!");
+        require(swapOffer.srcAddress != address(0), "Non existing swap offer!");
+        require(swapOffer.status == SwapStatus.OPENED, "Can't create swap for offer that is not in OPENED status!");
+        require(address(msg.sender) != swapOffer.srcAddress, "Cannot create swap for own swap offer!");
 
-        if (swap.expirationTime > 0) {
-            require(swap.expirationTime > block.timestamp, "Swap has expired!");
+        if (swapOffer.partialFill) {
+            require(partialDstAmount <= swapOffer.dstAmount, "Sent amount higher than swap offer amount!");
+        } else {
+            require(partialDstAmount == swapOffer.dstAmount, "Can't create partial swap for offer that is not a partial fill offer!");
         }
 
-        if (swap.dstAddress != address(0)) {
-            require(msg.sender == swap.dstAddress, "Only the specified destination address can take this swap!");
+        if (swapOffer.expirationTime > 0) {
+            require(swapOffer.expirationTime > block.timestamp, "Swap offer has expired!");
         }
 
-        address payable srcAddress = swap.srcAddress;
+        if (swapOffer.dstAddress != address(0)) {
+            require(msg.sender == swapOffer.dstAddress, "Only the specified destination address can take this swap offer!");
+        }
+
+        uint swapsSrcAmountSum = 0;
+        uint swapsDstAmountSum = 0;
+        for (uint i = 0; i < swapsForOffer.length; i++) {
+            swapsSrcAmountSum += swapsForOffer[i].srcAmount;
+            swapsDstAmountSum += swapsForOffer[i].dstAmount;
+        }
+
+        uint remainingDstAmount = swapOffer.dstAmount - swapsDstAmountSum;
+        require(partialDstAmount <= remainingDstAmount, "There's not enough resources left in offer for this swap!");
+
+        Swap memory swap;
+        swap.dstAddress = payable(msg.sender);
+        swap.dstAmount = partialDstAmount;
+        swap.closedTime = block.timestamp;
+
+        if (partialDstAmount == remainingDstAmount) {
+            console.log('proba1');
+            console.log(partialDstAmount);
+            console.log(remainingDstAmount);
+            swap.srcAmount = swapOffer.srcAmount - swapsSrcAmountSum;
+        } else {
+            console.log('proba2');
+            console.log(partialDstAmount);
+            console.log(remainingDstAmount);
+            swap.srcAmount = (partialDstAmount * swapOffer.srcAmount) / swapOffer.dstAmount;
+        }
+
         address payable dstAddress = payable(msg.sender);
-        address srcTokenAddress = swap.srcTokenAddress;
+        address srcTokenAddress = swapOffer.srcTokenAddress;
         ERC20 srcToken = ERC20(srcTokenAddress);
-        address dstTokenAddress = swap.dstTokenAddress;
+        address dstTokenAddress = swapOffer.dstTokenAddress;
 
-        require(srcToken.allowance(srcAddress, swapManagerAddress) >= swap.srcAmount, "Not enough allowence for source token!");
+        require(srcToken.allowance(swapOffer.srcAddress, swapManagerAddress) >= swap.srcAmount, "Not enough allowence for source token!");
 
         if (dstTokenAddress == address(0)) {
-            require(msg.value >= (swap.dstAmount + swap.feeAmount), "Not enough ETH to take a swap!");
-            srcAddress.transfer(swap.dstAmount);
+            require(msg.value >= (swap.dstAmount + swapOffer.feeAmount), "Not enough ETH to create swap!");
+            swapOffer.srcAddress.transfer(swap.dstAmount);
         } else {
-            require(msg.value >= swap.feeAmount, "Not enough ETH to take a swap!");
+            require(msg.value >= swapOffer.feeAmount, "Not enough ETH to take a swap!");
 
             ERC20 dstToken = ERC20(dstTokenAddress);
             require(dstToken.allowance(msg.sender, swapManagerAddress) >= swap.dstAmount, "Not enough allowence for destination token!");
 
-            if (!dstToken.transferFrom(msg.sender, srcAddress, swap.dstAmount)) {
+            if (!dstToken.transferFrom(msg.sender, swapOffer.srcAddress, swap.dstAmount)) {
                 revert SwapFailed();
             }
         }
 
         if (srcTokenAddress == _wethAddress) {
-            require(srcToken.transferFrom(srcAddress, address(this), swap.srcAmount), "Source amount failed to transfer");
+            console.log('blaaaaa');
+            console.log(swap.srcAmount);
+            require(srcToken.transferFrom(swapOffer.srcAddress, address(this), swap.srcAmount), "Source amount failed to transfer");
             
             _weth.withdraw(swap.srcAmount);
             dstAddress.transfer(swap.srcAmount);
         } else {
-            require(srcToken.transferFrom(srcAddress, msg.sender, swap.srcAmount), "Source amount failed to transfer");
+            require(srcToken.transferFrom(swapOffer.srcAddress, msg.sender, swap.srcAmount), "Source amount failed to transfer");
         }
 
-        feeAddress.transfer(swap.feeAmount);
+        feeAddress.transfer(swapOffer.feeAmount);
 
-        if (swap.dstAddress == address(0)) {
-            swap.dstAddress = msg.sender;
-            dstUserSwaps[swap.dstAddress].push(index);
-        }
-
-        swap.closedTime = block.timestamp;
-        swap.status = SwapStatus.COMPLETED;
+        swapsTakenByUser[swap.dstAddress].push(swapOfferIndex);
+        swapsForOffer.push(swap);
     }
 
-    function cancelSwap(bytes32 index) public payable {
-        Swap storage swap = swaps[index];
+    function cancelSwapOffer(bytes32 index) public payable {
+        SwapOffer storage swapOffer = swapOffers[index];
 
-        require(swap.srcAddress != address(0), "Non existing swap!");
-        require(swap.status == SwapStatus.OPENED, "Can't cancel swap that is not in OPENED status!");
-        require(address(msg.sender) == swap.srcAddress, "Only swap initiator can cancel a swap!");
+        require(swapOffer.srcAddress != address(0), "Non existing swap offer!");
+        require(swapOffer.status == SwapStatus.OPENED, "Can't cancel swap offer that is not in OPENED status!");
+        require(address(msg.sender) == swapOffer.srcAddress, "Only swap offer initiator can cancel a swap offer!");
 
-        swap.closedTime = block.timestamp;
-        swap.status = SwapStatus.CANCELED;
+        swapOffer.status = SwapStatus.CANCELED;
     }
 
     function setFeeAddress(address payable newFeeAddress) external {
