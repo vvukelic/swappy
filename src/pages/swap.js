@@ -3,8 +3,8 @@ import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
 import { ethers } from 'ethers';
 import Layout from '../components/Layout';
-import Swap from '../components/Swap';
-import SwapsList from '../components/SwapsList';
+import SwapOffer from '../components/SwapOffer';
+import SwapOffersList from '../components/SwapOffersList';
 import { getTokenImageUrl } from '../utils/tokens';
 import styled from '@emotion/styled';
 
@@ -17,13 +17,13 @@ const StyledBox = styled(Box)`
 
 export default () => {
     const [activeTab, setActiveTab] = useState('createSwap');
-    const [activeSwapsListTab, setActiveSwapsListTab] = useState(null);
+    const [activeSwapOffersListTab, setActiveSwapOffersListTab] = useState(null);
     const [srcAmount, setSrcAmount] = useState('0.0');
     const [dstAmount, setDstAmount] = useState('0.0');
     const [dstAddress, setDstAddress] = useState(ethers.constants.AddressZero);
     const [selectedSrcToken, setSelectedSrcToken] = useState(null);
     const [selectedDstToken, setSelectedDstToken] = useState(null);
-    const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
+    const [swapOfferButtonText, setSwapOfferButtonText] = useState('Connect wallet');
     const [tokenApproved, setTokenApproved] = useState(false);
     const [expiresInHours, setExpiresInHours] = useState(0);
     const [expiresInMinutes, setExpiresInMinutes] = useState(0);
@@ -35,27 +35,27 @@ export default () => {
     useEffect(() => {
         const tab = router.query.tab;
 
-        if (tab && ['createSwap', 'swapsList'].includes(tab)) {
+        if (tab && ['createSwapOffer', 'swapOffersList'].includes(tab)) {
             setActiveTab(tab);
         }
 
         const listTab = router.query.listTab;
 
-        if (listTab && ['yourSwaps', 'swapsForYou'].includes(listTab)) {
-            setActiveSwapsListTab(listTab);
+        if (listTab && ['yourSwapOffers', 'swapOffersForYou'].includes(listTab)) {
+            setActiveSwapOffersListTab(listTab);
         }
     }, [router.query.tab]);
 
     return (
-        <Layout activeTab={activeTab} setActiveTab={setActiveTab} activeSwapsListTab={activeSwapsListTab} setActiveSwapsListTab={setActiveSwapsListTab}>
-            {activeTab === 'createSwap' && (
-            <Swap
+        <Layout activeTab={activeTab} setActiveTab={setActiveTab} activeSwapOffersListTab={activeSwapOffersListTab} setActiveSwapOffersListTab={setActiveSwapOffersListTab}>
+            {activeTab === 'createSwapOffer' && (
+            <SwapOffer
                 srcAmount={srcAmount} setSrcAmount={setSrcAmount}
                 dstAmount={dstAmount} setDstAmount={setDstAmount}
                 dstAddress={dstAddress} setDstAddress={setDstAddress}
                 selectedSrcToken={selectedSrcToken} setSelectedSrcToken={setSelectedSrcToken}
                 selectedDstToken={selectedDstToken} setSelectedDstToken={setSelectedDstToken}
-                swapButtonText={swapButtonText} setSwapButtonText={setSwapButtonText}
+                swapOfferButtonText={swapOfferButtonText} setSwapOfferButtonText={setSwapOfferButtonText}
                 tokenApproved={tokenApproved} setTokenApproved={setTokenApproved}
                 expiresInHours={expiresInHours} setExpiresInHours={setExpiresInHours}
                 expiresInMinutes={expiresInMinutes} setExpiresInMinutes={setExpiresInMinutes}
@@ -63,7 +63,7 @@ export default () => {
                 selectedSrcTokenImg={selectedSrcTokenImg}
                 selectedDstTokenImg={selectedDstTokenImg}
             />)}
-            {activeTab === 'swapsList' && <SwapsList activeSwapsListTab={activeSwapsListTab} />}
+            {activeTab === 'swapOffersList' && <SwapOffersList activeSwapOffersListTab={activeSwapOffersListTab} />}
         </Layout>
     );
 };

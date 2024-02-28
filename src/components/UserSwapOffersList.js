@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
-import { getUserSwaps, getDstUserSwaps } from '../utils/web3';
-import { getSwap } from '../utils/general';
+import { getUserSwapOffers, getSwapOffersForUser } from '../utils/web3';
+import { getSwapOffer } from '../utils/general';
 import BorderedSection from './BorderSection';
-import SwapStatusChip from './SwapStatusChip';
+import SwapOfferStatusChip from './SwapOfferStatusChip';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -56,51 +56,51 @@ const StyledMessage = styled(Typography)`
     width: 100%;
 `;
 
-const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
-    const [userSwaps, setUserSwaps] = useState([]);
-    const [destinationSwaps, setDestinationSwaps] = useState([]);
+const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) => {
+    const [userSwapOffers, setUserSwapOffers] = useState([]);
+    const [swapOffersForUser, setSwapOffersForUser] = useState([]);
 
     useEffect(() => {
-        const fetchUserSwaps = async () => {
-            const swapHashes = await getUserSwaps(contractAddresses.SwapManager[network], userAddress);
+        const fetchUserSwapOffers = async () => {
+            const swapOffersHashes = await getUserSwapOffers(contractAddresses.SwapManager[network], userAddress);
 
             const swapsWithHash = await Promise.all(
-                swapHashes.map(async (hash) => {
-                    const swap = await getSwap(contractAddresses.SwapManager[network], hash, network);
+                swapOffersHashes.map(async (hash) => {
+                    const swapOffer = await getSwapOffer(contractAddresses.SwapManager[network], hash, network);
 
                     return {
                         hash,
-                        ...swap,
+                        ...swapOffer,
                     };
                 })
             );
-            setUserSwaps(swapsWithHash);
+            setUserSwapOffers(swapsWithHash);
         };
 
-        const fetchDestinationSwaps = async () => {
-            const swapHashes = await getDstUserSwaps(contractAddresses.SwapManager[network], userAddress);
+        const fetchSwapOffersForUser = async () => {
+            const swapOffersHashes = await getSwapOffersForUser(contractAddresses.SwapManager[network], userAddress);
             const swapsWithHash = await Promise.all(
-                swapHashes.map(async (hash) => {
-                    const swap = await getSwap(contractAddresses.SwapManager[network], hash, network);
+                swapOffersHashes.map(async (hash) => {
+                    const swapOffer = await getSwapOffer(contractAddresses.SwapManager[network], hash, network);
 
                     return {
                         hash,
-                        ...swap,
+                        ...swapOffer,
                     };
                 })
             );
-            setDestinationSwaps(swapsWithHash);
+            setSwapOffersForUser(swapsWithHash);
         };
 
-        fetchUserSwaps();
-        fetchDestinationSwaps();
+        fetchUserSwapOffers();
+        fetchSwapOffersForUser();
     }, [userAddress, network]);
 
-    const handleRowClick = (swapHash) => {
-        window.open(`/swap/${swapHash}`, '_blank');
+    const handleRowClick = (swapOfferHash) => {
+        window.open(`/swap/${swapOfferHash}`, '_blank');
     };
 
-    const renderSwapsTable = (swaps, tableTitle) => {
+    const renderSwapOffersTable = (swapOffers, tableTitle) => {
         return (
             <BorderedSection title={tableTitle}>
                 <StyledTableContainer component={Paper}>
@@ -114,26 +114,26 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
                             </TableRow>
                         </StyledTableHead>
                         <TableBody>
-                            {swaps.length === 0 ? (
+                            {swapOffers.length === 0 ? (
                                 <TableRow>
                                     <StyledTableCell colSpan={4} style={{ textAlign: 'center' }}>
                                         <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
                                     </StyledTableCell>
                                 </TableRow>
                             ) : (
-                                swaps.map((swap, index) => {
-                                    const srcAmount = swap.srcAmountInBaseUnit.toString();
-                                    const dstAmount = swap.dstAmountInBaseUnit.toString();
+                                swapOffers.map((swapOffer, index) => {
+                                    const srcAmount = swapOffer.srcAmountInBaseUnit.toString();
+                                    const dstAmount = swapOffer.dstAmountInBaseUnit.toString();
 
-                                    const isSwapsForYou = activeSwapsListTab === 'swapsForYou';
-                                    const displaySrcAmount = isSwapsForYou ? dstAmount : srcAmount;
-                                    const displayDstAmount = isSwapsForYou ? srcAmount : dstAmount;
-                                    const displaySrcTokenName = isSwapsForYou ? swap.dstTokenName : swap.srcTokenName;
-                                    const displayDstTokenName = isSwapsForYou ? swap.srcTokenName : swap.dstTokenName;;
+                                    const isSwapOffersForYou = activeSwapOffersListTab === 'swapOffersForYou';
+                                    const displaySrcAmount = isSwapOffersForYou ? dstAmount : srcAmount;
+                                    const displayDstAmount = isSwapOffersForYou ? srcAmount : dstAmount;
+                                    const displaySrcTokenName = isSwapOffersForYou ? swapOffer.dstTokenName : swapOffer.srcTokenName;
+                                    const displayDstTokenName = isSwapOffersForYou ? swapOffer.srcTokenName : swapOffer.dstTokenName;;
 
                                     return (
-                                        <StyledTableRow key={index} onClick={() => handleRowClick(swap.hash)}>
-                                            <StyledTableCell align='right'>{swap.displayCreatedTime}</StyledTableCell>
+                                        <StyledTableRow key={index} onClick={() => handleRowClick(swapOffer.hash)}>
+                                            <StyledTableCell align='right'>{swapOffer.displayCreatedTime}</StyledTableCell>
                                             <StyledTableCell align='right'>
                                                 {displaySrcAmount} {displaySrcTokenName}
                                             </StyledTableCell>
@@ -141,7 +141,7 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
                                                 {displayDstAmount} {displayDstTokenName}
                                             </StyledTableCell>
                                             <StyledTableCell>
-                                                <SwapStatusChip status={swap.readableStatus} />
+                                                <SwapOfferStatusChip status={swapOffer.readableStatus} />
                                             </StyledTableCell>
                                         </StyledTableRow>
                                     );
@@ -157,10 +157,10 @@ const UserSwapsList = ({ userAddress, network, activeSwapsListTab }) => {
 
     return (
         <div>
-            {activeSwapsListTab === 'yourSwaps' && renderSwapsTable(userSwaps, 'Your swaps')}
-            {activeSwapsListTab === 'swapsForYou' && renderSwapsTable(destinationSwaps, 'Swaps for you')}
+            {activeSwapOffersListTab === 'yourSwapOffers' && renderSwapOffersTable(userSwapOffers, 'Your swap offers')}
+            {activeSwapOffersListTab === 'swapOffersForYou' && renderSwapOffersTable(swapOffersForUser, 'Swap offers for you')}
         </div>
     );
 };
 
-export default UserSwapsList;
+export default UserSwapOffersList;

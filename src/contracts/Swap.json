@@ -103,7 +103,7 @@
       },
       {
         "internalType": "bool",
-        "name": "partialFill",
+        "name": "partialFillEnabled",
         "type": "bool"
       }
     ],
@@ -184,7 +184,7 @@
           },
           {
             "internalType": "bool",
-            "name": "partialFill",
+            "name": "partialFillEnabled",
             "type": "bool"
           },
           {
@@ -223,12 +223,53 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "swapHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getSwapsForOffer",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "dstAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "srcAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "dstAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closedTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct SwapManager.Swap[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "userAddress",
         "type": "address"
       }
     ],
-    "name": "getUserSwapsOffers",
+    "name": "getUserSwapOffers",
     "outputs": [
       {
         "internalType": "bytes32[]",
@@ -335,7 +376,7 @@
       },
       {
         "internalType": "bool",
-        "name": "partialFill",
+        "name": "partialFillEnabled",
         "type": "bool"
       },
       {

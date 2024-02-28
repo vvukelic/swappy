@@ -165,7 +165,7 @@ export async function approveToken(tokenContractAddress, spenderAddress) {
     }
 };
 
-export async function createSwap(contractAddress, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn) {
+export async function createSwapOffer(contractAddress, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn, partialFillEnabled) {
     const signer = getProvider().getSigner();
     const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
     let ethValue = 0;
@@ -175,7 +175,7 @@ export async function createSwap(contractAddress, srcTokenAddress, srcAmount, ds
     }
 
     try {
-        const result = await swapManagerContract.createSwap(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn, { value: ethValue });
+        const result = await swapManagerContract.createSwapOffer(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn, partialFillEnabled, { value: ethValue });
         const receipt = await result.wait();
         return receipt;
     } catch (error) {
@@ -184,35 +184,35 @@ export async function createSwap(contractAddress, srcTokenAddress, srcAmount, ds
     }
 }
 
-export async function getSwapRaw(contractAddress, swapHash) {
+export async function getSwapOfferRaw(contractAddress, swapHash) {
     const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
-    const swap = await swapManagerContract.getSwap(swapHash);
-    return swap;
+    const swapOffer = await swapManagerContract.getSwapOffer(swapHash);
+    return swapOffer;
 }
 
-export async function getUserSwaps(contractAddress, userAddress) {
+export async function getUserSwapOffers(contractAddress, userAddress) {
     try {
         const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
-        const swapHashes = await contract.getUserSwaps(userAddress);
-        return swapHashes;
+        const swapOffersHashes = await contract.getUserSwapOffers(userAddress);
+        return swapOffersHashes;
     } catch (error) {
         console.error('Error fetching user swaps:', error);
         return [];
     }
 };
 
-export async function getDstUserSwaps(contractAddress, userAddress){
+export async function getSwapOffersForUser(contractAddress, userAddress){
     try {
         const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
-        const swapHashes = await contract.getDstUserSwaps(userAddress);
-        return swapHashes;
+        const swapOffersHashes = await contract.getSwapOffersForUser(userAddress);
+        return swapOffersHashes;
     } catch (error) {
         console.error('Error fetching destination user swaps:', error);
         return [];
     }
 };
 
-export async function takeSwap(contractAddress, swapHash, dstTokenAddress, dstAmount, feeAmount) {
+export async function createSwapForOffer(contractAddress, swapHash, dstTokenAddress, dstAmount, feeAmount) {
     try {
         const signer = getProvider().getSigner();
         const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
@@ -222,7 +222,7 @@ export async function takeSwap(contractAddress, swapHash, dstTokenAddress, dstAm
             nativeTokenAmount = dstAmount;
         }
 
-        const transaction = await swapManagerContract.takeSwap(swapHash, { value: feeAmount.add(nativeTokenAmount) });
+        const transaction = await swapManagerContract.createSwapForOffer(swapHash, dstAmount, { value: feeAmount.add(nativeTokenAmount) });
         const receipt = await transaction.wait();
 
         return receipt;
@@ -232,11 +232,11 @@ export async function takeSwap(contractAddress, swapHash, dstTokenAddress, dstAm
     }
 }
 
-export async function cancelSwap(contractAddress, swapHash) {
+export async function cancelSwapOffer(contractAddress, swapHash) {
     try {
         const signer = getProvider().getSigner();
         const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
-        const transaction = await swapManagerContract.cancelSwap(swapHash);
+        const transaction = await swapManagerContract.cancelSwapOffer(swapHash);
         const receipt = await transaction.wait();
 
         return receipt;

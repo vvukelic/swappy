@@ -32,7 +32,7 @@ contract SwapManager is ReentrancyGuard {
         uint256 createdTime;
         uint256 expirationTime;
 
-        bool partialFill;
+        bool partialFillEnabled;
 
         SwapStatus status;
     }
@@ -60,7 +60,7 @@ contract SwapManager is ReentrancyGuard {
 
     event SwapOfferCreated(address indexed creator, bytes32 swapHash);
 
-    function createSwapOffer(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiresIn, bool partialFill) public payable {
+    function createSwapOffer(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiresIn, bool partialFillEnabled) public payable {
         if (srcTokenAddress == address(0)) {
             require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
 
@@ -79,7 +79,7 @@ contract SwapManager is ReentrancyGuard {
         newSwapOffer.dstAddress = dstAddress;
         newSwapOffer.createdTime = block.timestamp;
         newSwapOffer.feeAmount = calculateEthFee();
-        newSwapOffer.partialFill = partialFill;
+        newSwapOffer.partialFillEnabled = partialFillEnabled;
 
         if (expiresIn > 0) {
             newSwapOffer.expirationTime = block.timestamp + expiresIn;
@@ -130,7 +130,7 @@ contract SwapManager is ReentrancyGuard {
         require(swapOffer.status == SwapStatus.OPENED, "Can't create swap for offer that is not in OPENED status!");
         require(address(msg.sender) != swapOffer.srcAddress, "Cannot create swap for own swap offer!");
 
-        if (swapOffer.partialFill) {
+        if (swapOffer.partialFillEnabled) {
             require(partialDstAmount <= swapOffer.dstAmount, "Sent amount higher than swap offer amount!");
         } else {
             require(partialDstAmount == swapOffer.dstAmount, "Can't create partial swap for offer that is not a partial fill offer!");

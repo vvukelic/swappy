@@ -83,14 +83,14 @@ const NetworkIcon = styled.img`
     margin-right: 10px;
 `;
 
-function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsListTab }) {
+function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [ethBalance, setEthBalance] = useState(null);
     const [networkName, setNetworkName] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:600px)');
     const router = useRouter();
-    const [showSwapsHoverMenu, setShowSwapsHoverMenu] = useState(false);
+    const [showSwapOffersHoverMenu, setShowSwapOffersHoverMenu] = useState(false);
     const [showNetworksHoverMenu, setShowNetworksHoverMenu] = useState(false);
 
     useEffect(() => {
@@ -122,48 +122,48 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
         connectBtnText = sliceAddress(defaultAccount);
     }
 
-    const handleSwapNavigationButtonClick = (newActiveTab) => {
-        if (activeTab === 'createSwap' || activeTab === 'swapsList') {
+    const handleSwapOfferNavigationButtonClick = (newActiveTab) => {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
             setActiveTab(newActiveTab);
 
-            if (newActiveTab === 'createSwap') {
-                setActiveSwapsListTab(null);
+            if (newActiveTab === 'createSwapOffer') {
+                setActiveSwapOffersListTab(null);
             }
         } else {
             router.push(`/swap?tab=${newActiveTab}`);
         }
     };
 
-    const handleSwapsListClick = (item) => {
-        if (activeTab === 'createSwap' || activeTab === 'swapsList') {
-            setActiveTab('swapsList');
-            setActiveSwapsListTab('yourSwaps');
+    const handleSwapOffersListClick = (item) => {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
+            setActiveTab('swapOffersList');
+            setActiveSwapOffersListTab('yourSwapOffers');
         } else {
-            router.push(`/swap?tab=swapsList&listTab=yourSwaps`);
+            router.push(`/swap?tab=swapOffersList&listTab=yourSwapOffers`);
         }
     };
 
-    const handleSwapsListTabClick = (listTab) => {
-        if (activeTab === 'createSwap' || activeTab === 'swapsList') {
-            setShowSwapsHoverMenu(false);
-            setActiveTab('swapsList');
-            setActiveSwapsListTab(listTab);
+    const handleSwapOffersListTabClick = (listTab) => {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
+            setShowSwapOffersHoverMenu(false);
+            setActiveTab('swapOffersList');
+            setActiveSwapOffersListTab(listTab);
         } else {
-            router.push(`/swap?tab=swapsList&listTab=${listTab}`);
+            router.push(`/swap?tab=swapOffersList&listTab=${listTab}`);
         }
     };
 
-    const SwapsListsButtonWithMenu = () => (
-        <RelativePositionContainer onMouseEnter={() => setShowSwapsHoverMenu(true)} onMouseLeave={() => setShowSwapsHoverMenu(false)}>
-            <StyledTabButton isActive={activeTab === 'swapsList'} onClick={handleSwapsListClick}>
-                Swaps
+    const SwapOffersListsButtonWithMenu = () => (
+        <RelativePositionContainer onMouseEnter={() => setShowSwapOffersHoverMenu(true)} onMouseLeave={() => setShowSwapOffersHoverMenu(false)}>
+            <StyledTabButton isActive={activeTab === 'swapOffersList'} onClick={handleSwapOffersListClick}>
+                Swap Offers
             </StyledTabButton>
-            <StyledHoverMenu show={showSwapsHoverMenu} width='170px'>
-                <StyledTabButton isActive={activeSwapsListTab === 'yourSwaps'} onClick={() => handleSwapsListTabClick('yourSwaps')}>
-                    Your Swaps
+            <StyledHoverMenu show={showSwapOffersHoverMenu} width='170px'>
+                <StyledTabButton isActive={activeSwapOffersListTab === 'yourSwapOffers'} onClick={() => handleSwapOffersListTabClick('yourSwapOffers')}>
+                    Your Swap Offers
                 </StyledTabButton>
-                <StyledTabButton isActive={activeSwapsListTab === 'swapsForYou'} onClick={() => handleSwapsListTabClick('swapsForYou')}>
-                    Swaps for You
+                <StyledTabButton isActive={activeSwapOffersListTab === 'swapOffersForYou'} onClick={() => handleSwapOffersListTabClick('swapOffersForYou')}>
+                    Swap Offers for You
                 </StyledTabButton>
             </StyledHoverMenu>
         </RelativePositionContainer>
@@ -200,12 +200,12 @@ function Header({ activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsLis
 
     const CommonHeaderItems = () => (
         <>
-            <StyledTabButton isActive={activeTab === 'createSwap'} onClick={() => handleSwapNavigationButtonClick('createSwap')}>
-                Create Swap
+            <StyledTabButton isActive={activeTab === 'createSwapOffer'} onClick={() => handleSwapOfferNavigationButtonClick('createSwapOffer')}>
+                Create Swap Offer
             </StyledTabButton>
-            <SwapsListsButtonWithMenu isActive={activeTab === 'swapsList'} onClick={() => setActiveTab('swapsList')} onMouseEnter={() => setShowSwapsHoverMenu(true)}>
-                Swaps List
-            </SwapsListsButtonWithMenu>
+            <SwapOffersListsButtonWithMenu isActive={activeTab === 'swapOffersList'} onClick={() => setActiveTab('swapOffersList')} onMouseEnter={() => setShowSwapOfferOffersHoverMenu(true)}>
+                Swap Offer Offers List
+            </SwapOffersListsButtonWithMenu>
             <Box flexGrow={1} />
             {ethBalance !== null && (
                 <Typography sx={{ marginRight: '15px' }} variant='h6' color='white'>

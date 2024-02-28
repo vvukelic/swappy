@@ -509,7 +509,7 @@ describe('SwapManager contract', function () {
             expect(swapsForOffer.length).to.equal(1);
         });
 
-        it('ERC20 -> ERC20 partial swap 100% fill', async function () {
+        it('ERC20 -> ERC20 partial swap (100% fill)', async function () {
             const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
             const srcAmount = 93029302;
             const dstAmount = 100000;

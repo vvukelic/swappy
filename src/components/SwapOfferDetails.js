@@ -4,16 +4,16 @@ import { Grid, Typography, Box } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { takeSwap, cancelSwap, approveToken, getEthBalance, getAllowance } from '../utils/web3';
+import { createSwapForOffer, cancelSwapOffer, approveToken, getEthBalance, getAllowance } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
-import SwapDetailsTokenInfo from './SwapDetailsTokenInfo';
-import { getSwap, sliceAddress } from '../utils/general';
+import SwapDetailsTokenInfo from './SwapOfferDetailsTokenInfo';
+import { getSwapOffer, sliceAddress } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
-import SwapStatusChip from './SwapStatusChip';
+import SwapStatusChip from './SwapOfferStatusChip';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -22,10 +22,10 @@ const StyledBox = styled(Box)`
     min-height: 2.5em;
 `;
 
-function SwapDetails({ hash }) {
+function SwapOfferDetails({ hash }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
-    const [swap, setSwap] = useState(null);
+    const [swapOffer, setSwapOffer] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
 
@@ -33,56 +33,56 @@ function SwapDetails({ hash }) {
         async function checkTokenApproved() {
             let tokenBalance = null;
 
-            if (swap.dstTokenAddress === ethers.constants.AddressZero) {
+            if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
                 tokenBalance = await getEthBalance(defaultAccount);
                 setTokenApproved(tokenBalance > 0);
             } else {
-                tokenBalance = await getAllowance(swap.dstTokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
+                tokenBalance = await getAllowance(swapOffer.dstTokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
                 setTokenApproved(tokenBalance > 0);
             }
         }
 
-        if (swap) {
+        if (swapOffer) {
             checkTokenApproved();
         }
-    }, [defaultAccount, network, swap]);
+    }, [defaultAccount, network, swapOffer]);
 
     useEffect(() => {
-        if (defaultAccount && swap) {
+        if (defaultAccount && swapOffer) {
             if (tokenApproved) {
                 setSwapButtonText('Take swap');
             } else {
-                if (swap.dstTokenAddress === ethers.constants.AddressZero) {
+                if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
                     setSwapButtonText('ETH balance too low');
                 } else {
-                    setSwapButtonText(`Approve ${swap.dstTokenName} Token`);
+                    setSwapButtonText(`Approve ${swapOffer.dstTokenName} Token`);
                 }
             }
         }
-    }, [defaultAccount, swap, tokenApproved]);
+    }, [defaultAccount, swapOffer, tokenApproved]);
 
     useEffect(() => {
-        async function getSwapDetails() {
+        async function getSwapOfferDetails() {
             try {
-                const swap = await getSwap(contractAddresses.SwapManager[network], hash, network);
-                setSwap(swap);
+                const swapOffer = await getSwapOffer(contractAddresses.SwapManager[network], hash, network);
+                setSwapOffer(swapOffer);
             } catch (err) {
                 console.error(err);
             }
         }
 
         if (network && hash) {
-            getSwapDetails();
+            getSwapOfferDetails();
         }
     }, [hash, network]);
 
-    const handleTakeSwap = async () => {
+    const handleCreateSwapForOffer = async () => {
         if (tokenApproved) {
             try {
                 startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
 
                 try {
-                    const receipt = await takeSwap(contractAddresses.SwapManager[network], hash, swap.dstToken.networkSpecificAddress[network], swap.dstAmount, swap.feeAmount);
+                    const receipt = await createSwapForOffer(contractAddresses.SwapManager[network], hash, swapOffer.dstToken.networkSpecificAddress[network], swapOffer.dstAmount, swapOffer.feeAmount);
 
                     if (receipt.status === 1) {
                         endTransaction(true, `Swap taken successfully!`);
@@ -101,40 +101,40 @@ function SwapDetails({ hash }) {
                 console.error(err);
             }
         } else {
-            startTransaction(`Please go to your wallet and approve ${swap.dstTokenName}`);
+            startTransaction(`Please go to your wallet and approve ${swapOffer.dstTokenName}`);
 
             try {
-                const receipt = await approveToken(swap.dstTokenAddress, contractAddresses.SwapManager[network]);
+                const receipt = await approveToken(swapOffer.dstTokenAddress, contractAddresses.SwapManager[network]);
 
                 if (receipt.status === 1) {
-                    endTransaction(true, `You successfuly approved ${swap.dstTokenName}!`);
+                    endTransaction(true, `You successfuly approved ${swapOffer.dstTokenName}!`);
                     setTokenApproved(true);
                 } else {
-                    endTransaction(false, `There was an error approving ${swap.dstTokenName}.`);
+                    endTransaction(false, `There was an error approving ${swapOffer.dstTokenName}.`);
                 }
             } catch (error) {
-                endTransaction(false, `There was an error approving ${swap.dstTokenName}.`, error.toString());
+                endTransaction(false, `There was an error approving ${swapOffer.dstTokenName}.`, error.toString());
                 return;
             }
         }
     };
 
-    const handleCancelSwap = async () => {
+    const handleCancelSwapOffer = async () => {
         try {
-            startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap.`);
+            startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap offer.`);
 
             try {
-                const receipt = await cancelSwap(contractAddresses.SwapManager[network], hash);
+                const receipt = await cancelSwapOffer(contractAddresses.SwapManager[network], hash);
 
                 if (receipt.status === 1) {
-                    endTransaction(true, `Swap canceled successfully!`);
-                    console.log('Swap canceled successfully!');
+                    endTransaction(true, `Swap offer canceled successfully!`);
+                    console.log('Swap offer canceled successfully!');
                 } else {
-                    endTransaction(false, `Failed to cancel the swap.`);
-                    console.error('Failed to cancel the swap.');
+                    endTransaction(false, `Failed to cancel the swap offer.`);
+                    console.error('Failed to cancel the swap offer.');
                 }
             } catch (error) {
-                endTransaction(false, 'Failed to cancel the swap.', error.toString());
+                endTransaction(false, 'Failed to cancel the swap offer.', error.toString());
                 return;
             }
 
@@ -144,14 +144,14 @@ function SwapDetails({ hash }) {
         }
     };
 
-    if (!swap) {
+    if (!swapOffer) {
         return <div>Loading...</div>;
     }
 
     return (
         <>
         <MainContentContainer sx={{ width: '100%' }}>
-            <SwapDetailsTokenInfo token={swap.dstToken} amount={swap.dstAmountInBaseUnit.toString()} labelText='You send' sx={{ width: '100%' }} />
+            <SwapDetailsTokenInfo token={swapOffer.dstToken} amount={swapOffer.dstAmountInBaseUnit.toString()} labelText='You send' sx={{ width: '100%' }} />
 
             <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                 <IconButton variant='outlined' disabled>
@@ -159,11 +159,11 @@ function SwapDetails({ hash }) {
                 </IconButton>
             </Grid>
 
-            <SwapDetailsTokenInfo token={swap.srcToken} amount={swap.srcAmountInBaseUnit.toString()} labelText='You receive' />
+            <SwapDetailsTokenInfo token={swapOffer.srcToken} amount={swapOffer.srcAmountInBaseUnit.toString()} labelText='You receive' />
 
             <Grid item sx={{ height: '42px' }} />
 
-            <BorderSection title='Swap details'>
+            <BorderSection title='Swap offer details'>
                 <Grid container direction='row' alignItems='flex-start' sx={{ padding: '0.5em' }}>
                     <Grid item xs={4} textAlign='right'>
                         <StyledBox>
@@ -181,30 +181,30 @@ function SwapDetails({ hash }) {
                     </Grid>
                     <Grid item xs={8} textAlign='center'>
                         <StyledBox>
-                            <SwapStatusChip status={swap.readableStatus} />
+                            <SwapStatusChip status={swapOffer.readableStatus} />
                         </StyledBox>
                         <StyledBox>
-                            <Typography>{swap.feeAmountInBaseUnit} ETH</Typography>
+                            <Typography>{swapOffer.feeAmountInBaseUnit} ETH</Typography>
                         </StyledBox>
                         <StyledBox>
-                            <Typography>{swap.displayExpirationTime ? swap.displayExpirationTime : 'not defined'}</Typography>
+                            <Typography>{swapOffer.displayExpirationTime ? swapOffer.displayExpirationTime : 'not defined'}</Typography>
                         </StyledBox>
                         <StyledBox>
-                            <Typography>{sliceAddress(swap.dstAddress)}</Typography>
+                            <Typography>{sliceAddress(swapOffer.dstAddress)}</Typography>
                         </StyledBox>
                     </Grid>
                 </Grid>
             </BorderSection>
 
-            {swap.readableStatus === 'OPENED' && (swap.dstAddress === ethers.constants.AddressZero || swap.dstAddress === defaultAccount) && swap.srcAddress !== defaultAccount && (
+            {swapOffer.readableStatus === 'OPENED' && (swapOffer.dstAddress === ethers.constants.AddressZero || swapOffer.dstAddress === defaultAccount) && swapOffer.srcAddress !== defaultAccount && (
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
-                    <PrimaryButton onClick={handleTakeSwap} buttonText={swapButtonText} />
+                    <PrimaryButton onClick={handleCreateSwapForOffer} buttonText={swapButtonText} />
                 </Grid>
             )}
 
-            {swap.readableStatus === 'OPENED'  && swap.srcAddress === defaultAccount && (
+            {swapOffer.readableStatus === 'OPENED'  && swapOffer.srcAddress === defaultAccount && (
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
-                    <PrimaryButton onClick={handleCancelSwap} buttonText='Cancel' />
+                    <PrimaryButton onClick={handleCancelSwapOffer} buttonText='Cancel' />
                 </Grid>
             )}
         </MainContentContainer>
@@ -219,4 +219,4 @@ function SwapDetails({ hash }) {
     );
 }
 
-export default SwapDetails;
+export default SwapOfferDetails;
