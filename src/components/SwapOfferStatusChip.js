@@ -16,7 +16,7 @@ const StyledChip = styled(Chip)(({ status }) => {
             backgroundColor = '#4fbe30';
             break;
         case 'FILLED':
-            backgroundColor = '#07713d';
+            backgroundColor = '';
             break;
     }
 

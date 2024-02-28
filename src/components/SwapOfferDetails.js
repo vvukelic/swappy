@@ -8,7 +8,7 @@ import { createSwapForOffer, cancelSwapOffer, approveToken, getEthBalance, getAl
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
-import SwapDetailsTokenInfo from './SwapOfferDetailsTokenInfo';
+import SwapOfferDetailsTokenInfo from './SwapOfferDetailsTokenInfo';
 import { getSwapOffer, sliceAddress } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
@@ -26,6 +26,8 @@ function SwapOfferDetails({ hash }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const [swapOffer, setSwapOffer] = useState(null);
+    const [swapSrcAmount, setSwapSrcAmount] = useState(null);
+    const [swapDstAmount, setSwapDstAmount] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
 
@@ -66,6 +68,8 @@ function SwapOfferDetails({ hash }) {
             try {
                 const swapOffer = await getSwapOffer(contractAddresses.SwapManager[network], hash, network);
                 setSwapOffer(swapOffer);
+                setSwapSrcAmount(swapOffer.srcAmount);
+                setSwapDstAmount(swapOffer.dstAmount);
             } catch (err) {
                 console.error(err);
             }
@@ -76,13 +80,24 @@ function SwapOfferDetails({ hash }) {
         }
     }, [hash, network]);
 
+    useEffect(() => {
+        if (swapOffer) {
+            if (swapDstAmount >= swapOffer.dstAmount) {
+                setSwapSrcAmount(swapOffer.srcAmount);
+                setSwapDstAmount(swapOffer.dstAmount);
+            } else {
+                setSwapSrcAmount(swapDstAmount * swapOffer.exchangeRate);
+            }
+        }
+    }, [swapDstAmount]);
+
     const handleCreateSwapForOffer = async () => {
         if (tokenApproved) {
             try {
                 startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
 
                 try {
-                    const receipt = await createSwapForOffer(contractAddresses.SwapManager[network], hash, swapOffer.dstToken.networkSpecificAddress[network], swapOffer.dstAmount, swapOffer.feeAmount);
+                    const receipt = await createSwapForOffer(contractAddresses.SwapManager[network], hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
 
                     if (receipt.status === 1) {
                         endTransaction(true, `Swap taken successfully!`);
@@ -150,71 +165,65 @@ function SwapOfferDetails({ hash }) {
 
     return (
         <>
-        <MainContentContainer sx={{ width: '100%' }}>
-            <SwapDetailsTokenInfo token={swapOffer.dstToken} amount={swapOffer.dstAmountInBaseUnit.toString()} labelText='You send' sx={{ width: '100%' }} />
+            <MainContentContainer sx={{ width: '100%' }}>
+                <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={swapDstAmount} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} />
 
-            <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
-                <IconButton variant='outlined' disabled>
-                    <ArrowDownwardIcon />
-                </IconButton>
-            </Grid>
+                <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
+                    <IconButton variant='outlined' disabled>
+                        <ArrowDownwardIcon />
+                    </IconButton>
+                </Grid>
 
-            <SwapDetailsTokenInfo token={swapOffer.srcToken} amount={swapOffer.srcAmountInBaseUnit.toString()} labelText='You receive' />
+                <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={swapSrcAmount} setAmount={setSwapSrcAmount} tokenDecimals={swapOffer.srcTokenDecimals} labelText='You receive' />
 
-            <Grid item sx={{ height: '42px' }} />
+                <Grid item sx={{ height: '42px' }} />
 
-            <BorderSection title='Swap offer details'>
-                <Grid container direction='row' alignItems='flex-start' sx={{ padding: '0.5em' }}>
-                    <Grid item xs={4} textAlign='right'>
-                        <StyledBox>
-                            <Typography>Status:</Typography>
-                        </StyledBox>
-                        <StyledBox>
-                            <Typography>Swappy's fee:</Typography>
-                        </StyledBox>
-                        <StyledBox>
-                            <Typography>Expires:</Typography>
-                        </StyledBox>
-                        <StyledBox>
-                            <Typography>Private swap:</Typography>
-                        </StyledBox>
+                <BorderSection title='Swap offer details'>
+                    <Grid container direction='row' alignItems='flex-start' sx={{ padding: '0.5em' }}>
+                        <Grid item xs={4} textAlign='right'>
+                            <StyledBox>
+                                <Typography>Status:</Typography>
+                            </StyledBox>
+                            <StyledBox>
+                                <Typography>Swappy's fee:</Typography>
+                            </StyledBox>
+                            <StyledBox>
+                                <Typography>Expires:</Typography>
+                            </StyledBox>
+                            <StyledBox>
+                                <Typography>Private swap:</Typography>
+                            </StyledBox>
+                        </Grid>
+                        <Grid item xs={8} textAlign='center'>
+                            <StyledBox>
+                                <SwapStatusChip status={swapOffer.readableStatus} />
+                            </StyledBox>
+                            <StyledBox>
+                                <Typography>{swapOffer.feeAmountInBaseUnit} ETH</Typography>
+                            </StyledBox>
+                            <StyledBox>
+                                <Typography>{swapOffer.displayExpirationTime ? swapOffer.displayExpirationTime : 'not defined'}</Typography>
+                            </StyledBox>
+                            <StyledBox>
+                                <Typography>{sliceAddress(swapOffer.dstAddress)}</Typography>
+                            </StyledBox>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={8} textAlign='center'>
-                        <StyledBox>
-                            <SwapStatusChip status={swapOffer.readableStatus} />
-                        </StyledBox>
-                        <StyledBox>
-                            <Typography>{swapOffer.feeAmountInBaseUnit} ETH</Typography>
-                        </StyledBox>
-                        <StyledBox>
-                            <Typography>{swapOffer.displayExpirationTime ? swapOffer.displayExpirationTime : 'not defined'}</Typography>
-                        </StyledBox>
-                        <StyledBox>
-                            <Typography>{sliceAddress(swapOffer.dstAddress)}</Typography>
-                        </StyledBox>
+                </BorderSection>
+
+                {swapOffer.readableStatus === 'OPENED' && (swapOffer.dstAddress === ethers.constants.AddressZero || swapOffer.dstAddress === defaultAccount) && swapOffer.srcAddress !== defaultAccount && (
+                    <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
+                        <PrimaryButton onClick={handleCreateSwapForOffer} buttonText={swapButtonText} />
                     </Grid>
-                </Grid>
-            </BorderSection>
+                )}
 
-            {swapOffer.readableStatus === 'OPENED' && (swapOffer.dstAddress === ethers.constants.AddressZero || swapOffer.dstAddress === defaultAccount) && swapOffer.srcAddress !== defaultAccount && (
-                <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
-                    <PrimaryButton onClick={handleCreateSwapForOffer} buttonText={swapButtonText} />
-                </Grid>
-            )}
-
-            {swapOffer.readableStatus === 'OPENED'  && swapOffer.srcAddress === defaultAccount && (
-                <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
-                    <PrimaryButton onClick={handleCancelSwapOffer} buttonText='Cancel' />
-                </Grid>
-            )}
-        </MainContentContainer>
-        <TransactionStatusModal
-            open={txModalOpen}
-            status={txStatus}
-            statusTxt={txStatusTxt}
-            errorTxt={txErrorTxt}
-            onClose={() => setTxModalOpen(false)}
-        />
+                {swapOffer.readableStatus === 'OPENED' && swapOffer.srcAddress === defaultAccount && (
+                    <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
+                        <PrimaryButton onClick={handleCancelSwapOffer} buttonText='Cancel' />
+                    </Grid>
+                )}
+            </MainContentContainer>
+            <TransactionStatusModal open={txModalOpen} status={txStatus} statusTxt={txStatusTxt} errorTxt={txErrorTxt} onClose={() => setTxModalOpen(false)} />
         </>
     );
 }

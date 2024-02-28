@@ -161,7 +161,7 @@ function SwapOffer({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddres
             startTransaction(`Please go to your wallet and confirm the transaction for the swap.`);
 
             try {
-                const receipt = await createSwapOffer(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn, false);
+                const receipt = await createSwapOffer(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn, true);
                 
                 if (receipt.status === 1) {
                     const swapOfferCreatedEvent = receipt.events?.find((e) => e.event === 'SwapOfferCreated');
