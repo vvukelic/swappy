@@ -105,12 +105,12 @@ contract SwapManager is ReentrancyGuard {
         emit SwapOfferCreated(msg.sender, newSwapKey);
     }
 
-    function getSwapOffer(bytes32 swapHash) public view returns (SwapOffer memory) {
-        return swapOffers[swapHash];
+    function getSwapOffer(bytes32 swapOfferHash) public view returns (SwapOffer memory) {
+        return swapOffers[swapOfferHash];
     }
 
-    function getSwapsForOffer(bytes32 swapHash) public view returns (Swap[] memory) {
-        return swaps[swapHash];
+    function getSwapsForOffer(bytes32 swapOfferHash) public view returns (Swap[] memory) {
+        return swaps[swapOfferHash];
     }
 
     function getUserSwapOffers(address userAddress) public view returns (bytes32[] memory) {

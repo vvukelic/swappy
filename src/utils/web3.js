@@ -184,10 +184,16 @@ export async function createSwapOffer(contractAddress, srcTokenAddress, srcAmoun
     }
 }
 
-export async function getSwapOfferRaw(contractAddress, swapHash) {
+export async function getSwapOfferRaw(contractAddress, swapOfferHash) {
     const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
-    const swapOffer = await swapManagerContract.getSwapOffer(swapHash);
+    const swapOffer = await swapManagerContract.getSwapOffer(swapOfferHash);
     return swapOffer;
+}
+
+export async function getSwapsForOffer(contractAddress, swapOfferHash) {
+    const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
+    const swapsForOffer = await swapManagerContract.getSwapsForOffer(swapOfferHash);
+    return swapsForOffer;
 }
 
 export async function getUserSwapOffers(contractAddress, userAddress) {
