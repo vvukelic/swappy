@@ -10,6 +10,7 @@ import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
 import SwapOfferDetailsPartialFillTokenForm from './SwapOfferDetailsPartialFillTokenForm';
 import SwapOfferDetailsTokenInfo from './SwapOfferDetailsTokenInfo';
+import SwapOfferPercentageFilledLabel from './SwapOfferPercentageFilledLabel';
 import { getSwapOffer, sliceAddress } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
@@ -170,8 +171,8 @@ function SwapOfferDetails({ hash }) {
     return (
         <>
             <MainContentContainer sx={{ width: '100%' }}>
-                {swapOffer.partialFillEnabled && <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} />}
-                {!swapOffer.partialFillEnabled && <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={ethers.utils.formatUnits(swapDstAmount)} labelText='You send' />}
+                {swapOffer.partialFillEnabled && swapOffer.readableStatus !== 'FILLED' && <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} />}
+                {(!swapOffer.partialFillEnabled || swapOffer.readableStatus === 'FILLED') && <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
 
                 <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton variant='outlined' disabled>
@@ -200,8 +201,9 @@ function SwapOfferDetails({ hash }) {
                             </StyledBox>
                         </Grid>
                         <Grid item xs={8} textAlign='center'>
-                            <StyledBox>
+                            <StyledBox sx={{ display: 'inline-flex', alignItems: 'center', gap: '1em' }}>
                                 <SwapStatusChip status={swapOffer.readableStatus} />
+                                {swapOffer.partialFillEnabled && <SwapOfferPercentageFilledLabel percentage={swapOffer.filledPercentage} />}
                             </StyledBox>
                             <StyledBox>
                                 <Typography>{swapOffer.feeAmountInBaseUnit} ETH</Typography>
