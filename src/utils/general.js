@@ -1,5 +1,5 @@
 import { ethers, BigNumber } from 'ethers';
-import { getSwapRaw, getCurrentBlockTimestamp } from './web3';
+import { getSwapOfferRaw, getSwapsForOffer, getCurrentBlockTimestamp, getTokenDecimals } from './web3';
 import { getTokenByAddress, toBaseUnit, getTokenBalance } from './tokens';
 
 
@@ -7,48 +7,77 @@ export function sliceAddress(address) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-function getSwapStatus(swap, srcAccountTokenBalance, currentBlockTimestamp) {
-    if (swap.status === 0) {
-        if (!swap.expirationTime.isZero() && swap.expirationTime.lt(BigNumber.from(currentBlockTimestamp))) {
+function getSwapsDstAmountSum(swaps) {
+    let swapsDstAmountSum = ethers.BigNumber.from('0');
+
+    for (let i = 0; i < swaps.length; i++) {
+        swapsDstAmountSum = swapsDstAmountSum.add(swaps[i].dstAmount);
+    }
+
+    return swapsDstAmountSum;
+}
+
+function getSwapOfferFilledPercentage(swapOffer, swaps) {
+    const swapsDstAmountSum = getSwapsDstAmountSum(swaps);
+    return swapsDstAmountSum.mul(100).div(swapOffer.dstAmount).toNumber();
+}
+
+function getSwapOfferStatus(swapOffer, filledPercentage, srcAccountTokenBalance, currentBlockTimestamp) {
+    if (swapOffer.status === 0) {
+        if (filledPercentage === 100) {
+            return 'FILLED';
+        }
+
+        if (!swapOffer.expirationTime.isZero() && swapOffer.expirationTime.lt(BigNumber.from(currentBlockTimestamp))) {
             return 'EXPIRED';
-        } else if (srcAccountTokenBalance.lt(swap.srcAmount)) {
+        } else if (srcAccountTokenBalance.lt(swapOffer.srcAmount)) {
             return 'ERROR';
         } else {
             return 'OPENED';
         }
-    } else if (swap.status === 1) {
-        return 'SWAPPED';
-    } else if (swap.status === 2) {
+    } else if (swapOffer.status === 1) {
         return 'CANCELED';
     }
 }
 
-export async function getSwap(contractAddress, swapHash, network) {
+export async function getSwapOffer(contractAddress, swapOfferHash, network) {
     try {
-        const swap = await getSwapRaw(contractAddress, swapHash);
-        const srcAmountInBaseUnit = await toBaseUnit(swap.srcAmount, swap.srcTokenAddress);
-        const dstAmountInBaseUnit = await toBaseUnit(swap.dstAmount, swap.dstTokenAddress);
-        const srcToken = getTokenByAddress(swap.srcTokenAddress, network);
-        const dstToken = getTokenByAddress(swap.dstTokenAddress, network);
-        const feeAmountInBaseUnit = ethers.utils.formatUnits(swap.feeAmount, 'ether');
+        const swapOffer = await getSwapOfferRaw(contractAddress, swapOfferHash);
+        const swaps = await getSwapsForOffer(contractAddress, swapOfferHash);
+        const filledPercentage = getSwapOfferFilledPercentage(swapOffer, swaps);
+        const srcAmountInBaseUnit = await toBaseUnit(swapOffer.srcAmount, swapOffer.srcTokenAddress);
+        const dstAmountInBaseUnit = await toBaseUnit(swapOffer.dstAmount, swapOffer.dstTokenAddress);
+        const srcToken = getTokenByAddress(swapOffer.srcTokenAddress, network);
+        const dstToken = getTokenByAddress(swapOffer.dstTokenAddress, network);
+        const srcTokenDecimals = swapOffer.srcTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(swapOffer.srcTokenAddress);
+        const dstTokenDecimals = swapOffer.srcTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(swapOffer.dstTokenAddress);
+        const feeAmountInBaseUnit = ethers.utils.formatUnits(swapOffer.feeAmount, 'ether');
         const currentBlockTimestamp = await getCurrentBlockTimestamp();
-        const srcAccountTokenBalance = await getTokenBalance(swap.srcAddress, swap.srcTokenAddress);
+        const srcAccountTokenBalance = await getTokenBalance(swapOffer.srcAddress, swapOffer.srcTokenAddress);
+        const remainingDstAmountSum = swapOffer.dstAmount.sub(getSwapsDstAmountSum(swaps));
+        const exchangeRate = swapOffer.srcAmount / swapOffer.dstAmount;
 
         return {
-            ...swap,
+            ...swapOffer,
             srcAmountInBaseUnit: srcAmountInBaseUnit,
             dstAmountInBaseUnit: dstAmountInBaseUnit,
             feeAmountInBaseUnit: feeAmountInBaseUnit,
             srcToken: srcToken,
             dstToken: dstToken,
+            srcTokenDecimals: srcTokenDecimals,
+            dstTokenDecimals: dstTokenDecimals,
             srcTokenName: srcToken.name.toUpperCase(),
             dstTokenName: dstToken.name.toUpperCase(),
-            displayCreatedTime: new Date(swap.createdTime * 1000).toLocaleString(),
-            displayExpirationTime: swap.expirationTime.toString() !== '0' ? new Date(swap.expirationTime * 1000).toLocaleString() : null,
-            readableStatus: getSwapStatus(swap, srcAccountTokenBalance, currentBlockTimestamp),
+            displayCreatedTime: new Date(swapOffer.createdTime * 1000).toLocaleString(),
+            displayExpirationTime: swapOffer.expirationTime.toString() !== '0' ? new Date(swapOffer.expirationTime * 1000).toLocaleString() : null,
+            readableStatus: getSwapOfferStatus(swapOffer, filledPercentage, srcAccountTokenBalance, currentBlockTimestamp),
+            filledPercentage: filledPercentage,
+            exchangeRate: exchangeRate,
+            remainingSrcAmountSum: remainingDstAmountSum.mul(exchangeRate),
+            remainingDstAmountSum: remainingDstAmountSum,
         };
     } catch (error) {
-        console.error(`Failed to get swap details for hash ${swapHash}:`, error);
+        console.error(`Failed to get swap details for hash ${swapOfferHash}:`, error);
         return null;
     }
 }

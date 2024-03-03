@@ -15,8 +15,8 @@ const StyledChip = styled(Chip)(({ status }) => {
         case 'OPENED':
             backgroundColor = '#4fbe30';
             break;
-        case 'SWAPPED':
-            backgroundColor = '#07713d';
+        case 'FILLED':
+            backgroundColor = '';
             break;
     }
 
@@ -26,12 +26,12 @@ const StyledChip = styled(Chip)(({ status }) => {
     `;
 });
 
-function SwapStatusChip({ status }) {
+function SwapOfferStatusChip({ status }) {
     return (
-        <Tooltip title={status === 'ERROR' && 'The creator of the swap no longer has the required token balance on their account. When this changes, the swap will be available for taking.'}>
+        <Tooltip title={status === 'ERROR' && 'The creator of the swap offer no longer has the required token balance on their account. When this changes, the swap will be available for taking.'}>
             <StyledChip label={status} status={status} />
         </Tooltip>
     );
 }
 
-export default SwapStatusChip;
+export default SwapOfferStatusChip;

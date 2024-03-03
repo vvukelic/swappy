@@ -31,7 +31,7 @@
         "type": "bytes32"
       }
     ],
-    "name": "SwapCreated",
+    "name": "SwapOfferCreated",
     "type": "event"
   },
   {
@@ -46,7 +46,25 @@
         "type": "bytes32"
       }
     ],
-    "name": "cancelSwap",
+    "name": "cancelSwapOffer",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferIndex",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "partialDstAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "createSwapForOffer",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -82,35 +100,16 @@
         "internalType": "uint256",
         "name": "expiresIn",
         "type": "uint256"
-      }
-    ],
-    "name": "createSwap",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "partialFillEnabled",
+        "type": "bool"
       }
     ],
-    "name": "dstUserSwaps",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "createSwapOffer",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -129,31 +128,12 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "userAddress",
-        "type": "address"
-      }
-    ],
-    "name": "getDstUserSwaps",
-    "outputs": [
-      {
-        "internalType": "bytes32[]",
-        "name": "",
-        "type": "bytes32[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes32",
-        "name": "swapHash",
+        "name": "swapOfferHash",
         "type": "bytes32"
       }
     ],
-    "name": "getSwap",
+    "name": "getSwapOffer",
     "outputs": [
       {
         "components": [
@@ -203,9 +183,9 @@
             "type": "uint256"
           },
           {
-            "internalType": "uint256",
-            "name": "closedTime",
-            "type": "uint256"
+            "internalType": "bool",
+            "name": "partialFillEnabled",
+            "type": "bool"
           },
           {
             "internalType": "enum SwapManager.SwapStatus",
@@ -213,7 +193,7 @@
             "type": "uint8"
           }
         ],
-        "internalType": "struct SwapManager.Swap",
+        "internalType": "struct SwapManager.SwapOffer",
         "name": "",
         "type": "tuple"
       }
@@ -229,7 +209,67 @@
         "type": "address"
       }
     ],
-    "name": "getUserSwaps",
+    "name": "getSwapOffersForUser",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getSwapsForOffer",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "dstAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "srcAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "dstAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closedTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct SwapManager.Swap[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getUserSwapOffers",
     "outputs": [
       {
         "internalType": "bytes32[]",
@@ -287,7 +327,7 @@
         "type": "bytes32"
       }
     ],
-    "name": "swaps",
+    "name": "swapOffers",
     "outputs": [
       {
         "internalType": "address payable",
@@ -335,9 +375,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "closedTime",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "partialFillEnabled",
+        "type": "bool"
       },
       {
         "internalType": "enum SwapManager.SwapStatus",
@@ -346,19 +386,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "index",
-        "type": "bytes32"
-      }
-    ],
-    "name": "takeSwap",
-    "outputs": [],
-    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -374,7 +401,94 @@
         "type": "uint256"
       }
     ],
-    "name": "userSwaps",
+    "name": "swapOffersForUser",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "swaps",
+    "outputs": [
+      {
+        "internalType": "address payable",
+        "name": "dstAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "srcAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "dstAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "closedTime",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "swapsTakenByUser",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "userSwapOffers",
     "outputs": [
       {
         "internalType": "bytes32",

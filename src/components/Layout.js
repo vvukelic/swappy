@@ -11,10 +11,10 @@ const StyledBox = styled(Box)`
     padding-top: 3em;
 `;
 
-export default ({ children, activeTab, setActiveTab, activeSwapsListTab, setActiveSwapsListTab }) => {
+export default ({ children, activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) => {
     return (
         <AccountProvider>
-            <Header activeTab={activeTab} setActiveTab={setActiveTab} activeSwapsListTab={activeSwapsListTab} setActiveSwapsListTab={setActiveSwapsListTab} />
+            <Header activeTab={activeTab} setActiveTab={setActiveTab} activeSwapOffersListTab={activeSwapOffersListTab} setActiveSwapOffersListTab={setActiveSwapOffersListTab} />
             <StyledBox>{children}</StyledBox>
         </AccountProvider>
     );

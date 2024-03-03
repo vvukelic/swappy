@@ -7,7 +7,7 @@ import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
 import { getTokenByName, updateCustomTokensList, toSmallestUnit, toBaseUnit, getTokenBalance } from '../utils/tokens';
-import { getAllowance, approveToken, createSwap } from '../utils/web3';
+import { getAllowance, approveToken, createSwapOffer } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
@@ -29,7 +29,7 @@ const StyledSwitch = styled(Switch)`
     }
 `;
 
-function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, setDstAddress, selectedSrcToken, setSelectedSrcToken, selectedDstToken, setSelectedDstToken, swapButtonText, setSwapButtonText, tokenApproved, setTokenApproved, expiresInHours, setExpiresInHours, expiresInMinutes, setExpiresInMinutes, expirationEnabled, setExpirationEnabled, selectedSrcTokenImg, selectedDstTokenImg }) {
+function SwapOffer({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, setDstAddress, selectedSrcToken, setSelectedSrcToken, selectedDstToken, setSelectedDstToken, swapOfferButtonText, setSwapOfferButtonText, tokenApproved, setTokenApproved, expiresInHours, setExpiresInHours, expiresInMinutes, setExpiresInMinutes, expirationEnabled, setExpirationEnabled, selectedSrcTokenImg, selectedDstTokenImg }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
@@ -82,7 +82,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     }, [defaultAccount]);
 
     useEffect(() => {
-        async function swapButtonText() {
+        async function swapOfferButtonText() {
             const tokenAddress = selectedSrcToken.networkSpecificAddress[network];
             const defaultAccountSrcTokenBalance = await getTokenBalance(defaultAccount, tokenAddress);
 
@@ -92,18 +92,18 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 setInsufficientSrcTokenAmount(false);
 
                 if (tokenApproved) {
-                    setSwapButtonText('Create Swap');
+                    setSwapOfferButtonText('Create Swap Offer');
                 } else {
-                    setSwapButtonText(`Approve ${selectedSrcToken.name} Token`);
+                    setSwapOfferButtonText(`Approve ${selectedSrcToken.name} Token`);
                 }
             } else {
                 setInsufficientSrcTokenAmount(true);
-                setSwapButtonText(`Insufficient ${selectedSrcToken.name} balance`);
+                setSwapOfferButtonText(`Insufficient ${selectedSrcToken.name} balance`);
             }
         }
 
         if (defaultAccount && selectedSrcToken) {
-            swapButtonText();
+            swapOfferButtonText();
         }
     }, [network, selectedSrcToken, tokenApproved, srcAmount]);
 
@@ -119,7 +119,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
         }
     }, [network, selectedSrcToken]);
 
-    const handleSwapButtonClick = async () => {
+    const handleSwapOfferButtonClick = async () => {
         if (!defaultAccount) {
             connectWallet();
         } else if (!tokenApproved && !insufficientSrcTokenAmount) {
@@ -161,25 +161,25 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
             startTransaction(`Please go to your wallet and confirm the transaction for the swap.`);
 
             try {
-                const receipt = await createSwap(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn);
+                const receipt = await createSwapOffer(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn, true);
                 
                 if (receipt.status === 1) {
-                    const swapCreatedEvent = receipt.events?.find((e) => e.event === 'SwapCreated');
+                    const swapOfferCreatedEvent = receipt.events?.find((e) => e.event === 'SwapOfferCreated');
 
-                    if (swapCreatedEvent) {
-                        const swapHash = swapCreatedEvent.args[1];
-                        window.location.href = `/swap/${swapHash}`;
-                        endTransaction(true, `You successfuly created a swap!`);
+                    if (swapOfferCreatedEvent) {
+                        const swapOfferHash = swapOfferCreatedEvent.args[1];
+                        window.location.href = `/swap/${swapOfferHash}`;
+                        endTransaction(true, `You successfuly created a swap offer!`);
                     } else {
-                        endTransaction(false, `Transaction for creating a swap failed.`);
+                        endTransaction(false, `Transaction for creating a swap offer failed.`);
                         console.error("Couldn't find SwapCreated event in transaction receipt");
                     }
                 } else {
-                    endTransaction(false, `Transaction for creating a swap failed.`);
+                    endTransaction(false, `Transaction for creating a swap offer failed.`);
                 }
             } catch (error) {
                 console.error(error);
-                endTransaction(false, 'Transaction for creating a swap failed.', error.toString());
+                endTransaction(false, 'Transaction for creating a swap offer failed.', error.toString());
                 return;
             }
         }
@@ -247,7 +247,7 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
                 </Grid>
 
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
-                    <PrimaryButton onClick={handleSwapButtonClick} buttonText={swapButtonText} />
+                    <PrimaryButton onClick={handleSwapOfferButtonClick} buttonText={swapOfferButtonText} />
                 </Grid>
             </MainContentContainer>
 
@@ -270,4 +270,4 @@ function Swap({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, se
     );
 }
 
-export default Swap;
+export default SwapOffer;

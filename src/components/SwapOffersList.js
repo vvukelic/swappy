@@ -2,17 +2,17 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import MainContentContainer from './MainContentContainer';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import UserSwapsList from './UserSwapsList';
+import UserSwapOffersList from './UserSwapOffersList';
 
 
-function SwapsList({ activeSwapsListTab }) {
+function SwapOffersList({ activeSwapOffersListTab }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
 
     return (
         <MainContentContainer>
-            <Box>{defaultAccount && <UserSwapsList userAddress={defaultAccount} network={network} activeSwapsListTab={activeSwapsListTab} />}</Box>
+            <Box>{defaultAccount && <UserSwapOffersList userAddress={defaultAccount} network={network} activeSwapOffersListTab={activeSwapOffersListTab} />}</Box>
         </MainContentContainer>
     );
 }
 
-export default SwapsList;
+export default SwapOffersList;
