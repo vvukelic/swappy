@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Avatar, Grid, Typography, Box, TextField } from '@mui/material';
+import { Avatar, Grid, Typography, Box, TextField, Slider } from '@mui/material';
 import styled from '@emotion/styled';
 import BorderSection from './BorderSection';
 import { getTokenImageUrl } from '../utils/tokens';
@@ -40,13 +40,21 @@ const StyledTextField = styled(TextField)`
     }
 `;
 
+const StyledSlider = styled(Slider)`
+    margin-top: 10px;
+    color: #f7b93e;
+    width: 12em;
+`;
 
 function SwapOfferDetailsTokenInfo({ token, amount, maxAmount, setAmount, tokenDecimals, labelText }) {
     const [displayAmount, setDisplayAmount] = useState('');
+    const [sliderValue, setSliderValue] = useState(0);
 
     useEffect(() => {
         if (!displayAmount) {
-            setDisplayAmount(ethers.utils.formatUnits(amount.toString(), tokenDecimals));
+            const displayAmount = ethers.utils.formatUnits(amount.toString(), tokenDecimals);
+            setDisplayAmount(displayAmount);
+            setSliderValue(displayAmount);
         }
     }, [amount, tokenDecimals]);
 
@@ -72,6 +80,7 @@ function SwapOfferDetailsTokenInfo({ token, amount, maxAmount, setAmount, tokenD
         const formattedValue = formatValue(e.target.value);
 
         setDisplayAmount(formattedValue);
+        setSliderValue(formattedValue);
 
         if (formattedValue) {
             const parsedValue = ethers.utils.parseUnits(formattedValue || '0', tokenDecimals);
@@ -93,6 +102,18 @@ function SwapOfferDetailsTokenInfo({ token, amount, maxAmount, setAmount, tokenD
         }
     }
 
+    const handleSliderChange = (event, newValue) => {
+        setSliderValue(newValue);
+        const formattedValue = newValue.toFixed(tokenDecimals); // Format value based on token decimals
+        setDisplayAmount(formattedValue);
+        const parsedValue = ethers.utils.parseUnits(formattedValue, tokenDecimals);
+        setAmount(parsedValue);
+    };
+
+    const stepPercentage = 0.0001; // 0.01%
+    const maxAmountInUnits = ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals);
+    const stepValue = maxAmountInUnits * stepPercentage;
+
     return (
         <BorderSection title={labelText}>
             <StyledContainerGrid container>
@@ -104,6 +125,7 @@ function SwapOfferDetailsTokenInfo({ token, amount, maxAmount, setAmount, tokenD
                 <StyledAmountGrid item xs={9}>
                     <StyledTextField value={displayAmount} onChange={handleAmountOnChange} onBlur={handleAmountOnBlur} inputProps={{ 'aria-label': 'amount' }} />
                     {token && <Typography>{token.name.toUpperCase()}</Typography>}
+                    <StyledSlider value={sliderValue} onChange={handleSliderChange} min={0} max={ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals)} step={stepValue} />
                 </StyledAmountGrid>
             </StyledContainerGrid>
         </BorderSection>
