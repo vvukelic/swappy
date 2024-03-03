@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Grid, TextField, FormControlLabel, Switch } from '@mui/material';
+import { Grid, TextField, FormControlLabel, Switch, Tooltip } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectTokenModal from './SelectTokenModal';
@@ -29,7 +29,32 @@ const StyledSwitch = styled(Switch)`
     }
 `;
 
-function SwapOffer({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddress, setDstAddress, selectedSrcToken, setSelectedSrcToken, selectedDstToken, setSelectedDstToken, swapOfferButtonText, setSwapOfferButtonText, tokenApproved, setTokenApproved, expiresInHours, setExpiresInHours, expiresInMinutes, setExpiresInMinutes, expirationEnabled, setExpirationEnabled, selectedSrcTokenImg, selectedDstTokenImg }) {
+function SwapOffer({ 
+    srcAmount,
+    setSrcAmount,
+    dstAmount,
+    setDstAmount,
+    dstAddress,
+    setDstAddress,
+    selectedSrcToken,
+    setSelectedSrcToken,
+    selectedDstToken,
+    setSelectedDstToken,
+    swapOfferButtonText, 
+    setSwapOfferButtonText,
+    tokenApproved,
+    setTokenApproved,
+    expiresInHours,
+    setExpiresInHours,
+    expiresInMinutes,
+    setExpiresInMinutes,
+    expirationEnabled,
+    setExpirationEnabled,
+    partialFillEnabled,
+    setPartialFillEnabled,
+    selectedSrcTokenImg,
+    selectedDstTokenImg
+}) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null);
@@ -161,7 +186,16 @@ function SwapOffer({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddres
             startTransaction(`Please go to your wallet and confirm the transaction for the swap.`);
 
             try {
-                const receipt = await createSwapOffer(contractAddresses.SwapManager[network], selectedSrcToken.networkSpecificAddress[network], srcAmountInt, selectedDstToken.networkSpecificAddress[network], dstAmountInt, dstAddress, expiresIn, true);
+                const receipt = await createSwapOffer(
+                    contractAddresses.SwapManager[network],
+                    selectedSrcToken.networkSpecificAddress[network],
+                    srcAmountInt,
+                    selectedDstToken.networkSpecificAddress[network],
+                    dstAmountInt,
+                    dstAddress,
+                    expiresIn,
+                    partialFillEnabled
+                );
                 
                 if (receipt.status === 1) {
                     const swapOfferCreatedEvent = receipt.events?.find((e) => e.event === 'SwapOfferCreated');
@@ -231,13 +265,13 @@ function SwapOffer({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddres
                 <SelectToken selectedToken={selectedDstToken} amount={dstAmount} setAmount={setDstAmount} selectedTokenImg={selectedDstTokenImg} labelText='You receive' openModal={() => openModal('dst')} />
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px', marginTop: '20px' }}>
-                    <Grid item xs={6}>
+                    <Grid item xs={4}>
                         <FormControlLabel control={<StyledSwitch onChange={() => setExpirationEnabled(!expirationEnabled)} checked={expirationEnabled} />} label='Expires In:' sx={{ color: 'white' }} />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={4}>
                         <TextField label='Hours' variant='outlined' type='number' value={expiresInHours} onChange={(e) => setExpiresInHours(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={4}>
                         <TextField label='Minutes' variant='outlined' type='number' value={expiresInMinutes} onChange={(e) => setExpiresInMinutes(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
                     </Grid>
                 </Grid>
@@ -246,26 +280,22 @@ function SwapOffer({ srcAmount, setSrcAmount, dstAmount, setDstAmount, dstAddres
                     <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
                 </Grid>
 
+                <Grid item xs={12} sx={{ color: 'white', padding: '0 16px' }}>
+                    <Grid item xs={12}>
+                        <Tooltip title='Enable this option to allow others to partially fulfill your swap offer. This increases the chances of your offer being used, but you may receive multiple smaller transactions instead of a single one.'>
+                            <FormControlLabel control={<StyledSwitch onChange={() => setPartialFillEnabled(!partialFillEnabled)} checked={partialFillEnabled} />} label='Allow swap offer to be partially filled' sx={{ color: 'white' }} />
+                        </Tooltip>
+                    </Grid>
+                </Grid>
+
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
                     <PrimaryButton onClick={handleSwapOfferButtonClick} buttonText={swapOfferButtonText} />
                 </Grid>
             </MainContentContainer>
 
-            <SelectTokenModal
-                open={modalOpen}
-                onClose={closeModal}
-                handleTokenSelection={(token) => handleTokenSelection(token, modalType)}
-                title={modalType === 'src' ? 'Select a token to send': 'Select a token to receive'}
-                network={network}
-            />
+            <SelectTokenModal open={modalOpen} onClose={closeModal} handleTokenSelection={(token) => handleTokenSelection(token, modalType)} title={modalType === 'src' ? 'Select a token to send' : 'Select a token to receive'} network={network} />
 
-            <TransactionStatusModal
-                open={txModalOpen}
-                status={txStatus}
-                statusTxt={txStatusTxt}
-                errorTxt={txErrorTxt}
-                onClose={() => setTxModalOpen(false)}
-            />
+            <TransactionStatusModal open={txModalOpen} status={txStatus} statusTxt={txStatusTxt} errorTxt={txErrorTxt} onClose={() => setTxModalOpen(false)} />
         </>
     );
 }

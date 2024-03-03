@@ -104,9 +104,8 @@ function SwapOfferDetailsPartialFillTokenForm({ token, amount, maxAmount, setAmo
 
     const handleSliderChange = (event, newValue) => {
         setSliderValue(newValue);
-        const formattedValue = newValue.toFixed(tokenDecimals);
-        setDisplayAmount(formattedValue);
-        const parsedValue = ethers.utils.parseUnits(formattedValue, tokenDecimals);
+        setDisplayAmount(newValue);
+        const parsedValue = ethers.utils.parseUnits(newValue.toString(), tokenDecimals);
         setAmount(parsedValue);
     };
 

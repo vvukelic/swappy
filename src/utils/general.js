@@ -50,7 +50,7 @@ export async function getSwapOffer(contractAddress, swapOfferHash, network) {
         const srcToken = getTokenByAddress(swapOffer.srcTokenAddress, network);
         const dstToken = getTokenByAddress(swapOffer.dstTokenAddress, network);
         const srcTokenDecimals = swapOffer.srcTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(swapOffer.srcTokenAddress);
-        const dstTokenDecimals = swapOffer.srcTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(swapOffer.dstTokenAddress);
+        const dstTokenDecimals = swapOffer.dstTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(swapOffer.dstTokenAddress);
         const feeAmountInBaseUnit = ethers.utils.formatUnits(swapOffer.feeAmount, 'ether');
         const currentBlockTimestamp = await getCurrentBlockTimestamp();
         const srcAccountTokenBalance = await getTokenBalance(swapOffer.srcAddress, swapOffer.srcTokenAddress);
@@ -73,7 +73,7 @@ export async function getSwapOffer(contractAddress, swapOfferHash, network) {
             readableStatus: getSwapOfferStatus(swapOffer, filledPercentage, srcAccountTokenBalance, currentBlockTimestamp),
             filledPercentage: filledPercentage,
             exchangeRate: exchangeRate,
-            remainingSrcAmountSum: remainingDstAmountSum.mul(exchangeRate),
+            remainingSrcAmountSum: remainingDstAmountSum.eq(swapOffer.dstAmount) ? swapOffer.srcAmount : Math.floor(remainingDstAmountSum * exchangeRate),
             remainingDstAmountSum: remainingDstAmountSum,
         };
     } catch (error) {

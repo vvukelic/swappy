@@ -28,6 +28,7 @@ export default () => {
     const [expiresInHours, setExpiresInHours] = useState(0);
     const [expiresInMinutes, setExpiresInMinutes] = useState(0);
     const [expirationEnabled, setExpirationEnabled] = useState(false);
+    const [partialFillEnabled, setPartialFillEnabled] = useState(false);
     const selectedSrcTokenImg = getTokenImageUrl(selectedSrcToken);
     const selectedDstTokenImg = getTokenImageUrl(selectedDstToken);
     const router = useRouter();
@@ -60,6 +61,7 @@ export default () => {
                 expiresInHours={expiresInHours} setExpiresInHours={setExpiresInHours}
                 expiresInMinutes={expiresInMinutes} setExpiresInMinutes={setExpiresInMinutes}
                 expirationEnabled={expirationEnabled} setExpirationEnabled={setExpirationEnabled}
+                partialFillEnabled={partialFillEnabled} setPartialFillEnabled={setPartialFillEnabled}
                 selectedSrcTokenImg={selectedSrcTokenImg}
                 selectedDstTokenImg={selectedDstTokenImg}
             />)}

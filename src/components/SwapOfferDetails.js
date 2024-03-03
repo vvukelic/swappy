@@ -88,10 +88,10 @@ function SwapOfferDetails({ hash }) {
                 setSwapSrcAmount(swapOffer.srcAmount);
                 setSwapDstAmount(swapOffer.dstAmount);
             } else if (swapDstAmount.gte(swapOffer.remainingDstAmountSum)) {
-                setSwapSrcAmount(swapOffer.remainingDstAmountSum === swapOffer.dstAmount ? swapOffer.srcAmount : swapOffer.remainingDstAmountSum.mul(swapOffer.exchangeRate));
+                setSwapSrcAmount(swapOffer.remainingDstAmountSum.eq(swapOffer.dstAmount) ? swapOffer.srcAmount : Math.floor(swapOffer.remainingDstAmountSum * swapOffer.exchangeRate));
                 setSwapDstAmount(swapOffer.remainingDstAmountSum);
             } else {
-                setSwapSrcAmount(swapDstAmount.mul(swapOffer.exchangeRate));
+                setSwapSrcAmount(Math.floor(swapDstAmount * swapOffer.exchangeRate));
             }
         }
     }, [swapDstAmount]);
@@ -180,7 +180,7 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount)} labelText='You receive' />
+                <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount, swapOffer.srcTokenDecimals)} labelText='You receive' />
 
                 <Grid item sx={{ height: '42px' }} />
 
