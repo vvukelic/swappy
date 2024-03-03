@@ -8,8 +8,8 @@ import { createSwapForOffer, cancelSwapOffer, approveToken, getEthBalance, getAl
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
-import SwapOfferDetailsYouSend from './SwapOfferDetailsYouSend';
-import SwapOfferDetailsYouReceive from './SwapOfferDetailsYouReceive';
+import SwapOfferDetailsPartialFillTokenForm from './SwapOfferDetailsPartialFillTokenForm';
+import SwapOfferDetailsTokenInfo from './SwapOfferDetailsTokenInfo';
 import { getSwapOffer, sliceAddress } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
@@ -170,7 +170,8 @@ function SwapOfferDetails({ hash }) {
     return (
         <>
             <MainContentContainer sx={{ width: '100%' }}>
-                <SwapOfferDetailsYouSend token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} />
+                {swapOffer.partialFillEnabled && <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} />}
+                {!swapOffer.partialFillEnabled && <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={ethers.utils.formatUnits(swapDstAmount)} labelText='You send' />}
 
                 <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton variant='outlined' disabled>
@@ -178,7 +179,7 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                <SwapOfferDetailsYouReceive token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount)} labelText='You receive' />
+                <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount)} labelText='You receive' />
 
                 <Grid item sx={{ height: '42px' }} />
 

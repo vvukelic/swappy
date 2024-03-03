@@ -46,7 +46,7 @@ const StyledSlider = styled(Slider)`
     width: 12em;
 `;
 
-function SwapOfferDetailsTokenInfo({ token, amount, maxAmount, setAmount, tokenDecimals, labelText }) {
+function SwapOfferDetailsPartialFillTokenForm({ token, amount, maxAmount, setAmount, tokenDecimals, labelText }) {
     const [displayAmount, setDisplayAmount] = useState('');
     const [sliderValue, setSliderValue] = useState(0);
 
@@ -125,11 +125,21 @@ function SwapOfferDetailsTokenInfo({ token, amount, maxAmount, setAmount, tokenD
                 <StyledAmountGrid item xs={9}>
                     <StyledTextField value={displayAmount} onChange={handleAmountOnChange} onBlur={handleAmountOnBlur} inputProps={{ 'aria-label': 'amount' }} />
                     {token && <Typography>{token.name.toUpperCase()}</Typography>}
-                    <StyledSlider value={sliderValue} onChange={handleSliderChange} min={0} max={ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals)} step={stepValue} />
+                    <StyledSlider
+                        value={sliderValue}
+                        onChange={handleSliderChange}
+                        min={0}
+                        max={ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals)}
+                        step={stepValue}
+                        inputProps={{
+                            'aria-label': '',
+                            autoComplete: 'off'
+                        }}
+                    />
                 </StyledAmountGrid>
             </StyledContainerGrid>
         </BorderSection>
     );
 }
 
-export default SwapOfferDetailsTokenInfo;
+export default SwapOfferDetailsPartialFillTokenForm;
