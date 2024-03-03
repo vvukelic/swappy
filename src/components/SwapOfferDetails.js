@@ -8,7 +8,8 @@ import { createSwapForOffer, cancelSwapOffer, approveToken, getEthBalance, getAl
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
-import SwapOfferDetailsTokenInfo from './SwapOfferDetailsTokenInfo';
+import SwapOfferDetailsYouSend from './SwapOfferDetailsYouSend';
+import SwapOfferDetailsYouReceive from './SwapOfferDetailsYouReceive';
 import { getSwapOffer, sliceAddress } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
@@ -68,8 +69,8 @@ function SwapOfferDetails({ hash }) {
             try {
                 const swapOffer = await getSwapOffer(contractAddresses.SwapManager[network], hash, network);
                 setSwapOffer(swapOffer);
-                setSwapSrcAmount(swapOffer.srcAmount);
-                setSwapDstAmount(swapOffer.dstAmount);
+                setSwapSrcAmount(swapOffer.remainingSrcAmountSum);
+                setSwapDstAmount(swapOffer.remainingDstAmountSum);
             } catch (err) {
                 console.error(err);
             }
@@ -82,11 +83,14 @@ function SwapOfferDetails({ hash }) {
 
     useEffect(() => {
         if (swapOffer) {
-            if (swapDstAmount >= swapOffer.dstAmount) {
+            if (swapOffer.readableStatus === 'FILLED') {
                 setSwapSrcAmount(swapOffer.srcAmount);
                 setSwapDstAmount(swapOffer.dstAmount);
+            } else if (swapDstAmount.gte(swapOffer.remainingDstAmountSum)) {
+                setSwapSrcAmount(swapOffer.remainingDstAmountSum === swapOffer.dstAmount ? swapOffer.srcAmount : swapOffer.remainingDstAmountSum.mul(swapOffer.exchangeRate));
+                setSwapDstAmount(swapOffer.remainingDstAmountSum);
             } else {
-                setSwapSrcAmount(swapDstAmount * swapOffer.exchangeRate);
+                setSwapSrcAmount(swapDstAmount.mul(swapOffer.exchangeRate));
             }
         }
     }, [swapDstAmount]);
@@ -160,13 +164,13 @@ function SwapOfferDetails({ hash }) {
     };
 
     if (!swapOffer) {
-        return <div>Loading...</div>;
+        return <MainContentContainer sx={{ width: '100%' }}>Loading...</MainContentContainer>;
     }
 
     return (
         <>
             <MainContentContainer sx={{ width: '100%' }}>
-                <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={swapDstAmount} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} />
+                <SwapOfferDetailsYouSend token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} />
 
                 <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton variant='outlined' disabled>
@@ -174,7 +178,7 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={swapSrcAmount} setAmount={setSwapSrcAmount} tokenDecimals={swapOffer.srcTokenDecimals} labelText='You receive' />
+                <SwapOfferDetailsYouReceive token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount)} labelText='You receive' />
 
                 <Grid item sx={{ height: '42px' }} />
 

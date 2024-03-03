@@ -60,8 +60,7 @@ function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, label
 
         if (formattedValue === '.' || formattedValue === '') {
             formattedValue = '0.0';
-        }
-        else if (formattedValue.startsWith('.')) {
+        } else if (formattedValue.startsWith('.')) {
             formattedValue = '0' + formattedValue;
         }
 

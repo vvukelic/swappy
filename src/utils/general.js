@@ -7,13 +7,18 @@ export function sliceAddress(address) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-function getSwapOfferFilledPercentage(swapOffer, swaps) {
+function getSwapsDstAmountSum(swaps) {
     let swapsDstAmountSum = ethers.BigNumber.from('0');
 
     for (let i = 0; i < swaps.length; i++) {
         swapsDstAmountSum = swapsDstAmountSum.add(swaps[i].dstAmount);
     }
 
+    return swapsDstAmountSum;
+}
+
+function getSwapOfferFilledPercentage(swapOffer, swaps) {
+    const swapsDstAmountSum = getSwapsDstAmountSum(swaps);
     return swapsDstAmountSum.mul(100).div(swapOffer.dstAmount).toNumber();
 }
 
@@ -49,6 +54,8 @@ export async function getSwapOffer(contractAddress, swapOfferHash, network) {
         const feeAmountInBaseUnit = ethers.utils.formatUnits(swapOffer.feeAmount, 'ether');
         const currentBlockTimestamp = await getCurrentBlockTimestamp();
         const srcAccountTokenBalance = await getTokenBalance(swapOffer.srcAddress, swapOffer.srcTokenAddress);
+        const remainingDstAmountSum = swapOffer.dstAmount.sub(getSwapsDstAmountSum(swaps));
+        const exchangeRate = swapOffer.srcAmount / swapOffer.dstAmount;
 
         return {
             ...swapOffer,
@@ -65,7 +72,9 @@ export async function getSwapOffer(contractAddress, swapOfferHash, network) {
             displayExpirationTime: swapOffer.expirationTime.toString() !== '0' ? new Date(swapOffer.expirationTime * 1000).toLocaleString() : null,
             readableStatus: getSwapOfferStatus(swapOffer, filledPercentage, srcAccountTokenBalance, currentBlockTimestamp),
             filledPercentage: filledPercentage,
-            exchangeRate: swapOffer.srcAmount / swapOffer.dstAmount,
+            exchangeRate: exchangeRate,
+            remainingSrcAmountSum: remainingDstAmountSum.mul(exchangeRate),
+            remainingDstAmountSum: remainingDstAmountSum,
         };
     } catch (error) {
         console.error(`Failed to get swap details for hash ${swapOfferHash}:`, error);
