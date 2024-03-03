@@ -104,7 +104,7 @@ function SwapOfferDetailsTokenInfo({ token, amount, maxAmount, setAmount, tokenD
 
     const handleSliderChange = (event, newValue) => {
         setSliderValue(newValue);
-        const formattedValue = newValue.toFixed(tokenDecimals); // Format value based on token decimals
+        const formattedValue = newValue.toFixed(tokenDecimals);
         setDisplayAmount(formattedValue);
         const parsedValue = ethers.utils.parseUnits(formattedValue, tokenDecimals);
         setAmount(parsedValue);
