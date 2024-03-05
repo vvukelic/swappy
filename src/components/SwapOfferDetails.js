@@ -16,6 +16,7 @@ import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import SwapStatusChip from './SwapOfferStatusChip';
+import SwapOffer from '../utils/swapOffer';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -68,7 +69,8 @@ function SwapOfferDetails({ hash }) {
     useEffect(() => {
         async function getSwapOfferDetails() {
             try {
-                const swapOffer = await getSwapOffer(contractAddresses.SwapManager[network], hash, network);
+                const swapOffer = new SwapOffer(network);
+                await swapOffer.load(hash);
                 setSwapOffer(swapOffer);
                 setSwapSrcAmount(swapOffer.remainingSrcAmountSum);
                 setSwapDstAmount(swapOffer.remainingDstAmountSum);
@@ -88,10 +90,10 @@ function SwapOfferDetails({ hash }) {
                 setSwapSrcAmount(swapOffer.srcAmount);
                 setSwapDstAmount(swapOffer.dstAmount);
             } else if (swapDstAmount.gte(swapOffer.remainingDstAmountSum)) {
-                setSwapSrcAmount(swapOffer.remainingDstAmountSum.eq(swapOffer.dstAmount) ? swapOffer.srcAmount : Math.floor(swapOffer.remainingDstAmountSum * swapOffer.exchangeRate));
+                setSwapSrcAmount(swapOffer.remainingDstAmountSum.eq(swapOffer.dstAmount) ? swapOffer.srcAmount : swapOffer.calculateSrcAmountFromDstAmount(swapOffer.remainingDstAmountSum));
                 setSwapDstAmount(swapOffer.remainingDstAmountSum);
             } else {
-                setSwapSrcAmount(Math.floor(swapDstAmount * swapOffer.exchangeRate));
+                setSwapSrcAmount(swapOffer.calculateSrcAmountFromDstAmount(swapDstAmount));
             }
         }
     }, [swapDstAmount]);

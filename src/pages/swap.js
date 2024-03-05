@@ -16,7 +16,7 @@ const StyledBox = styled(Box)`
 `;
 
 export default () => {
-    const [activeTab, setActiveTab] = useState('createSwap');
+    const [activeTab, setActiveTab] = useState('createSwapOffer');
     const [activeSwapOffersListTab, setActiveSwapOffersListTab] = useState(null);
     const [srcAmount, setSrcAmount] = useState('0.0');
     const [dstAmount, setDstAmount] = useState('0.0');

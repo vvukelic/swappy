@@ -5,6 +5,7 @@ import { getUserSwapOffers, getSwapOffersForUser } from '../utils/web3';
 import { getSwapOffer } from '../utils/general';
 import BorderedSection from './BorderSection';
 import SwapOfferStatusChip from './SwapOfferStatusChip';
+import SwapOffer from '../utils/swapOffer';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -66,12 +67,9 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
 
             const swapsWithHash = await Promise.all(
                 swapOffersHashes.map(async (hash) => {
-                    const swapOffer = await getSwapOffer(contractAddresses.SwapManager[network], hash, network);
-
-                    return {
-                        hash,
-                        ...swapOffer,
-                    };
+                    const swapOffer = new SwapOffer(network);
+                    await swapOffer.load(hash);
+                    return swapOffer;
                 })
             );
             setUserSwapOffers(swapsWithHash);
@@ -81,12 +79,9 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
             const swapOffersHashes = await getSwapOffersForUser(contractAddresses.SwapManager[network], userAddress);
             const swapsWithHash = await Promise.all(
                 swapOffersHashes.map(async (hash) => {
-                    const swapOffer = await getSwapOffer(contractAddresses.SwapManager[network], hash, network);
-
-                    return {
-                        hash,
-                        ...swapOffer,
-                    };
+                    const swapOffer = new SwapOffer(network);
+                    await swapOffer.load(hash);
+                    return swapOffer;
                 })
             );
             setSwapOffersForUser(swapsWithHash);

@@ -103,9 +103,19 @@ function SwapOfferDetailsPartialFillTokenForm({ token, amount, maxAmount, setAmo
     }
 
     const handleSliderChange = (event, newValue) => {
-        setSliderValue(newValue);
-        setDisplayAmount(newValue);
-        const parsedValue = ethers.utils.parseUnits(newValue.toString(), tokenDecimals);
+        const maxAmountInBaseUnit = ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals);
+        let formattedValue = null;
+
+        if (newValue >= maxAmountInBaseUnit * (1 - stepPercentage)) {
+            formattedValue = maxAmountInBaseUnit;
+        } else {
+            formattedValue = newValue.toFixed(tokenDecimals);
+        }
+
+        setSliderValue(formattedValue);
+        setDisplayAmount(formattedValue);
+
+        const parsedValue = ethers.utils.parseUnits(formattedValue, tokenDecimals);
         setAmount(parsedValue);
     };
 
