@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { Grid, Typography, Box } from '@mui/material';
+import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
@@ -11,12 +11,14 @@ import BorderSection from './BorderSection';
 import SwapOfferDetailsPartialFillTokenForm from './SwapOfferDetailsPartialFillTokenForm';
 import SwapOfferDetailsTokenInfo from './SwapOfferDetailsTokenInfo';
 import SwapOfferPercentageFilledLabel from './SwapOfferPercentageFilledLabel';
-import { getSwapOffer, sliceAddress } from '../utils/general';
+import { sliceAddress } from '../utils/general';
+import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, StyledTableCell, StyledHeaderTableCell } from '../sharedStyles/tableStyles';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import SwapStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
+import Truncate from '../sharedStyles/general';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -219,6 +221,49 @@ function SwapOfferDetails({ hash }) {
                         </Grid>
                     </Grid>
                 </BorderSection>
+
+                <Grid item sx={{ height: '22px' }} />
+
+                {swapOffer.swaps.length !== 0 && 
+                    <BorderSection title='Swaps'>
+                        <StyledTableContainer component={Paper}>
+                            <StyledTable aria-label='simple table'>
+                                <StyledTableHead>
+                                    <TableRow>
+                                        <StyledHeaderTableCell>Time</StyledHeaderTableCell>
+                                        <StyledHeaderTableCell>User</StyledHeaderTableCell>
+                                        <StyledHeaderTableCell>Sent</StyledHeaderTableCell>
+                                        <StyledHeaderTableCell>Received</StyledHeaderTableCell>
+                                    </TableRow>
+                                </StyledTableHead>
+                                <TableBody>
+                                    {
+                                        swapOffer.swaps.map((swap, index) => {
+                                            return (
+                                                <StyledTableRow key={index}>
+                                                    <StyledTableCell align='right'>{swap.displayClosedTime}</StyledTableCell>
+                                                    <StyledTableCell align='right'>{swap.displayDstAddress}</StyledTableCell>
+                                                    <StyledTableCell align='right'>
+                                                        <Tooltip title={swap.dstAmountInBaseUnit}>
+                                                            <Truncate>{swap.dstAmountInBaseUnit}</Truncate>
+                                                        </Tooltip>
+                                                        {swapOffer.dstTokenName}
+                                                    </StyledTableCell>
+                                                    <StyledTableCell>
+                                                        <Tooltip title={swap.srcAmountInBaseUnit}>
+                                                            <Truncate>{swap.srcAmountInBaseUnit}</Truncate>
+                                                        </Tooltip>
+                                                        {swapOffer.srcTokenName}
+                                                    </StyledTableCell>
+                                                </StyledTableRow>
+                                            );
+                                        })
+                                    }
+                                </TableBody>
+                            </StyledTable>
+                        </StyledTableContainer>
+                    </BorderSection>
+                }
 
                 {swapOffer.readableStatus === 'OPENED' && (swapOffer.dstAddress === ethers.constants.AddressZero || swapOffer.dstAddress === defaultAccount) && swapOffer.srcAddress !== defaultAccount && (
                     <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import { TableBody, TableRow, Paper, Typography } from '@mui/material';
+import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, StyledTableCell, StyledHeaderTableCell } from '../sharedStyles/tableStyles';
 import { getUserSwapOffers, getSwapOffersForUser } from '../utils/web3';
-import { getSwapOffer } from '../utils/general';
 import BorderedSection from './BorderSection';
 import SwapOfferStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
@@ -10,44 +10,6 @@ import SwapOffer from '../utils/swapOffer';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
-const StyledTableContainer = styled(TableContainer)`
-    margin: 0 auto;
-    max-width: 100%;
-    background-color: transparent;
-    padding: 0.5em;
-`;
-
-const StyledTable = styled(Table)`
-    width: 100%;
-    table-layout: fixed;
-`;
-
-const StyledTableHead = styled(TableHead)`
-    border-bottom: 1px solid white;
-`;
-
-const StyledTableRow = styled(TableRow)`
-    &:nth-of-type(odd) {
-        background-color: #328094;
-    }
-    &:nth-of-type(even) {
-        background-color: #358a9e;
-    }
-    &:hover {
-        background-color: #235666;
-        cursor: pointer;
-    }
-`;
-
-const StyledTableCell = styled(TableCell)`
-    color: white;
-    text-align: center;
-    border-bottom: none;
-`;
-
-const StyledHeaderTableCell = styled(StyledTableCell)`
-    font-weight: bold;
-`;
 
 const StyledMessage = styled(Typography)`
     color: white;

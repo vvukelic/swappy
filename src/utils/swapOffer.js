@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { getSwapOfferRaw, getSwapsForOffer, getTokenDecimals, getCurrentBlockTimestamp } from './web3';
 import { toBaseUnit, getTokenByAddress, getTokenBalance } from './tokens';
+import { sliceAddress } from '../utils/general';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -43,6 +44,30 @@ class SwapOffer {
         return dstAmount.eq(this.dstAmount) ? this.srcAmount : Math.floor(dstAmount.mul(this.exchangeRate).div(this.scalingFactor));
     }
 
+    async getSwaps() {
+        const rawSwaps = await getSwapsForOffer(this.contractAddress, this.hash);
+        const swaps = [];
+
+        for (let i = 0; i < rawSwaps.length; i++) {
+            const srcAmountInBaseUnit = ethers.utils.formatUnits(rawSwaps[i].srcAmount.toString(), this.srcTokenDecimals);
+            const dstAmountInBaseUnit = ethers.utils.formatUnits(rawSwaps[i].dstAmount.toString(), this.dstTokenDecimals);
+            const displayClosedTime = new Date(rawSwaps[i].closedTime * 1000).toLocaleString();
+            const displayDstAddress = sliceAddress(rawSwaps[i].dstAddress);
+
+            swaps.push({
+                ...rawSwaps[i],
+                srcAmountInBaseUnit,
+                dstAmountInBaseUnit,
+                displayClosedTime,
+                displayDstAddress,
+            });
+        }
+
+        swaps.sort((a, b) => b.closedTime - a.closedTime);
+
+        return swaps;
+    }
+
     async load(swapOfferHash) {
         const swapOffer = await getSwapOfferRaw(this.contractAddress, swapOfferHash);
         this.hash = swapOfferHash;
@@ -57,14 +82,14 @@ class SwapOffer {
         this.expirationTime = swapOffer.expirationTime;
         this.partialFillEnabled = swapOffer.partialFillEnabled;
         this.status = swapOffer.status;
-        this.swaps = await getSwapsForOffer(this.contractAddress, swapOfferHash);
+        this.srcTokenDecimals = this.srcTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(this.srcTokenAddress);
+        this.dstTokenDecimals = this.dstTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(this.dstTokenAddress);
+        this.swaps = await this.getSwaps();
         this.srcAmountInBaseUnit = await toBaseUnit(this.srcAmount, this.srcTokenAddress);
         this.dstAmountInBaseUnit = await toBaseUnit(this.dstAmount, this.dstTokenAddress);
         this.feeAmountInBaseUnit = ethers.utils.formatUnits(this.feeAmount, 'ether');
         this.srcToken = await getTokenByAddress(this.srcTokenAddress, this.network);
         this.dstToken = await getTokenByAddress(this.dstTokenAddress, this.network);
-        this.srcTokenDecimals = this.srcTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(this.srcTokenAddress);
-        this.dstTokenDecimals = this.dstTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(this.dstTokenAddress);
         this.srcTokenName = this.srcToken.name.toUpperCase();
         this.dstTokenName = this.dstToken.name.toUpperCase();
         this.displayCreatedTime = new Date(this.createdTime * 1000).toLocaleString();
