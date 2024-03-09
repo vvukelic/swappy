@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { TableBody, TableRow, Paper, Typography } from '@mui/material';
+import { TableBody, TableRow, Paper, Typography, Tooltip } from '@mui/material';
 import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, StyledTableCell, StyledHeaderTableCell } from '../sharedStyles/tableStyles';
 import { getUserSwapOffers, getSwapOffersForUser } from '../utils/web3';
 import BorderedSection from './BorderSection';
 import SwapOfferStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
+import SwapOfferPercentageFilledLabel from './SwapOfferPercentageFilledLabel';
+import Truncate from '../sharedStyles/general';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -17,6 +19,10 @@ const StyledMessage = styled(Typography)`
     margin-top: 20px;
     display: block;
     width: 100%;
+`;
+
+const StyledStatusTableCell = styled(StyledTableCell)`
+    padding: 0;
 `;
 
 const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) => {
@@ -68,6 +74,7 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
                                 <StyledHeaderTableCell>You send</StyledHeaderTableCell>
                                 <StyledHeaderTableCell>You receive</StyledHeaderTableCell>
                                 <StyledHeaderTableCell>Status</StyledHeaderTableCell>
+                                <StyledHeaderTableCell>Filled %</StyledHeaderTableCell>
                             </TableRow>
                         </StyledTableHead>
                         <TableBody>
@@ -86,19 +93,28 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
                                     const displaySrcAmount = isSwapOffersForYou ? dstAmount : srcAmount;
                                     const displayDstAmount = isSwapOffersForYou ? srcAmount : dstAmount;
                                     const displaySrcTokenName = isSwapOffersForYou ? swapOffer.dstTokenName : swapOffer.srcTokenName;
-                                    const displayDstTokenName = isSwapOffersForYou ? swapOffer.srcTokenName : swapOffer.dstTokenName;;
+                                    const displayDstTokenName = isSwapOffersForYou ? swapOffer.srcTokenName : swapOffer.dstTokenName;
 
                                     return (
                                         <StyledTableRow key={index} onClick={() => handleRowClick(swapOffer.hash)}>
                                             <StyledTableCell align='right'>{swapOffer.displayCreatedTime}</StyledTableCell>
                                             <StyledTableCell align='right'>
-                                                {displaySrcAmount} {displaySrcTokenName}
+                                                <Tooltip title={displaySrcAmount}>
+                                                    <Truncate>{displaySrcAmount}</Truncate>
+                                                </Tooltip>
+                                                {displaySrcTokenName}
                                             </StyledTableCell>
                                             <StyledTableCell align='right'>
-                                                {displayDstAmount} {displayDstTokenName}
+                                                <Tooltip title={displayDstAmount}>
+                                                    <Truncate>{displayDstAmount}</Truncate>
+                                                </Tooltip>
+                                                {displayDstTokenName}
                                             </StyledTableCell>
-                                            <StyledTableCell>
+                                            <StyledStatusTableCell>
                                                 <SwapOfferStatusChip status={swapOffer.readableStatus} />
+                                            </StyledStatusTableCell>
+                                            <StyledTableCell>
+                                                <SwapOfferPercentageFilledLabel percentage={swapOffer.filledPercentage} />
                                             </StyledTableCell>
                                         </StyledTableRow>
                                     );

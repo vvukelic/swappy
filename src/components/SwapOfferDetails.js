@@ -192,7 +192,7 @@ function SwapOfferDetails({ hash }) {
                     <Grid container direction='row' alignItems='flex-start' sx={{ padding: '0.5em' }}>
                         <Grid item xs={4} textAlign='right'>
                             <StyledBox>
-                                <Typography>Status:</Typography>
+                                <SwapStatusChip status={swapOffer.readableStatus} />
                             </StyledBox>
                             <StyledBox>
                                 <Typography>Swappy's fee:</Typography>
@@ -205,10 +205,7 @@ function SwapOfferDetails({ hash }) {
                             </StyledBox>
                         </Grid>
                         <Grid item xs={8} textAlign='center'>
-                            <StyledBox sx={{ display: 'inline-flex', alignItems: 'center', gap: '1em' }}>
-                                <SwapStatusChip status={swapOffer.readableStatus} />
-                                {swapOffer.partialFillEnabled && <SwapOfferPercentageFilledLabel percentage={swapOffer.filledPercentage} />}
-                            </StyledBox>
+                            <StyledBox sx={{ display: 'inline-flex', alignItems: 'center', gap: '1em' }}>{swapOffer.partialFillEnabled && <SwapOfferPercentageFilledLabel percentage={swapOffer.filledPercentage} />}</StyledBox>
                             <StyledBox>
                                 <Typography>{swapOffer.feeAmountInBaseUnit} ETH</Typography>
                             </StyledBox>
@@ -224,7 +221,7 @@ function SwapOfferDetails({ hash }) {
 
                 <Grid item sx={{ height: '22px' }} />
 
-                {swapOffer.swaps.length !== 0 && 
+                {swapOffer.swaps.length !== 0 && (
                     <BorderSection title='Swaps'>
                         <StyledTableContainer component={Paper}>
                             <StyledTable aria-label='simple table'>
@@ -237,33 +234,31 @@ function SwapOfferDetails({ hash }) {
                                     </TableRow>
                                 </StyledTableHead>
                                 <TableBody>
-                                    {
-                                        swapOffer.swaps.map((swap, index) => {
-                                            return (
-                                                <StyledTableRow key={index}>
-                                                    <StyledTableCell align='right'>{swap.displayClosedTime}</StyledTableCell>
-                                                    <StyledTableCell align='right'>{swap.displayDstAddress}</StyledTableCell>
-                                                    <StyledTableCell align='right'>
-                                                        <Tooltip title={swap.dstAmountInBaseUnit}>
-                                                            <Truncate>{swap.dstAmountInBaseUnit}</Truncate>
-                                                        </Tooltip>
-                                                        {swapOffer.dstTokenName}
-                                                    </StyledTableCell>
-                                                    <StyledTableCell>
-                                                        <Tooltip title={swap.srcAmountInBaseUnit}>
-                                                            <Truncate>{swap.srcAmountInBaseUnit}</Truncate>
-                                                        </Tooltip>
-                                                        {swapOffer.srcTokenName}
-                                                    </StyledTableCell>
-                                                </StyledTableRow>
-                                            );
-                                        })
-                                    }
+                                    {swapOffer.swaps.map((swap, index) => {
+                                        return (
+                                            <StyledTableRow key={index}>
+                                                <StyledTableCell align='right'>{swap.displayClosedTime}</StyledTableCell>
+                                                <StyledTableCell align='right'>{swap.displayDstAddress}</StyledTableCell>
+                                                <StyledTableCell align='right'>
+                                                    <Tooltip title={swap.dstAmountInBaseUnit}>
+                                                        <Truncate>{swap.dstAmountInBaseUnit}</Truncate>
+                                                    </Tooltip>
+                                                    {swapOffer.dstTokenName}
+                                                </StyledTableCell>
+                                                <StyledTableCell>
+                                                    <Tooltip title={swap.srcAmountInBaseUnit}>
+                                                        <Truncate>{swap.srcAmountInBaseUnit}</Truncate>
+                                                    </Tooltip>
+                                                    {swapOffer.srcTokenName}
+                                                </StyledTableCell>
+                                            </StyledTableRow>
+                                        );
+                                    })}
                                 </TableBody>
                             </StyledTable>
                         </StyledTableContainer>
                     </BorderSection>
-                }
+                )}
 
                 {swapOffer.readableStatus === 'OPENED' && (swapOffer.dstAddress === ethers.constants.AddressZero || swapOffer.dstAddress === defaultAccount) && swapOffer.srcAddress !== defaultAccount && (
                     <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
