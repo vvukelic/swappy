@@ -71,8 +71,8 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
                         <StyledTableHead>
                             <TableRow>
                                 <StyledHeaderTableCell>Created at</StyledHeaderTableCell>
-                                <StyledHeaderTableCell>You send</StyledHeaderTableCell>
-                                <StyledHeaderTableCell>You receive</StyledHeaderTableCell>
+                                <StyledHeaderTableCell>Send</StyledHeaderTableCell>
+                                <StyledHeaderTableCell>Receive</StyledHeaderTableCell>
                                 <StyledHeaderTableCell>Status</StyledHeaderTableCell>
                                 <StyledHeaderTableCell>Filled %</StyledHeaderTableCell>
                             </TableRow>
@@ -80,7 +80,7 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
                         <TableBody>
                             {swapOffers.length === 0 ? (
                                 <TableRow>
-                                    <StyledTableCell colSpan={4} style={{ textAlign: 'center' }}>
+                                    <StyledTableCell colSpan={5} style={{ textAlign: 'center' }}>
                                         <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
                                     </StyledTableCell>
                                 </TableRow>

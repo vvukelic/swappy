@@ -102,6 +102,7 @@ class SwapOffer {
 
         this.scalingFactor = ethers.BigNumber.from('10').pow(18);
         this.exchangeRate = this.srcAmount.mul(this.scalingFactor).div(this.dstAmount);
+        this.displayExchangeRateSrcDst = this.srcAmountInBaseUnit / this.dstAmountInBaseUnit;
 
         this.remainingDstAmountSum = this.dstAmount.sub(this.swapsDstAmountSum);
         this.remainingSrcAmountSum = this.remainingDstAmountSum.eq(this.dstAmount) ? this.srcAmount : this.remainingDstAmountSum.mul(this.exchangeRate).div(this.scalingFactor);

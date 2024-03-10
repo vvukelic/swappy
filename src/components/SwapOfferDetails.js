@@ -27,6 +27,14 @@ const StyledBox = styled(Box)`
     min-height: 2.5em;
 `;
 
+const StyledTypography = styled(Typography)`
+    display: inline-flex;
+
+    & > *:first-child {
+        margin-right: 0.3em;
+    }
+`;
+
 function SwapOfferDetails({ hash }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
@@ -189,32 +197,89 @@ function SwapOfferDetails({ hash }) {
                 <Grid item sx={{ height: '42px' }} />
 
                 <BorderSection title='Swap offer details'>
-                    <Grid container direction='row' alignItems='flex-start' sx={{ padding: '0.5em' }}>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider', paddingBottom: '8px', marginBottom: '8px', marginTop: '8px', display: 'flex', alignItems: 'center' }}>
                         <Grid item xs={4} textAlign='right'>
                             <StyledBox>
                                 <SwapStatusChip status={swapOffer.readableStatus} />
                             </StyledBox>
+                        </Grid>
+                        <Grid item xs={8} textAlign='center'>
+                            <StyledBox>
+                                <SwapOfferPercentageFilledLabel percentage={swapOffer.filledPercentage} />
+                            </StyledBox>
+                        </Grid>
+                    </Box>
+                    <Grid container direction='row' alignItems='flex-start' sx={{ padding: '0.5em' }}>
+                        <Grid item xs={4} textAlign='right'>
+                            <StyledBox>
+                                <Typography>Created by:</Typography>
+                            </StyledBox>
+                            <StyledBox>
+                                <Typography>Offer:</Typography>
+                            </StyledBox>
+                            <StyledBox>
+                                <Typography>For:</Typography>
+                            </StyledBox>
+                            <StyledBox>
+                                <Typography>Exchange rate:</Typography>
+                            </StyledBox>
                             <StyledBox>
                                 <Typography>Swappy's fee:</Typography>
                             </StyledBox>
-                            <StyledBox>
-                                <Typography>Expires:</Typography>
-                            </StyledBox>
-                            <StyledBox>
-                                <Typography>Private swap:</Typography>
-                            </StyledBox>
+                            {swapOffer.displayExpirationTime && (
+                                <StyledBox>
+                                    <Typography>Expires:</Typography>
+                                </StyledBox>
+                            )}
+                            {swapOffer.dstAddress !== ethers.constants.AddressZero && (
+                                <StyledBox>
+                                    <Typography>Private swap for:</Typography>
+                                </StyledBox>
+                            )}
                         </Grid>
                         <Grid item xs={8} textAlign='center'>
-                            <StyledBox sx={{ display: 'inline-flex', alignItems: 'center', gap: '1em' }}>{swapOffer.partialFillEnabled && <SwapOfferPercentageFilledLabel percentage={swapOffer.filledPercentage} />}</StyledBox>
                             <StyledBox>
-                                <Typography>{swapOffer.feeAmountInBaseUnit} ETH</Typography>
+                                <Tooltip title={swapOffer.srcAddress}>
+                                    <Typography>{sliceAddress(swapOffer.srcAddress)}</Typography>
+                                </Tooltip>
                             </StyledBox>
                             <StyledBox>
-                                <Typography>{swapOffer.displayExpirationTime ? swapOffer.displayExpirationTime : 'not defined'}</Typography>
+                                <StyledTypography>
+                                    <Tooltip title={swapOffer.srcAmountInBaseUnit}>
+                                        <Truncate>{swapOffer.srcAmountInBaseUnit}</Truncate>
+                                    </Tooltip>
+                                    {swapOffer.srcTokenName}
+                                </StyledTypography>
                             </StyledBox>
                             <StyledBox>
-                                <Typography>{sliceAddress(swapOffer.dstAddress)}</Typography>
+                                <StyledTypography>
+                                    <Tooltip title={swapOffer.dstAmountInBaseUnit}>
+                                        <Truncate>{swapOffer.dstAmountInBaseUnit}</Truncate>
+                                    </Tooltip>
+                                    {swapOffer.dstTokenName}
+                                </StyledTypography>
                             </StyledBox>
+                            <StyledBox>
+                                <Typography>1 {swapOffer.dstTokenName} = {swapOffer.displayExchangeRateSrcDst} {swapOffer.srcTokenName}</Typography>
+                            </StyledBox>
+                            <StyledBox>
+                                <StyledTypography>
+                                    <Tooltip title={swapOffer.feeAmountInBaseUnit}>
+                                        <Truncate>{swapOffer.feeAmountInBaseUnit}</Truncate>
+                                    </Tooltip>
+                                    ETH
+                                </StyledTypography>
+                            </StyledBox>
+                            {swapOffer.displayExpirationTime && (
+                                <StyledBox>
+                                    <Typography>{swapOffer.displayExpirationTime ? swapOffer.displayExpirationTime : 'not defined'}</Typography>
+                                </StyledBox>
+                            )}
+                            {swapOffer.dstAddress !== ethers.constants.AddressZero && (
+                                <StyledBox>
+                                    <Typography>{sliceAddress(swapOffer.dstAddress)}</Typography>
+                                </StyledBox>
+                            )}
                         </Grid>
                     </Grid>
                 </BorderSection>
@@ -229,8 +294,8 @@ function SwapOfferDetails({ hash }) {
                                     <TableRow>
                                         <StyledHeaderTableCell>Time</StyledHeaderTableCell>
                                         <StyledHeaderTableCell>User</StyledHeaderTableCell>
-                                        <StyledHeaderTableCell>Sent</StyledHeaderTableCell>
-                                        <StyledHeaderTableCell>Received</StyledHeaderTableCell>
+                                        <StyledHeaderTableCell>User sent</StyledHeaderTableCell>
+                                        <StyledHeaderTableCell>User received</StyledHeaderTableCell>
                                     </TableRow>
                                 </StyledTableHead>
                                 <TableBody>
@@ -238,7 +303,11 @@ function SwapOfferDetails({ hash }) {
                                         return (
                                             <StyledTableRow key={index}>
                                                 <StyledTableCell align='right'>{swap.displayClosedTime}</StyledTableCell>
-                                                <StyledTableCell align='right'>{swap.displayDstAddress}</StyledTableCell>
+                                                <StyledTableCell align='right'>
+                                                    <Tooltip title={swap.dstAddress}>
+                                                        <Truncate>{swap.displayDstAddress}</Truncate>
+                                                    </Tooltip>
+                                                </StyledTableCell>
                                                 <StyledTableCell align='right'>
                                                     <Tooltip title={swap.dstAmountInBaseUnit}>
                                                         <Truncate>{swap.dstAmountInBaseUnit}</Truncate>
