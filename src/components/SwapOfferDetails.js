@@ -212,6 +212,9 @@ function SwapOfferDetails({ hash }) {
                     <Grid container direction='row' alignItems='flex-start' sx={{ padding: '0.5em' }}>
                         <Grid item xs={4} textAlign='right'>
                             <StyledBox>
+                                <Typography>Created at:</Typography>
+                            </StyledBox>
+                            <StyledBox>
                                 <Typography>Created by:</Typography>
                             </StyledBox>
                             <StyledBox>
@@ -239,6 +242,9 @@ function SwapOfferDetails({ hash }) {
                         </Grid>
                         <Grid item xs={8} textAlign='center'>
                             <StyledBox>
+                                <Typography>{swapOffer.displayCreatedTime}</Typography>
+                            </StyledBox>
+                            <StyledBox>
                                 <Tooltip title={swapOffer.srcAddress}>
                                     <Typography>{sliceAddress(swapOffer.srcAddress)}</Typography>
                                 </Tooltip>
@@ -260,7 +266,9 @@ function SwapOfferDetails({ hash }) {
                                 </StyledTypography>
                             </StyledBox>
                             <StyledBox>
-                                <Typography>1 {swapOffer.dstTokenName} = {swapOffer.displayExchangeRateSrcDst} {swapOffer.srcTokenName}</Typography>
+                                <Typography>
+                                    1 {swapOffer.dstTokenName} = {swapOffer.displayExchangeRateSrcDst} {swapOffer.srcTokenName}
+                                </Typography>
                             </StyledBox>
                             <StyledBox>
                                 <StyledTypography>
