@@ -123,7 +123,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     }
 
     const handleSwapOfferNavigationButtonClick = (newActiveTab) => {
-        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList' || activeTab === 'completedSwapsList') {
             setActiveTab(newActiveTab);
 
             if (newActiveTab === 'createSwapOffer') {
@@ -135,7 +135,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     };
 
     const handleSwapOffersListClick = (item) => {
-        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList' || activeTab === 'completedSwapsList') {
             setActiveTab('swapOffersList');
             setActiveSwapOffersListTab('yourSwapOffers');
         } else {
@@ -144,7 +144,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     };
 
     const handleSwapOffersListTabClick = (listTab) => {
-        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList' || activeTab === 'completedSwapsList') {
             setShowSwapOffersHoverMenu(false);
             setActiveTab('swapOffersList');
             setActiveSwapOffersListTab(listTab);
@@ -206,6 +206,9 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             <SwapOffersListsButtonWithMenu isActive={activeTab === 'swapOffersList'} onClick={() => setActiveTab('swapOffersList')} onMouseEnter={() => setShowSwapOfferOffersHoverMenu(true)}>
                 Swap Offer Offers List
             </SwapOffersListsButtonWithMenu>
+            <StyledTabButton isActive={activeTab === 'completedSwapsList'} onClick={() => handleSwapOfferNavigationButtonClick('completedSwapsList')}>
+                Completed swaps
+            </StyledTabButton>
             <Box flexGrow={1} />
             {ethBalance !== null && (
                 <Typography sx={{ marginRight: '15px' }} variant='h6' color='white'>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { TableBody, TableRow, Paper, Typography, Tooltip } from '@mui/material';
-import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, StyledTableCell, StyledHeaderTableCell } from '../sharedStyles/tableStyles';
+import { TableBody, TableRow, Paper, Tooltip } from '@mui/material';
+import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, StyledTableCell, StyledHeaderTableCell, StyledMessage } from '../sharedStyles/tableStyles';
 import { getUserSwapOffers, getSwapOffersForUser } from '../utils/web3';
 import BorderedSection from './BorderSection';
 import SwapOfferStatusChip from './SwapOfferStatusChip';
@@ -12,14 +12,6 @@ import Truncate from '../sharedStyles/general';
 
 const contractAddresses = require('../contracts/contract-address.json');
 
-
-const StyledMessage = styled(Typography)`
-    color: white;
-    text-align: center;
-    margin-top: 20px;
-    display: block;
-    width: 100%;
-`;
 
 const StyledStatusTableCell = styled(StyledTableCell)`
     padding: 0;

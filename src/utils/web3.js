@@ -218,6 +218,17 @@ export async function getSwapOffersForUser(contractAddress, userAddress){
     }
 };
 
+export async function getSwapOffersTakenByUser(contractAddress, userAddress) {
+    try {
+        const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
+        const swapOffersHashes = await contract.getSwapOffersTakenByUser(userAddress);
+        return swapOffersHashes;
+    } catch (error) {
+        console.error('Error fetching swap offers taken by user:', error);
+        return [];
+    }
+};
+
 export async function createSwapForOffer(contractAddress, swapHash, dstTokenAddress, dstAmount, feeAmount) {
     try {
         const signer = getProvider().getSigner();

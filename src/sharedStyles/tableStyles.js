@@ -39,3 +39,11 @@ export const StyledTableCell = styled(TableCell)`
 export const StyledHeaderTableCell = styled(StyledTableCell)`
     font-weight: bold;
 `;
+
+export const StyledMessage = styled(Typography)`
+    color: white;
+    text-align: center;
+    margin-top: 20px;
+    display: block;
+    width: 100%;
+`;

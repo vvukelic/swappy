@@ -43,7 +43,7 @@ contract SwapManager is ReentrancyGuard {
     mapping(bytes32 => Swap[]) public swaps;
     mapping(address => bytes32[]) public userSwapOffers;
     mapping(address => bytes32[]) public swapOffersForUser;
-    mapping(address => bytes32[]) public swapsTakenByUser;
+    mapping(address => bytes32[]) public swapOffersTakenByUser;
     address constant private _wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     IWETH constant private _weth = IWETH(_wethAddress);
     AggregatorV3Interface internal priceFeed;
@@ -121,10 +121,14 @@ contract SwapManager is ReentrancyGuard {
         return swapOffersForUser[userAddress];
     }
 
-    function createSwapForOffer(bytes32 swapOfferIndex, uint partialDstAmount) public payable nonReentrant {
+    function getSwapOffersTakenByUser(address userAddress) public view returns (bytes32[] memory) {
+        return swapOffersTakenByUser[userAddress];
+    }
+
+    function createSwapForOffer(bytes32 swapOfferHash, uint partialDstAmount) public payable nonReentrant {
         address swapManagerAddress = address(this);
-        SwapOffer storage swapOffer = swapOffers[swapOfferIndex];
-        Swap[] storage swapsForOffer = swaps[swapOfferIndex];
+        SwapOffer storage swapOffer = swapOffers[swapOfferHash];
+        Swap[] storage swapsForOffer = swaps[swapOfferHash];
 
         require(swapOffer.srcAddress != address(0), "Non existing swap offer!");
         require(swapOffer.status == SwapStatus.OPENED, "Can't create swap for offer that is not in OPENED status!");
@@ -197,7 +201,7 @@ contract SwapManager is ReentrancyGuard {
 
         feeAddress.transfer(swapOffer.feeAmount);
 
-        swapsTakenByUser[swap.dstAddress].push(swapOfferIndex);
+        swapOffersTakenByUser[swap.dstAddress].push(swapOfferHash);
         swapsForOffer.push(swap);
     }
 

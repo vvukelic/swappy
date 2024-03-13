@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { getSwapOfferRaw, getSwapsForOffer, getTokenDecimals, getCurrentBlockTimestamp } from './web3';
 import { toBaseUnit, getTokenByAddress, getTokenBalance } from './tokens';
-import { sliceAddress } from '../utils/general';
+import { sliceAddress } from './general';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -84,14 +84,14 @@ class SwapOffer {
         this.status = swapOffer.status;
         this.srcTokenDecimals = this.srcTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(this.srcTokenAddress);
         this.dstTokenDecimals = this.dstTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(this.dstTokenAddress);
-        this.swaps = await this.getSwaps();
-        this.srcAmountInBaseUnit = await toBaseUnit(this.srcAmount, this.srcTokenAddress);
-        this.dstAmountInBaseUnit = await toBaseUnit(this.dstAmount, this.dstTokenAddress);
-        this.feeAmountInBaseUnit = ethers.utils.formatUnits(this.feeAmount, 'ether');
         this.srcToken = await getTokenByAddress(this.srcTokenAddress, this.network);
         this.dstToken = await getTokenByAddress(this.dstTokenAddress, this.network);
         this.srcTokenName = this.srcToken.name.toUpperCase();
         this.dstTokenName = this.dstToken.name.toUpperCase();
+        this.swaps = await this.getSwaps();
+        this.srcAmountInBaseUnit = await toBaseUnit(this.srcAmount, this.srcTokenAddress);
+        this.dstAmountInBaseUnit = await toBaseUnit(this.dstAmount, this.dstTokenAddress);
+        this.feeAmountInBaseUnit = ethers.utils.formatUnits(this.feeAmount, 'ether');
         this.displayCreatedTime = new Date(this.createdTime * 1000).toLocaleString();
         this.displayExpirationTime = this.expirationTime.toString() !== '0' ? new Date(this.expirationTime * 1000).toLocaleString() : null;
         this.currentBlockTimestamp = await getCurrentBlockTimestamp();

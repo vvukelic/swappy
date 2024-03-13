@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 import Layout from '../components/Layout';
 import SwapOffer from '../components/SwapOffer';
 import SwapOffersList from '../components/SwapOffersList';
+import CompletedSwapsList from '../components/CompletedSwapsList';
 import { getTokenImageUrl } from '../utils/tokens';
 import styled from '@emotion/styled';
 
@@ -66,6 +67,7 @@ export default () => {
                 selectedDstTokenImg={selectedDstTokenImg}
             />)}
             {activeTab === 'swapOffersList' && <SwapOffersList activeSwapOffersListTab={activeSwapOffersListTab} />}
+            {activeTab === 'completedSwapsList' && <CompletedSwapsList />}
         </Layout>
     );
 };
