@@ -14,7 +14,7 @@ import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, Sty
 const contractAddresses = require('../contracts/contract-address.json');
 
 
-function CompletedSwapsList({ activeSwapOffersListTab }) {
+function CompletedSwapsList() {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [swapsTakenByUser, setSwapsTakenByUser] = useState([]);
 

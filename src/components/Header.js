@@ -135,7 +135,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     };
 
     const handleSwapOffersListClick = (item) => {
-        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList' || activeTab === 'completedSwapsList') {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
             setActiveTab('swapOffersList');
             setActiveSwapOffersListTab('yourSwapOffers');
         } else {
@@ -144,7 +144,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     };
 
     const handleSwapOffersListTabClick = (listTab) => {
-        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList' || activeTab === 'completedSwapsList') {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
             setShowSwapOffersHoverMenu(false);
             setActiveTab('swapOffersList');
             setActiveSwapOffersListTab(listTab);

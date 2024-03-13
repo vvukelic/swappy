@@ -37,7 +37,7 @@ export default () => {
     useEffect(() => {
         const tab = router.query.tab;
 
-        if (tab && ['createSwapOffer', 'swapOffersList'].includes(tab)) {
+        if (tab && ['createSwapOffer', 'swapOffersList', 'completedSwapsList'].includes(tab)) {
             setActiveTab(tab);
         }
 
