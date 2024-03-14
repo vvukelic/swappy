@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
 import { Grid, TextField, Button } from '@mui/material';
 import TokenButton from './TokenButton';
 import styled from '@emotion/styled';
@@ -47,12 +48,28 @@ const MaxButtonGrid = styled(Grid)`
     color: white;
 `;
 
-function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, labelText, openModal, selectedTokenAccountBalance }) {
-    const [displayAmount, setDisplayAmount] = useState('0.0');
+function SelectToken({ selectedToken, selectedTokenDecimals, amount, setAmount, selectedTokenImg, labelText, openModal, selectedTokenAccountBalance }) {
+    const [displayAmount, setDisplayAmount] = useState('');
+
+    useEffect(() => {
+        setDisplayAmount(amount);
+    }, [selectedToken]);
 
     function handleAmountOnChange(e) {
-        const value = e.target.value.replace(/^0+/, '').replace(/(\..*?)\..*/g, '$1');
-        setDisplayAmount(value);
+        // const value = e.target.value.replace(/^0+/, '').replace(/(\..*?)\..*/g, '$1');
+        let value = e.target.value
+            .replace(/[^\d.]/g, '') // Allow numbers and dot only.
+            .replace(/^0+(\d)/, '$1') // Remove leading zeros.
+            .replace(/(\..*)\./g, '$1'); // Allow only one decimal point.
+
+        if (value === '.') {
+            value = '0.';
+        }
+
+        const regex = new RegExp(`(\\.\\d{0,${selectedTokenDecimals}}).*`);
+        const formattedValue = value.replace(regex, '$1');
+
+        setDisplayAmount(formattedValue);
     }
 
     function handleAmountOnBlur() {

@@ -7,7 +7,7 @@ import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
 import { getTokenByName, updateCustomTokensList, toSmallestUnit, toBaseUnit, getTokenBalance } from '../utils/tokens';
-import { getAllowance, approveToken, createSwapOffer } from '../utils/web3';
+import { getAllowance, approveToken, createSwapOffer, getTokenDecimals } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
@@ -60,6 +60,8 @@ function SwapOffer({
     const [modalType, setModalType] = useState(null);
     const [insufficientSrcTokenAmount, setInsufficientSrcTokenAmount] = useState(false);
     const [defaultAccountSrcTokenBalance, setDefaultAccountSrcTokenBalance] = useState(null);
+    const [selectedSrcTokenDecimals, setSelectedSrcTokenDecimals] = useState(0);
+    const [selectedDstTokenDecimals, setSelectedDstTokenDecimals] = useState(0);
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
 
     const openModal = (type) => {
@@ -139,10 +141,29 @@ function SwapOffer({
             setDefaultAccountSrcTokenBalance(await toBaseUnit(tokenBalance, tokenContract));
         }
 
+        async function getSrcTokenDecimals() {
+            const tokenAddress = selectedSrcToken.networkSpecificAddress[network];
+            const srcTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(tokenAddress);
+            setSelectedSrcTokenDecimals(srcTokenDecimals);
+        }
+
         if (defaultAccount && selectedSrcToken) {
             srcTokenHoldingsAmount();
+            getSrcTokenDecimals();
         }
     }, [network, selectedSrcToken]);
+
+    useEffect(() => {
+        async function getDstTokenDecimals() {
+            const tokenAddress = selectedDstToken.networkSpecificAddress[network];
+            const dstTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(tokenAddress);
+            setSelectedDstTokenDecimals(dstTokenDecimals);
+        }
+
+        if (defaultAccount && selectedDstToken) {
+            getDstTokenDecimals();
+        }
+    }, [network, selectedDstToken]);
 
     const handleSwapOfferButtonClick = async () => {
         if (!defaultAccount) {
@@ -242,7 +263,7 @@ function SwapOffer({
     return (
         <>
             <MainContentContainer>
-                <SelectToken selectedToken={selectedSrcToken} amount={srcAmount} setAmount={setSrcAmount} selectedTokenImg={selectedSrcTokenImg} labelText='You send' openModal={() => openModal('src')} selectedTokenAccountBalance={defaultAccountSrcTokenBalance} />
+                <SelectToken selectedToken={selectedSrcToken} selectedTokenDecimals={selectedSrcTokenDecimals} amount={srcAmount} setAmount={setSrcAmount} selectedTokenImg={selectedSrcTokenImg} labelText='You send' openModal={() => openModal('src')} selectedTokenAccountBalance={defaultAccountSrcTokenBalance} />
 
                 <Grid item xs={12} container justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton
@@ -262,7 +283,7 @@ function SwapOffer({
                     </IconButton>
                 </Grid>
 
-                <SelectToken selectedToken={selectedDstToken} amount={dstAmount} setAmount={setDstAmount} selectedTokenImg={selectedDstTokenImg} labelText='You receive' openModal={() => openModal('dst')} />
+                <SelectToken selectedToken={selectedDstToken} selectedTokenDecimals={selectedDstTokenDecimals} amount={dstAmount} setAmount={setDstAmount} selectedTokenImg={selectedDstTokenImg} labelText='You receive' openModal={() => openModal('dst')} />
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px', marginTop: '20px' }}>
                     <Grid item xs={4}>
