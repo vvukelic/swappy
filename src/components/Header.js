@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { ethers } from 'ethers';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -15,6 +16,7 @@ import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getEthBalance, getNetworkName, switchNetwork } from '../utils/web3';
 import { sliceAddress } from '../utils/general';
 import networks from '../data/networks';
+import PrimaryButton from './PrimaryButton';
 
 
 const RelativePositionContainer = styled.div`
@@ -217,9 +219,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             )}
             {/* {network !== null && <NetworkSelector networkName={networkName} sx={{ marginRight: '15px' }} />} */}
             <SelectNetworkButtonWithMenu />
-            <Button onClick={connectWallet} sx={{ backgroundColor: '#F7B93E', '&:hover': { backgroundColor: '#FFD684' }, color: 'black' }}>
-                {connectBtnText}
-            </Button>
+            <PrimaryButton onClick={connectWallet} buttonText={connectBtnText} />
         </>
     );
 
@@ -227,21 +227,23 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
         <Box sx={{ flexGrow: 1, padding: 0, margin: 0 }}>
             <AppBar position='sticky' elevation={0} component='nav'>
                 <Toolbar sx={{ backgroundColor: '#1B3A47' }}>
-                    <Card
-                        sx={{
-                            backgroundColor: 'transparent',
-                            boxShadow: 'none',
-                        }}
-                    >
-                        <CardMedia
+                    <Link href='/' passHref>
+                        <Card
                             sx={{
-                                width: '100px',
-                                height: '100px',
                                 backgroundColor: 'transparent',
+                                boxShadow: 'none',
                             }}
-                            image='/images/swappy_logo.png'
-                        />
-                    </Card>
+                        >
+                            <CardMedia
+                                sx={{
+                                    width: '100px',
+                                    height: '100px',
+                                    backgroundColor: 'transparent',
+                                }}
+                                image='/images/swappy_logo.png'
+                            />
+                        </Card>
+                    </Link>
                     {isMobile ? (
                         <>
                             <Box flexGrow={1} />

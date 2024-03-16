@@ -18,7 +18,7 @@ import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import SwapStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
-import Truncate from '../sharedStyles/general';
+import { Truncate } from '../sharedStyles/general';
 
 
 const contractAddresses = require('../contracts/contract-address.json');

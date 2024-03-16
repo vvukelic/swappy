@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Box } from '@mui/material';
 import { ethers } from 'ethers';
 import Layout from '../components/Layout';
 import SwapOffer from '../components/SwapOffer';
 import SwapOffersList from '../components/SwapOffersList';
 import CompletedSwapsList from '../components/CompletedSwapsList';
 import { getTokenImageUrl } from '../utils/tokens';
-import styled from '@emotion/styled';
 
-
-const StyledBox = styled(Box)`
-    min-height: calc(100vh - 100px);
-    background: linear-gradient(to bottom, #1b3a47, #45bbd6);
-    padding-top: 3em;
-`;
 
 export default () => {
     const [activeTab, setActiveTab] = useState('createSwapOffer');

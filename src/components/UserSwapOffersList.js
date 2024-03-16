@@ -7,7 +7,7 @@ import BorderedSection from './BorderSection';
 import SwapOfferStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
 import SwapOfferPercentageFilledLabel from './SwapOfferPercentageFilledLabel';
-import Truncate from '../sharedStyles/general';
+import { Truncate } from '../sharedStyles/general';
 
 
 const contractAddresses = require('../contracts/contract-address.json');

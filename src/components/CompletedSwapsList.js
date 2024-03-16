@@ -4,7 +4,7 @@ import { Paper, TableBody, TableRow, Tooltip } from '@mui/material';
 import MainContentContainer from './MainContentContainer';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getUserSwapOffers, getSwapOffersTakenByUser } from '../utils/web3';
-import Truncate from '../sharedStyles/general';
+import { Truncate } from '../sharedStyles/general';
 import SwapOffer from '../utils/swapOffer';
 import { sliceAddress } from '../utils/general';
 import BorderSection from './BorderSection';
