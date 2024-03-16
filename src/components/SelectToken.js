@@ -6,25 +6,36 @@ import styled from '@emotion/styled';
 import BorderedSection from './BorderSection';
 
 const StyledTextField = styled(TextField)`
-    color: black;
-    background-color: #d9d9d9;
     width: 100%;
-    box-shadow: none;
-    underline: none;
-    height: 48px;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
+    .MuiInputBase-input {
+        color: black;
+        background-color: #d9d9d9;
+        height: 48px;
+        box-shadow: none;
+        border-radius: 4px;
+        text-align: right;
+        font-size: 1.5rem;
+        padding: 0 8px;
 
-    & .MuiInput-underline:after {
+        @media (max-width: 600px) {
+            font-size: 0.9rem;
+            padding: 0px 8px;
+            height: 35px;
+        }
+    }
+
+    .MuiInput-underline:after,
+    .MuiInput-underline:before,
+    .MuiInput-underline:hover:not(.Mui-disabled):before {
         border-bottom: none;
     }
 
-    & .MuiInput-underline:before {
-        border-bottom: none;
+    .MuiInputBase-root {
+        height: auto;
     }
 
-    & .MuiInput-underline:hover:not(.Mui-disabled):before {
-        border-bottom: none;
+    .MuiInputLabel-root {
+        padding: 8px;
     }
 `;
 
@@ -46,6 +57,14 @@ const MaxButtonGrid = styled(Grid)`
     margin-top: 0;
     padding-top: 8px !important;
     color: white;
+`;
+
+const BalanceInfo = styled.span`
+    margin-right: 10px;
+
+    @media (max-width: 600px) {
+        display: none;
+    }
 `;
 
 function SelectToken({ selectedToken, selectedTokenDecimals, amount, setAmount, selectedTokenImg, labelText, openModal, selectedTokenAccountBalance }) {
@@ -110,29 +129,12 @@ function SelectToken({ selectedToken, selectedTokenDecimals, amount, setAmount, 
                             onChange={handleAmountOnChange}
                             onBlur={handleAmountOnBlur}
                             variant='standard'
-                            inputProps={{
-                                style: {
-                                    textAlign: 'right',
-                                    color: 'black',
-                                    fontSize: '1.5rem',
-                                    paddingBottom: 0,
-                                    paddingTop: 8,
-                                    paddingLeft: 0,
-                                    paddingRight: 8,
-                                    borderRadius: '20px',
-                                },
-                            }}
-                            InputLabelProps={{
-                                style: {
-                                    padding: '8px',
-                                },
-                            }}
                             type='text'
                         />
                     </Grid>
                     {selectedTokenAccountBalance && (
                         <MaxButtonGrid item xs={12} container justifyContent='flex-end' alignItems='center'>
-                            <span style={{ marginRight: '10px' }}>Balance: {selectedTokenAccountBalance}</span>
+                            <BalanceInfo>Balance: {selectedTokenAccountBalance}</BalanceInfo>
                             <MaxButton onClick={handleMaxButtonClick} variant='outlined' size='small'>
                                 Max
                             </MaxButton>

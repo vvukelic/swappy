@@ -14,6 +14,7 @@ const ContentContainer = styled.div`
 
     @media (max-width: 768px) {
         flex-direction: column;
+        padding: 0 15px;
     }
 `;
 
@@ -27,7 +28,7 @@ const TextContainer = styled.div`
     flex: 1;
     max-width: 600px;
     color: white;
-    font-size: 1.1em;
+    font-size: 1.3em;
 
     p {
         margin-bottom: 3em;
@@ -36,6 +37,15 @@ const TextContainer = styled.div`
     ul {
         margin-bottom: 2.5em;
     }
+
+    @media (max-width: 768px) {
+        margin-top: 1em;
+        padding: 0 1em;
+        font-size: 1em;
+        p {
+            margin-bottom: 2em;
+        }
+    }
 `;
 
 const ImageContainer = styled.div`
@@ -43,6 +53,10 @@ const ImageContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+
+    @media (max-width: 768px) {
+        margin-top: 2em;
+    }
 `;
 
 export default () => {
@@ -71,7 +85,7 @@ export default () => {
                             />
                         </Card>
                         <Box sx={{ flexGrow: 1 }} />
-                        <PrimaryButton onClick={onDappBtnClick} buttonText='Go to dapp' />
+                        <PrimaryButton onClick={onDappBtnClick} buttonText='Launch app' />
                     </Toolbar>
                 </AppBar>
             </Box>
@@ -80,14 +94,14 @@ export default () => {
                     <TextContainer>
                         <h1>What is Swappy?</h1>
                         <p>Swappy is a platform facilitating decentralized, peer-to-peer (P2P) swaps, offering users a trustless environment for over-the-counter (OTC) trading.</p>
-                        <h1>Why Swappy?</h1>
+                        {/* <h1>Why Swappy?</h1>
                         <ul>
                             <li>Trustless transactions enabled by smart contract technology.</li>
                             <li>Direct P2P trading, cutting out the middleman.</li>
                             <li>Support for partial swap offers, enhancing flexibility.</li>
                             <li>Secure and transparent process with blockchain verification.</li>
                             <li>User-friendly interface for easy trading.</li>
-                        </ul>
+                        </ul> */}
                         <PrimaryButton onClick={onDappBtnClick} buttonText='Create a swap' />
                     </TextContainer>
                     <ImageContainer>

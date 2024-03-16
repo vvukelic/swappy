@@ -21,6 +21,10 @@ const StyledButton = styled(Button)`
     &:hover {
         background-color: #396777;
     }
+
+    @media (max-width: 600px) {
+        height: 35px;
+    }
 `;
 
 const StyledBox = styled(Box)`
@@ -32,12 +36,20 @@ const StyledBox = styled(Box)`
     align-items: left;
     justify-content: center;
     margin-left: 0.2em;
+
+    @media (max-width: 600px) {
+        display: none;
+    }
 `;
 
 const StyledTypography = styled(Typography)`
     color: white;
     flex-grow: 2;
     text-align: center;
+
+    @media (max-width: 600px) {
+        font-size: 0.9rem;
+    }
 `;
 
 function TokenButton({ imageSrc, text, onClick, ...props }) {
