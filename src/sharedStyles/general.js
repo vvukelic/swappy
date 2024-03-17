@@ -16,4 +16,8 @@ export const BackgroundBox = styled(Box)`
     min-height: calc(100vh - 100px);
     background: linear-gradient(to bottom, #1b3a47, #45bbd6);
     padding-top: 3em;
+
+    @media (max-width: 600px) {
+        padding-top: 1.5em;
+    }
 `;

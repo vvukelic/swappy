@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { TableBody, TableRow, Paper, Tooltip } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, StyledTableCell, StyledHeaderTableCell, StyledMessage } from '../sharedStyles/tableStyles';
 import { getUserSwapOffers, getSwapOffersForUser } from '../utils/web3';
 import BorderedSection from './BorderSection';
@@ -20,6 +21,7 @@ const StyledStatusTableCell = styled(StyledTableCell)`
 const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) => {
     const [userSwapOffers, setUserSwapOffers] = useState([]);
     const [swapOffersForUser, setSwapOffersForUser] = useState([]);
+    const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         const fetchUserSwapOffers = async () => {
@@ -62,17 +64,17 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
                     <StyledTable aria-label='simple table'>
                         <StyledTableHead>
                             <TableRow>
-                                <StyledHeaderTableCell>Created at</StyledHeaderTableCell>
+                                {!isMobile && <StyledHeaderTableCell>Created at</StyledHeaderTableCell>}
                                 <StyledHeaderTableCell>Send</StyledHeaderTableCell>
                                 <StyledHeaderTableCell>Receive</StyledHeaderTableCell>
                                 <StyledHeaderTableCell>Status</StyledHeaderTableCell>
-                                <StyledHeaderTableCell>Filled %</StyledHeaderTableCell>
+                                <StyledHeaderTableCell>{isMobile ? '%' : 'Filled %'}</StyledHeaderTableCell>
                             </TableRow>
                         </StyledTableHead>
                         <TableBody>
                             {swapOffers.length === 0 ? (
                                 <TableRow>
-                                    <StyledTableCell colSpan={5} style={{ textAlign: 'center' }}>
+                                    <StyledTableCell colSpan={isMobile ? 4 : 5} style={{ textAlign: 'center' }}>
                                         <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
                                     </StyledTableCell>
                                 </TableRow>
@@ -89,7 +91,7 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
 
                                     return (
                                         <StyledTableRow key={index} onClick={() => handleRowClick(swapOffer.hash)}>
-                                            <StyledTableCell align='right'>{swapOffer.displayCreatedTime}</StyledTableCell>
+                                            {!isMobile && <StyledTableCell align='right'>{swapOffer.displayCreatedTime}</StyledTableCell>}
                                             <StyledTableCell align='right'>
                                                 <Tooltip title={displaySrcAmount}>
                                                     <Truncate>{displaySrcAmount}</Truncate>
@@ -103,7 +105,7 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
                                                 {displayDstTokenName}
                                             </StyledTableCell>
                                             <StyledStatusTableCell>
-                                                <SwapOfferStatusChip status={swapOffer.readableStatus} />
+                                                <SwapOfferStatusChip status={swapOffer.readableStatus} isMobile={isMobile} />
                                             </StyledStatusTableCell>
                                             <StyledTableCell>
                                                 <SwapOfferPercentageFilledLabel percentage={swapOffer.filledPercentage} />
