@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Paper, TableBody, TableRow, Tooltip } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import MainContentContainer from './MainContentContainer';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getUserSwapOffers, getSwapOffersTakenByUser } from '../utils/web3';
@@ -17,6 +18,7 @@ const contractAddresses = require('../contracts/contract-address.json');
 function CompletedSwapsList() {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [swapsTakenByUser, setSwapsTakenByUser] = useState([]);
+    const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         const fetchUserCompletedSwapsList = async () => {
@@ -87,7 +89,7 @@ function CompletedSwapsList() {
                         <StyledTable aria-label='simple table'>
                             <StyledTableHead>
                                 <TableRow>
-                                    <StyledHeaderTableCell>Time</StyledHeaderTableCell>
+                                    {!isMobile && <StyledHeaderTableCell>Time</StyledHeaderTableCell>}
                                     <StyledHeaderTableCell>User</StyledHeaderTableCell>
                                     <StyledHeaderTableCell>You sent</StyledHeaderTableCell>
                                     <StyledHeaderTableCell>You received</StyledHeaderTableCell>
@@ -103,7 +105,7 @@ function CompletedSwapsList() {
                                 ) : (swapsTakenByUser.map((swap, index) => {
                                     return (
                                         <StyledTableRow key={index} onClick={() => handleRowClick(swap.swapOfferHash)}>
-                                            <StyledTableCell align='right'>{swap.displayClosedTime}</StyledTableCell>
+                                            {!isMobile && <StyledTableCell align='right'>{swap.displayClosedTime}</StyledTableCell>}
                                             <StyledTableCell align='right'>
                                                 <Tooltip title={swap.userAddress}>
                                                     <Truncate>{swap.displayUserAddress}</Truncate>

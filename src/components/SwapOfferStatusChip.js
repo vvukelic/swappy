@@ -38,7 +38,6 @@ const StyledChip = styled(Chip)(({ status }) => {
 function SwapOfferStatusChip({ status, isMobile }) {
     const backgroundColor = getBackgroundColor(status);
     let icon;
-    let iconColor;
 
     switch (status) {
         case 'EXPIRED':

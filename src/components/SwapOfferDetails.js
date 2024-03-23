@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
@@ -43,6 +44,7 @@ function SwapOfferDetails({ hash }) {
     const [swapDstAmount, setSwapDstAmount] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
+    const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         async function checkTokenApproved() {
@@ -300,7 +302,7 @@ function SwapOfferDetails({ hash }) {
                             <StyledTable aria-label='simple table'>
                                 <StyledTableHead>
                                     <TableRow>
-                                        <StyledHeaderTableCell>Time</StyledHeaderTableCell>
+                                        {!isMobile && <StyledHeaderTableCell>Time</StyledHeaderTableCell>}
                                         <StyledHeaderTableCell>User</StyledHeaderTableCell>
                                         <StyledHeaderTableCell>User sent</StyledHeaderTableCell>
                                         <StyledHeaderTableCell>User received</StyledHeaderTableCell>
@@ -310,7 +312,7 @@ function SwapOfferDetails({ hash }) {
                                     {swapOffer.swaps.map((swap, index) => {
                                         return (
                                             <StyledTableRow key={index}>
-                                                <StyledTableCell align='right'>{swap.displayClosedTime}</StyledTableCell>
+                                                {!isMobile && <StyledTableCell align='right'>{swap.displayClosedTime}</StyledTableCell>}
                                                 <StyledTableCell align='right'>
                                                     <Tooltip title={swap.dstAddress}>
                                                         <Truncate>{swap.displayDstAddress}</Truncate>
