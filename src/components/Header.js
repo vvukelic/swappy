@@ -19,9 +19,17 @@ import networks from '../data/networks';
 import PrimaryButton from './PrimaryButton';
 
 
+const StyledToolbar = styled(Toolbar)`
+    background-color: #1b3a47;
+    justify-content: center;
+    @media (max-width: 900px) {
+        justify-content: space-between;
+    }
+`;
+
 const RelativePositionContainer = styled.div`
     position: relative;
-    display: inline-block;
+    display: grid;
 `;
 
 const StyledTabButton = styled(Button)`
@@ -48,11 +56,16 @@ const StyledHoverMenu = styled(Box)`
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
+
+    @media (max-width: 900px) {
+        position: static;
+        transform: none;
+        left: 0;
+        width: auto;
+    }
 `;
 
 const NetworkButton = styled(Button)`
-    margin-left: 10px;
-    margin-right: 10px;
     color: white;
     background-color: ${(props) => props.bgColor || 'transparent'};
     display: flex;
@@ -67,6 +80,11 @@ const NetworkButton = styled(Button)`
     &:hover {
         background-color: ${(props) => props.bgColor || 'transparent'};
         border-color: #ffffff;
+    }
+
+    @media (min-width: 900px) {
+        margin-left: 10px;
+        margin-right: 10px;
     }
 `;
 
@@ -85,12 +103,21 @@ const NetworkIcon = styled.img`
     margin-right: 10px;
 `;
 
+const NativeCoinBalance = styled(Typography)`
+    margin-right: 15px;
+
+    @media (max-width: 900px) {
+        text-align: center;
+        margin-right: 0;
+    }
+`;
+
 function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const [ethBalance, setEthBalance] = useState(null);
     const [networkName, setNetworkName] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const isMobile = useMediaQuery('(max-width:600px)');
+    const isMobile = useMediaQuery('(max-width:900px)');
     const router = useRouter();
     const [showSwapOffersHoverMenu, setShowSwapOffersHoverMenu] = useState(false);
     const [showNetworksHoverMenu, setShowNetworksHoverMenu] = useState(false);
@@ -137,7 +164,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     };
 
     const handleSwapOffersListClick = (item) => {
-        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList' || activeTab === 'completedSwapsList') {
             setActiveTab('swapOffersList');
             setActiveSwapOffersListTab('yourSwapOffers');
         } else {
@@ -146,7 +173,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     };
 
     const handleSwapOffersListTabClick = (listTab) => {
-        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList') {
+        if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList' || activeTab === 'completedSwapsList') {
             setShowSwapOffersHoverMenu(false);
             setActiveTab('swapOffersList');
             setActiveSwapOffersListTab(listTab);
@@ -177,8 +204,6 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             setShowNetworksHoverMenu(false);
         };
 
-        const networkDetails = networks[networkName] || null;
-
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
                 <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={networkName ? networks[networkName].color : ''}>
@@ -205,17 +230,16 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             <StyledTabButton isActive={activeTab === 'createSwapOffer'} onClick={() => handleSwapOfferNavigationButtonClick('createSwapOffer')}>
                 Create Swap Offer
             </StyledTabButton>
-            <SwapOffersListsButtonWithMenu isActive={activeTab === 'swapOffersList'} onClick={() => setActiveTab('swapOffersList')} onMouseEnter={() => setShowSwapOfferOffersHoverMenu(true)}>
-                Swap Offer Offers List
-            </SwapOffersListsButtonWithMenu>
+            <SwapOffersListsButtonWithMenu isActive={activeTab === 'swapOffersList'} onClick={() => setActiveTab('swapOffersList')} onMouseEnter={() => setShowSwapOfferOffersHoverMenu(true)} />
             <StyledTabButton isActive={activeTab === 'completedSwapsList'} onClick={() => handleSwapOfferNavigationButtonClick('completedSwapsList')}>
                 Completed swaps
             </StyledTabButton>
             <Box flexGrow={1} />
+            {isMobile && <Box sx={{ borderTop: 1, color: 'white' }} />}
             {ethBalance !== null && (
-                <Typography sx={{ marginRight: '15px' }} variant='h6' color='white'>
+                <NativeCoinBalance variant='h6' color='white'>
                     {ethBalance} ETH
-                </Typography>
+                </NativeCoinBalance>
             )}
             {/* {network !== null && <NetworkSelector networkName={networkName} sx={{ marginRight: '15px' }} />} */}
             <SelectNetworkButtonWithMenu />
@@ -226,7 +250,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     return (
         <Box sx={{ flexGrow: 1, padding: 0, margin: 0 }}>
             <AppBar position='sticky' elevation={0} component='nav'>
-                <Toolbar sx={{ backgroundColor: '#1B3A47' }}>
+                <StyledToolbar>
                     <Link href='/' passHref>
                         <Card
                             sx={{
@@ -259,7 +283,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                     ) : (
                         <CommonHeaderItems />
                     )}
-                </Toolbar>
+                </StyledToolbar>
             </AppBar>
         </Box>
     );
