@@ -18,7 +18,7 @@ class SwapOffer {
                 return 'FILLED';
             }
 
-            if (!this.expirationTime.isZero() && this.expirationTime.lt(BigNumber.from(this.currentBlockTimestamp))) {
+            if (!this.expirationTime.isZero() && this.expirationTime.lt(ethers.BigNumber.from(this.currentBlockTimestamp))) {
                 return 'EXPIRED';
             } else if (this.srcAccountTokenBalance.lt(this.srcAmount)) {
                 return 'ERROR';

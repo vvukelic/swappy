@@ -11,6 +11,7 @@ const StyledContainerGrid = styled(Grid)`
 
 const StyledAmountTypography = styled(Typography)`
     font-size: 2em;
+    word-break: break-word;
 `;
 
 const StyledAvatarBox= styled(Box)`

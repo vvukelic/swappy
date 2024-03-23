@@ -7,7 +7,7 @@ const TruncateBase = styled.div`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px; // Adjust based on your needs
+    max-width: 100px;
 `;
 
 export const Truncate = React.forwardRef((props, ref) => <TruncateBase ref={ref} {...props} />);

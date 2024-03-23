@@ -36,6 +36,41 @@ const StyledTypography = styled(Typography)`
     }
 `;
 
+const StyledExchangeRate = styled(Typography)`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+
+    @media (max-width: 600px) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+`;
+
+const StyledAmountAndToken = styled.div`
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.3em;
+
+    @media (max-width: 600px) {
+        margin-left: 0;
+    }
+`;
+
+const StyledAttributeKey = styled(Typography)`
+    font-weight: bold;
+`;
+
+const StyledInfoValues = styled(Grid)`
+    padding-left: 2em;
+
+    @media (max-width: 600px) {
+        padding-left: 0.8em;
+    }
+`;
+
 function SwapOfferDetails({ hash }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
@@ -214,35 +249,35 @@ function SwapOfferDetails({ hash }) {
                     <Grid container direction='row' alignItems='flex-start' sx={{ padding: '0.5em' }}>
                         <Grid item xs={4} textAlign='right'>
                             <StyledBox>
-                                <Typography>Created at:</Typography>
+                                <StyledAttributeKey>Created at:</StyledAttributeKey>
                             </StyledBox>
                             <StyledBox>
-                                <Typography>Created by:</Typography>
+                                <StyledAttributeKey>Created by:</StyledAttributeKey>
                             </StyledBox>
                             <StyledBox>
-                                <Typography>Offer:</Typography>
+                                <StyledAttributeKey>Offer:</StyledAttributeKey>
                             </StyledBox>
                             <StyledBox>
-                                <Typography>For:</Typography>
+                                <StyledAttributeKey>For:</StyledAttributeKey>
                             </StyledBox>
                             <StyledBox>
-                                <Typography>Exchange rate:</Typography>
-                            </StyledBox>
-                            <StyledBox>
-                                <Typography>Swappy's fee:</Typography>
+                                <StyledAttributeKey>{isMobile ? 'Fee:' : "Swappy's fee:"}</StyledAttributeKey>
                             </StyledBox>
                             {swapOffer.displayExpirationTime && (
                                 <StyledBox>
-                                    <Typography>Expires:</Typography>
+                                    <StyledAttributeKey>Expires:</StyledAttributeKey>
                                 </StyledBox>
                             )}
                             {swapOffer.dstAddress !== ethers.constants.AddressZero && (
                                 <StyledBox>
-                                    <Typography>Private swap for:</Typography>
+                                    <StyledAttributeKey>{isMobile ? 'Private:' : 'Private swap for:'}</StyledAttributeKey>
                                 </StyledBox>
                             )}
+                            <StyledBox>
+                                <StyledAttributeKey>Rate:</StyledAttributeKey>
+                            </StyledBox>
                         </Grid>
-                        <Grid item xs={8} textAlign='center'>
+                        <StyledInfoValues item xs={8} textAlign='left'>
                             <StyledBox>
                                 <Typography>{swapOffer.displayCreatedTime}</Typography>
                             </StyledBox>
@@ -268,11 +303,6 @@ function SwapOfferDetails({ hash }) {
                                 </StyledTypography>
                             </StyledBox>
                             <StyledBox>
-                                <Typography>
-                                    1 {swapOffer.dstTokenName} = {swapOffer.displayExchangeRateSrcDst} {swapOffer.srcTokenName}
-                                </Typography>
-                            </StyledBox>
-                            <StyledBox>
                                 <StyledTypography>
                                     <Tooltip title={swapOffer.feeAmountInBaseUnit}>
                                         <Truncate>{swapOffer.feeAmountInBaseUnit}</Truncate>
@@ -290,7 +320,18 @@ function SwapOfferDetails({ hash }) {
                                     <Typography>{sliceAddress(swapOffer.dstAddress)}</Typography>
                                 </StyledBox>
                             )}
-                        </Grid>
+                            <StyledBox>
+                                <StyledExchangeRate>
+                                    <StyledTypography>1 {swapOffer.dstTokenName} =</StyledTypography>
+                                    <StyledAmountAndToken>
+                                        <Tooltip title={swapOffer.displayExchangeRateSrcDst}>
+                                            <Truncate>{swapOffer.displayExchangeRateSrcDst}</Truncate>
+                                        </Tooltip>
+                                        {swapOffer.srcTokenName}
+                                    </StyledAmountAndToken>
+                                </StyledExchangeRate>
+                            </StyledBox>
+                        </StyledInfoValues>
                     </Grid>
                 </BorderSection>
 
