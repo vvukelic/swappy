@@ -68,6 +68,16 @@ const ImageContainer = styled.div`
     }
 `;
 
+const FooterContainer = styled(Box)`
+    width: 100%;
+    padding: 1em 0;
+    background-color: #1b3a47;
+    color: white;
+    text-align: center;
+    font-size: 0.9em;
+    margin-top: auto;
+`;
+
 export default () => {
     function onDappBtnClick() {
         window.location.href = '/swap';
@@ -142,6 +152,7 @@ export default () => {
                     </ImageContainer>
                 </ContentContainer>
             </FrontpageBackgroundBox>
+            <FooterContainer>© 2024 Swappy</FooterContainer>
         </>
     );
 };
