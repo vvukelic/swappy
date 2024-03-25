@@ -7,18 +7,24 @@ import { BackgroundBox } from '../sharedStyles/general';
 
 const ContentContainer = styled.div`
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     padding: 0 50px;
     gap: 20px;
+    max-width: 1300px;
+    max-height: 560px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
         flex-direction: column;
         padding: 0 15px;
+        max-height: 1120px;
     }
 `;
 
 const FrontpageBackgroundBox = styled(BackgroundBox)`
+    display: flex;
+    justify-content: center;
+    width: 100%;
     padding: 0;
 `;
 
