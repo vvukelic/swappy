@@ -130,11 +130,11 @@ export default () => {
                     <TextContainer>
                         <h1>Why Swappy?</h1>
                         <ul>
-                            <li>Trustless transactions enabled by smart contract technology.</li>
-                            <li>Direct P2P trading, cutting out the middleman.</li>
-                            <li>Support for partial swap offers, enhancing flexibility.</li>
-                            <li>Secure and transparent process with blockchain verification.</li>
-                            <li>User-friendly interface for easy trading.</li>
+                            <li>Trustless transactions enabled by smart contract technology</li>
+                            <li>Direct P2P trading, cutting out the middleman</li>
+                            <li>Support for partial swap offers, enhancing flexibility</li>
+                            <li>Secure and transparent process with blockchain verification</li>
+                            <li>User-friendly interface for easy trading</li>
                         </ul>
                     </TextContainer>
                     <ImageContainer>
