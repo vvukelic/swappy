@@ -13,6 +13,7 @@ const ContentContainer = styled.div`
     gap: 20px;
     max-width: 1300px;
     max-height: 560px;
+    margin-bottom: 3em;
 
     @media (max-width: 600px) {
         flex-direction: column;
@@ -23,7 +24,9 @@ const ContentContainer = styled.div`
 
 const FrontpageBackgroundBox = styled(BackgroundBox)`
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
     width: 100%;
     padding: 0;
 `;
@@ -100,18 +103,42 @@ export default () => {
                     <TextContainer>
                         <h1>What is Swappy?</h1>
                         <p>Swappy is a platform facilitating decentralized, peer-to-peer (P2P) swaps, offering users a trustless environment for over-the-counter (OTC) trading.</p>
-                        {/* <h1>Why Swappy?</h1>
+                        <PrimaryButton onClick={onDappBtnClick} buttonText='Try it out' />
+                    </TextContainer>
+                    <ImageContainer>
+                        <img src='/images/swappy_logo.png' alt='Descriptive Alt Text' style={{ maxWidth: '100%', height: 'auto' }} />
+                    </ImageContainer>
+                </ContentContainer>
+                <ContentContainer>
+                    <ImageContainer>
+                        <img src='/images/example.png' alt='Descriptive Alt Text' style={{ maxWidth: '100%', height: 'auto' }} />
+                    </ImageContainer>
+                    <TextContainer>
+                        <h1>How to use Swappy?</h1>
+                        <ul>
+                            <li>Select the token you want to send</li>
+                            <li>Type in the amount you want to send</li>
+                            <li>Select the token you want to receive</li>
+                            <li>Type in the amount you want to receive</li>
+                            <li>Create a swap offer</li>
+                            <li>Send the url of a swap offer to your counterparty</li>
+                        </ul>
+                        <PrimaryButton onClick={onDappBtnClick} buttonText='Create a swap offer' />
+                    </TextContainer>
+                </ContentContainer>
+                <ContentContainer>
+                    <TextContainer>
+                        <h1>Why Swappy?</h1>
                         <ul>
                             <li>Trustless transactions enabled by smart contract technology.</li>
                             <li>Direct P2P trading, cutting out the middleman.</li>
                             <li>Support for partial swap offers, enhancing flexibility.</li>
                             <li>Secure and transparent process with blockchain verification.</li>
                             <li>User-friendly interface for easy trading.</li>
-                        </ul> */}
-                        <PrimaryButton onClick={onDappBtnClick} buttonText='Create a swap' />
+                        </ul>
                     </TextContainer>
                     <ImageContainer>
-                        <img src='/images/swappy_logo.png' alt='Descriptive Alt Text' style={{ maxWidth: '100%', height: 'auto' }} />
+                        <img src='/images/swappy_thinking.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
                     </ImageContainer>
                 </ContentContainer>
             </FrontpageBackgroundBox>
