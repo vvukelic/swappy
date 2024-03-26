@@ -5,7 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { createSwapForOffer, cancelSwapOffer, approveToken, getEthBalance, getAllowance } from '../utils/web3';
+import { createSwapForOffer, cancelSwapOffer, approveToken, getNativeTokenBalance, getAllowance } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
@@ -86,7 +86,7 @@ function SwapOfferDetails({ hash }) {
             let tokenBalance = null;
 
             if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
-                tokenBalance = await getEthBalance(defaultAccount);
+                tokenBalance = await getNativeTokenBalance(defaultAccount);
                 setTokenApproved(tokenBalance > 0);
             } else {
                 tokenBalance = await getAllowance(swapOffer.dstTokenAddress, defaultAccount, contractAddresses.SwapManager[network]);

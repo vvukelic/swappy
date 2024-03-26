@@ -131,7 +131,7 @@ export default () => {
                             <li>Select the token you want to receive</li>
                             <li>Type in the amount you want to receive</li>
                             <li>Create a swap offer</li>
-                            <li>Send the url of a swap offer to your counterparty</li>
+                            <li>Send the url of the swap offer to your counterparty</li>
                         </ul>
                         <PrimaryButton onClick={onDappBtnClick} buttonText='Create a swap offer' />
                     </TextContainer>

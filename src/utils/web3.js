@@ -71,7 +71,7 @@ export async function switchNetwork(networkKey) {
     }
 };
 
-export async function getEthBalance(address) {
+export async function getNativeTokenBalance(address) {
     if (!address) return null;
 
     try {

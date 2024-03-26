@@ -75,7 +75,6 @@ function SelectToken({ selectedToken, selectedTokenDecimals, amount, setAmount, 
     }, [selectedToken]);
 
     function handleAmountOnChange(e) {
-        // const value = e.target.value.replace(/^0+/, '').replace(/(\..*?)\..*/g, '$1');
         let value = e.target.value
             .replace(/[^\d.]/g, '') // Allow numbers and dot only.
             .replace(/^0+(\d)/, '$1') // Remove leading zeros.

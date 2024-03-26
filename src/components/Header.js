@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { getEthBalance, getNetworkName, switchNetwork } from '../utils/web3';
+import { getNativeTokenBalance, getNetworkName, switchNetwork } from '../utils/web3';
 import { sliceAddress } from '../utils/general';
 import networks from '../data/networks';
 import PrimaryButton from './PrimaryButton';
@@ -114,7 +114,7 @@ const NativeCoinBalance = styled(Typography)`
 
 function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
-    const [ethBalance, setEthBalance] = useState(null);
+    const [nativeTokenBalance, setNativeTokenBalance] = useState(null);
     const [networkName, setNetworkName] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:900px)');
@@ -125,10 +125,10 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     useEffect(() => {
         const fetchBalance = async () => {
             if (defaultAccount) {
-                let balance = await getEthBalance(defaultAccount);
+                let balance = await getNativeTokenBalance(defaultAccount);
                 balance = ethers.utils.formatEther(balance);
                 balance = parseFloat(balance).toFixed(2);
-                setEthBalance(balance);
+                setNativeTokenBalance(balance);
             }
         };
 
@@ -236,9 +236,9 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             </StyledTabButton>
             <Box flexGrow={1} />
             {isMobile && <Box sx={{ borderTop: 1, color: 'white' }} />}
-            {ethBalance !== null && (
+            {nativeTokenBalance !== null && (
                 <NativeCoinBalance variant='h6' color='white'>
-                    {ethBalance} ETH
+                    {nativeTokenBalance} {networks[networkName].nativeCurrency.symbol}
                 </NativeCoinBalance>
             )}
             {/* {network !== null && <NetworkSelector networkName={networkName} sx={{ marginRight: '15px' }} />} */}

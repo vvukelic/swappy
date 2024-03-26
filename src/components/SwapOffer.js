@@ -13,6 +13,7 @@ import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
+import networks from '../data/networks';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -81,6 +82,7 @@ function SwapOffer({
             }
 
             let tokenAddress = token.networkSpecificAddress[network];
+
             if (tokenAddress === ethers.constants.AddressZero) {
                 tokenAddress = getTokenByName('WETH').networkSpecificAddress[network];
             }
@@ -99,33 +101,34 @@ function SwapOffer({
     }, []);
 
     useEffect(() => {
-        if (!selectedSrcToken) {
-            handleTokenSelection(getTokenByName('ETH'), 'src');
+        if (network) {
+            handleTokenSelection(getTokenByName(networks[network].nativeCurrency.symbol), 'src');
         }
 
-        if (!selectedDstToken) {
-            handleTokenSelection(getTokenByName('USDC'), 'dst');
-        }
-    }, [defaultAccount]);
+        handleTokenSelection(getTokenByName('USDC'), 'dst');
+    }, [defaultAccount, network]);
 
     useEffect(() => {
         async function swapOfferButtonText() {
             const tokenAddress = selectedSrcToken.networkSpecificAddress[network];
-            const defaultAccountSrcTokenBalance = await getTokenBalance(defaultAccount, tokenAddress);
 
-            const srcAmountInt = await toSmallestUnit(srcAmount, tokenAddress);
+            if (tokenAddress) {
+                const defaultAccountSrcTokenBalance = await getTokenBalance(defaultAccount, tokenAddress);
 
-            if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
-                setInsufficientSrcTokenAmount(false);
+                const srcAmountInt = await toSmallestUnit(srcAmount, tokenAddress);
 
-                if (tokenApproved) {
-                    setSwapOfferButtonText('Create Swap Offer');
+                if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
+                    setInsufficientSrcTokenAmount(false);
+
+                    if (tokenApproved) {
+                        setSwapOfferButtonText('Create Swap Offer');
+                    } else {
+                        setSwapOfferButtonText(`Approve ${selectedSrcToken.name} Token`);
+                    }
                 } else {
-                    setSwapOfferButtonText(`Approve ${selectedSrcToken.name} Token`);
+                    setInsufficientSrcTokenAmount(true);
+                    setSwapOfferButtonText(`Insufficient ${selectedSrcToken.name} balance`);
                 }
-            } else {
-                setInsufficientSrcTokenAmount(true);
-                setSwapOfferButtonText(`Insufficient ${selectedSrcToken.name} balance`);
             }
         }
 
@@ -137,33 +140,42 @@ function SwapOffer({
     useEffect(() => {
         async function srcTokenHoldingsAmount() {
             const tokenContract = selectedSrcToken.networkSpecificAddress[network];
-            const tokenBalance = await getTokenBalance(defaultAccount, tokenContract);
-            setDefaultAccountSrcTokenBalance(await toBaseUnit(tokenBalance, tokenContract));
+
+            if (tokenContract) {
+                const tokenBalance = await getTokenBalance(defaultAccount, tokenContract);
+                setDefaultAccountSrcTokenBalance(await toBaseUnit(tokenBalance, tokenContract));
+            }
         }
 
         async function getSrcTokenDecimals() {
             const tokenAddress = selectedSrcToken.networkSpecificAddress[network];
-            const srcTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(tokenAddress);
-            setSelectedSrcTokenDecimals(srcTokenDecimals);
+
+            if (tokenAddress) {
+                const srcTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(tokenAddress);
+                setSelectedSrcTokenDecimals(srcTokenDecimals);
+            }
         }
 
         if (defaultAccount && selectedSrcToken) {
             srcTokenHoldingsAmount();
             getSrcTokenDecimals();
         }
-    }, [network, selectedSrcToken]);
+    }, [network, defaultAccount, selectedSrcToken]);
 
     useEffect(() => {
         async function getDstTokenDecimals() {
             const tokenAddress = selectedDstToken.networkSpecificAddress[network];
-            const dstTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(tokenAddress);
-            setSelectedDstTokenDecimals(dstTokenDecimals);
+
+            if (tokenAddress) {
+                const dstTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(tokenAddress);
+                setSelectedDstTokenDecimals(dstTokenDecimals);
+            }
         }
 
         if (defaultAccount && selectedDstToken) {
             getDstTokenDecimals();
         }
-    }, [network, selectedDstToken]);
+    }, [network, defaultAccount, selectedDstToken]);
 
     const handleSwapOfferButtonClick = async () => {
         if (!defaultAccount) {

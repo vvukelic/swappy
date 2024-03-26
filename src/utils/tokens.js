@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 import commonTokens from '../data/commonTokens.json';
-import { getTokenDecimals, getEthBalance, getErc20TokenBalance } from './web3';
+import { getTokenDecimals, getNativeTokenBalance, getErc20TokenBalance } from './web3';
 
 let tokensByAddressCache = {};
 let tokensByNameCache = {};
@@ -145,7 +145,7 @@ export async function getTokenBalance(accountAddress, tokenContractAddress) {
     let tokenBalance = null;
 
     if (tokenContractAddress === ethers.constants.AddressZero) {
-        tokenBalance = await getEthBalance(accountAddress);
+        tokenBalance = await getNativeTokenBalance(accountAddress);
     } else {
         tokenBalance = await getErc20TokenBalance(tokenContractAddress, accountAddress);
     }
