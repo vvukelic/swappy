@@ -44,6 +44,7 @@ contract SwapManager is ReentrancyGuard {
     mapping(address => bytes32[]) public userSwapOffers;
     mapping(address => bytes32[]) public swapOffersForUser;
     mapping(address => bytes32[]) public swapOffersTakenByUser;
+    mapping(address => uint256) private nonces;
     address constant private _wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     IWETH constant private _weth = IWETH(_wethAddress);
     AggregatorV3Interface internal priceFeed;
@@ -87,22 +88,17 @@ contract SwapManager is ReentrancyGuard {
             newSwapOffer.expirationTime = 0;
         }
 
-        uint salt = block.number;
-        bytes32 newSwapKey;
+        bytes32 newSwapHash = keccak256(abi.encode(newSwapOffer, nonces[msg.sender], msg.sender));
+        nonces[msg.sender] += 1;
 
-        do {
-            newSwapKey = keccak256(abi.encode(newSwapOffer, salt, msg.sender));
-            salt += 1; 
-        } while (swapOffers[newSwapKey].srcAddress != address(0));
-
-        swapOffers[newSwapKey] = newSwapOffer;
-        userSwapOffers[address(msg.sender)].push(newSwapKey);
+        swapOffers[newSwapHash] = newSwapOffer;
+        userSwapOffers[address(msg.sender)].push(newSwapHash);
 
         if (dstAddress != address(0)) {
-            swapOffersForUser[dstAddress].push(newSwapKey);
+            swapOffersForUser[dstAddress].push(newSwapHash);
         }
 
-        emit SwapOfferCreated(msg.sender, newSwapKey);
+        emit SwapOfferCreated(msg.sender, newSwapHash);
     }
 
     function getSwapOffer(bytes32 swapOfferHash) public view returns (SwapOffer memory) {
