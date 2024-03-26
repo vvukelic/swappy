@@ -84,7 +84,7 @@ function SwapOffer({
             let tokenAddress = token.networkSpecificAddress[network];
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByName('WETH').networkSpecificAddress[network];
+                tokenAddress = getTokenByName(networks[network].wrappedNativeCurrencySymbol).networkSpecificAddress[network];
             }
 
             const availableTokenBalance = await getAllowance(tokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
@@ -184,7 +184,7 @@ function SwapOffer({
             let tokenAddress = selectedSrcToken.networkSpecificAddress[network];
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByName('WETH').networkSpecificAddress[network];
+                tokenAddress = getTokenByName(networks[network].wrappedNativeCurrencySymbol).networkSpecificAddress[network];
             }
 
             startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
@@ -265,7 +265,7 @@ function SwapOffer({
 
         let newSrcTokenAddress = selectedDstToken.networkSpecificAddress[network];
         if (newSrcTokenAddress === ethers.constants.AddressZero) {
-            newSrcTokenAddress = getTokenByName('WETH').networkSpecificAddress[network];
+            newSrcTokenAddress = getTokenByName(networks[network].wrappedNativeCurrencySymbol).networkSpecificAddress[network];
         }
 
         const availableTokenBalance = await getAllowance(newSrcTokenAddress, defaultAccount, contractAddresses.SwapManager[network]);

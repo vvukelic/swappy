@@ -20,6 +20,7 @@ import TransactionStatusModal from './TransactionStatusModal';
 import SwapStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
 import { Truncate } from '../sharedStyles/general';
+import networks from '../data/networks';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -105,7 +106,7 @@ function SwapOfferDetails({ hash }) {
                 setSwapButtonText('Take swap');
             } else {
                 if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
-                    setSwapButtonText('ETH balance too low');
+                    setSwapButtonText(`${networks[network].wrappedNativeCurrencySymbol} balance too low`);
                 } else {
                     setSwapButtonText(`Approve ${swapOffer.dstTokenName} Token`);
                 }
@@ -307,7 +308,7 @@ function SwapOfferDetails({ hash }) {
                                     <Tooltip title={swapOffer.feeAmountInBaseUnit}>
                                         <Truncate>{swapOffer.feeAmountInBaseUnit}</Truncate>
                                     </Tooltip>
-                                    ETH
+                                    {networks[network].nativeCurrency.symbol}
                                 </StyledTypography>
                             </StyledBox>
                             {swapOffer.displayExpirationTime && (

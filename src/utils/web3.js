@@ -78,7 +78,7 @@ export async function getNativeTokenBalance(address) {
         let balance = await getProvider().getBalance(address);
         return balance
     } catch (error) {
-        console.error('Error fetching ETH balance:', error);
+        console.error('Error fetching balance:', error);
         return null;
     }
 }

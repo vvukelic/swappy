@@ -20,7 +20,7 @@ class SwapOffer {
 
             if (!this.expirationTime.isZero() && this.expirationTime.lt(ethers.BigNumber.from(this.currentBlockTimestamp))) {
                 return 'EXPIRED';
-            } else if (this.srcAccountTokenBalance.lt(this.srcAmount)) {
+            } else if (this.srcAccountTokenBalance.lt(this.remainingSrcAmountSum)) {
                 return 'ERROR';
             } else {
                 return 'OPENED';
@@ -98,7 +98,6 @@ class SwapOffer {
         this.srcAccountTokenBalance = await getTokenBalance(this.srcAddress, this.srcTokenAddress);
         this.swapsDstAmountSum = this.getSwapsDstAmountSum();
         this.filledPercentage = this.swapsDstAmountSum.mul(100).div(swapOffer.dstAmount).toNumber();
-        this.readableStatus = this.getSwapOfferStatus();
 
         this.scalingFactor = ethers.BigNumber.from('10').pow(18);
         this.exchangeRate = this.srcAmount.mul(this.scalingFactor).div(this.dstAmount);
@@ -106,6 +105,8 @@ class SwapOffer {
 
         this.remainingDstAmountSum = this.dstAmount.sub(this.swapsDstAmountSum);
         this.remainingSrcAmountSum = this.remainingDstAmountSum.eq(this.dstAmount) ? this.srcAmount : this.remainingDstAmountSum.mul(this.exchangeRate).div(this.scalingFactor);
+
+        this.readableStatus = this.getSwapOfferStatus();
     }
 }
 
