@@ -53,7 +53,7 @@ const networks = {
             decimals: 18,
         },
         wrappedNativeCurrencySymbol: 'WETH',
-        color: '#627EEA',
+        color: '#3d5dd7',
         logo: '/images/eth-logo.png',
         blockExplorerUrls: ['https://goerli.etherscan.io'],
     },
@@ -68,7 +68,7 @@ const networks = {
             decimals: 18,
         },
         wrappedNativeCurrencySymbol: 'WETH',
-        color: '#627EEA',
+        color: '#3d5dd7',
         logo: '/images/eth-logo.png',
     },
 };

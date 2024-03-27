@@ -39,12 +39,13 @@ contract SwapManager is ReentrancyGuard {
 
     address public owner;
     address payable public feeAddress;
+    bytes32[] public allSwapOffers;
     mapping(bytes32 => SwapOffer) public swapOffers;
-    mapping(bytes32 => Swap[]) public swaps;
+    mapping(bytes32 => Swap[]) public swapOfferSwaps;
     mapping(address => bytes32[]) public userSwapOffers;
     mapping(address => bytes32[]) public swapOffersForUser;
     mapping(address => bytes32[]) public swapOffersTakenByUser;
-    mapping(address => uint256) private nonces;
+    uint256 private nonce;
     address constant private _wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     IWETH constant private _weth = IWETH(_wethAddress);
     AggregatorV3Interface internal priceFeed;
@@ -88,17 +89,37 @@ contract SwapManager is ReentrancyGuard {
             newSwapOffer.expirationTime = 0;
         }
 
-        bytes32 newSwapHash = keccak256(abi.encode(newSwapOffer, nonces[msg.sender], msg.sender));
-        nonces[msg.sender] += 1;
+        bytes32 newSwapOfferHash = keccak256(abi.encode(newSwapOffer, nonce, msg.sender));
 
-        swapOffers[newSwapHash] = newSwapOffer;
-        userSwapOffers[address(msg.sender)].push(newSwapHash);
-
-        if (dstAddress != address(0)) {
-            swapOffersForUser[dstAddress].push(newSwapHash);
+        unchecked {
+            nonce += 1;
         }
 
-        emit SwapOfferCreated(msg.sender, newSwapHash);
+        swapOffers[newSwapOfferHash] = newSwapOffer;
+        userSwapOffers[address(msg.sender)].push(newSwapOfferHash);
+
+        if (dstAddress != address(0)) {
+            swapOffersForUser[dstAddress].push(newSwapOfferHash);
+        }
+
+        allSwapOffers.push(newSwapOfferHash);
+
+        emit SwapOfferCreated(msg.sender, newSwapOfferHash);
+    }
+
+    function getTotalSwapOffers() public view returns (uint) {
+        return allSwapOffers.length;
+    }
+
+    function getSwapOffersRange(uint startIndex, uint endIndex) public view returns (bytes32[] memory) {
+        require(startIndex < endIndex, "Invalid index range");
+        require(endIndex <= allSwapOffers.length, "Index out of bounds");
+
+        bytes32[] memory rangeSwapOffers = new bytes32[](endIndex - startIndex);
+        for (uint i = startIndex; i < endIndex; i++) {
+            rangeSwapOffers[i - startIndex] = allSwapOffers[i];
+        }
+        return rangeSwapOffers;
     }
 
     function getSwapOffer(bytes32 swapOfferHash) public view returns (SwapOffer memory) {
@@ -106,7 +127,7 @@ contract SwapManager is ReentrancyGuard {
     }
 
     function getSwapsForOffer(bytes32 swapOfferHash) public view returns (Swap[] memory) {
-        return swaps[swapOfferHash];
+        return swapOfferSwaps[swapOfferHash];
     }
 
     function getUserSwapOffers(address userAddress) public view returns (bytes32[] memory) {
@@ -124,7 +145,7 @@ contract SwapManager is ReentrancyGuard {
     function createSwapForOffer(bytes32 swapOfferHash, uint partialDstAmount) public payable nonReentrant {
         address swapManagerAddress = address(this);
         SwapOffer storage swapOffer = swapOffers[swapOfferHash];
-        Swap[] storage swapsForOffer = swaps[swapOfferHash];
+        Swap[] storage swapsForOffer = swapOfferSwaps[swapOfferHash];
 
         require(swapOffer.srcAddress != address(0), "Non existing swap offer!");
         require(swapOffer.status == SwapStatus.OPENED, "Can't create swap for offer that is not in OPENED status!");

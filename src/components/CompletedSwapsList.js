@@ -22,12 +22,12 @@ function CompletedSwapsList() {
 
     useEffect(() => {
         const fetchUserCompletedSwapsList = async () => {
-            const swapOffersTakenByUserHashes = await getSwapOffersTakenByUser(contractAddresses.SwapManager[network], defaultAccount);
+            const swapOffersTakenByUserHashes = new Set(await getSwapOffersTakenByUser(contractAddresses.SwapManager[network], defaultAccount));
             const swaps = [];
 
-            for (let i = 0; i < swapOffersTakenByUserHashes.length; i++) {
+            for (const swapOfferHash of swapOffersTakenByUserHashes) {
                 const swapOffer = new SwapOffer(network);
-                await swapOffer.load(swapOffersTakenByUserHashes[i]);
+                await swapOffer.load(swapOfferHash);
 
                 swapOffer.swaps.map((swap, index) => {
                     if (swap.dstAddress !== defaultAccount) {
@@ -45,7 +45,7 @@ function CompletedSwapsList() {
                         displayYouReceivedTokenName: swapOffer.srcTokenName,
                     });
                 });
-            }
+            };
 
             const userSwapOffersHashes = await getUserSwapOffers(contractAddresses.SwapManager[network], defaultAccount);
 

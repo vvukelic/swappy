@@ -103,6 +103,8 @@ function SwapOffer({
     useEffect(() => {
         if (network) {
             handleTokenSelection(getTokenByName(networks[network].nativeCurrency.symbol), 'src');
+        } else {
+            handleTokenSelection(getTokenByName('ETH'), 'src');
         }
 
         handleTokenSelection(getTokenByName('USDC'), 'dst');
