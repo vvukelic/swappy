@@ -22,7 +22,7 @@ function CompletedSwapsList() {
 
     useEffect(() => {
         const fetchUserCompletedSwapsList = async () => {
-            const swapOffersTakenByUserHashes = new Set(await getSwapOffersTakenByUser(contractAddresses.SwapManager[network], defaultAccount));
+            const swapOffersTakenByUserHashes = new Set(await getSwapOffersTakenByUser(contractAddresses[network].SwappyData, defaultAccount));
             const swaps = [];
 
             for (const swapOfferHash of swapOffersTakenByUserHashes) {
@@ -47,7 +47,7 @@ function CompletedSwapsList() {
                 });
             };
 
-            const userSwapOffersHashes = await getUserSwapOffers(contractAddresses.SwapManager[network], defaultAccount);
+            const userSwapOffersHashes = await getUserSwapOffers(contractAddresses[network].SwappyData, defaultAccount);
 
             await Promise.all(
                 userSwapOffersHashes.map(async (hash) => {

@@ -76,6 +76,10 @@ function SwapOffer({
     };
 
     const handleTokenSelection = async (token, type) => {
+        if (!network) {
+            return;
+        }
+
         if (type === 'src') {
             if (token === selectedSrcToken) {
                 return;
@@ -87,7 +91,7 @@ function SwapOffer({
                 tokenAddress = getTokenByName(networks[network].wrappedNativeCurrencySymbol).networkSpecificAddress[network];
             }
 
-            const availableTokenBalance = await getAllowance(tokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
+            const availableTokenBalance = await getAllowance(tokenAddress, defaultAccount, contractAddresses[network].SwappyManager);
             setTokenApproved(availableTokenBalance > 0);
 
             setSelectedSrcToken(token);
@@ -192,7 +196,7 @@ function SwapOffer({
             startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
 
             try {
-                const receipt = await approveToken(tokenAddress, contractAddresses.SwapManager[network]);
+                const receipt = await approveToken(tokenAddress, contractAddresses[network].SwappyManager);
 
                 if (receipt.status === 1) {
                     endTransaction(true, `You successfuly approved ${selectedSrcToken.name.toUpperCase()}!`);
@@ -222,7 +226,7 @@ function SwapOffer({
 
             try {
                 const receipt = await createSwapOffer(
-                    contractAddresses.SwapManager[network],
+                    contractAddresses[network].SwappyManager,
                     selectedSrcToken.networkSpecificAddress[network],
                     srcAmountInt,
                     selectedDstToken.networkSpecificAddress[network],
@@ -270,7 +274,7 @@ function SwapOffer({
             newSrcTokenAddress = getTokenByName(networks[network].wrappedNativeCurrencySymbol).networkSpecificAddress[network];
         }
 
-        const availableTokenBalance = await getAllowance(newSrcTokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
+        const availableTokenBalance = await getAllowance(newSrcTokenAddress, defaultAccount, contractAddresses[network].SwappyManager);
         setTokenApproved(availableTokenBalance > 0);
     };
 
@@ -304,15 +308,15 @@ function SwapOffer({
                         <FormControlLabel control={<StyledSwitch onChange={() => setExpirationEnabled(!expirationEnabled)} checked={expirationEnabled} />} label='Expires In:' sx={{ color: 'white' }} />
                     </Grid>
                     <Grid item xs={3} sm={4}>
-                        <TextField label='Hours' variant='outlined' type='number' value={expiresInHours} onChange={(e) => setExpiresInHours(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                        <TextField label='Hours' variant='outlined' type='number' value={expiresInHours} onChange={(e) => setExpiresInHours(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} />
                     </Grid>
                     <Grid item xs={3} sm={4}>
-                        <TextField label='Minutes' variant='outlined' type='number' value={expiresInMinutes} onChange={(e) => setExpiresInMinutes(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                        <TextField label='Minutes' variant='outlined' type='number' value={expiresInMinutes} onChange={(e) => setExpiresInMinutes(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} />
                     </Grid>
                 </Grid>
 
                 <Grid item xs={12} sx={{ color: 'white', padding: '0 16px' }}>
-                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth InputLabelProps={{ style: { color: 'white' } }} />
                 </Grid>
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px' }}>

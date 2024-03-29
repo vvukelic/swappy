@@ -32,7 +32,7 @@ const RelativePositionContainer = styled.div`
     display: grid;
 `;
 
-const StyledTabButton = styled(Button)`
+const StyledTabButton = styled(({ isActive, ...props }) => <Button {...props} />)`
     margin-left: 10px;
     color: white;
     background-color: ${(props) => (props.isActive ? '#396777' : 'transparent')};
@@ -64,8 +64,7 @@ const StyledHoverMenu = styled(Box)`
         width: auto;
     }
 `;
-
-const NetworkButton = styled(Button)`
+const NetworkButton = styled(({ bgColor, ...props }) => <Button {...props} />)`
     color: white;
     background-color: ${(props) => props.bgColor || 'transparent'};
     display: flex;

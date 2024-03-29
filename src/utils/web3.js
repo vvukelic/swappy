@@ -3,7 +3,8 @@ import networks from '../data/networks';
 
 
 const erc20Abi = require('../contracts/Erc20.json');
-const swapManagerAbi = require('../contracts/Swap.json');
+const swappyManagerAbi = require('../contracts/SwappyManager.json');
+const swappyDataAbi = require('../contracts/SwappyData.json');
 
 export function getProvider() {
     let provider;
@@ -167,7 +168,7 @@ export async function approveToken(tokenContractAddress, spenderAddress) {
 
 export async function createSwapOffer(contractAddress, srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn, partialFillEnabled) {
     const signer = getProvider().getSigner();
-    const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
+    const swapManagerContract = new ethers.Contract(contractAddress, swappyManagerAbi, signer);
     let ethValue = 0;
 
     if (srcTokenAddress === ethers.constants.AddressZero) {
@@ -185,21 +186,21 @@ export async function createSwapOffer(contractAddress, srcTokenAddress, srcAmoun
 }
 
 export async function getSwapOfferRaw(contractAddress, swapOfferHash) {
-    const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
-    const swapOffer = await swapManagerContract.getSwapOffer(swapOfferHash);
+    const swappyDataContract = new ethers.Contract(contractAddress, swappyDataAbi, getProvider());
+    const swapOffer = await swappyDataContract.getSwapOffer(swapOfferHash);
     return swapOffer;
 }
 
 export async function getSwapsForOffer(contractAddress, swapOfferHash) {
-    const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
-    const swapsForOffer = await swapManagerContract.getSwapsForOffer(swapOfferHash);
+    const swappyDataContract = new ethers.Contract(contractAddress, swappyDataAbi, getProvider());
+    const swapsForOffer = await swappyDataContract.getSwapOfferSwaps(swapOfferHash);
     return swapsForOffer;
 }
 
 export async function getUserSwapOffers(contractAddress, userAddress) {
     try {
-        const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
-        const swapOffersHashes = await contract.getUserSwapOffers(userAddress);
+        const swappyDataContract = new ethers.Contract(contractAddress, swappyDataAbi, getProvider());
+        const swapOffersHashes = await swappyDataContract.getUserSwapOffers(userAddress);
         return swapOffersHashes;
     } catch (error) {
         console.error('Error fetching user swaps:', error);
@@ -209,8 +210,8 @@ export async function getUserSwapOffers(contractAddress, userAddress) {
 
 export async function getSwapOffersForUser(contractAddress, userAddress){
     try {
-        const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
-        const swapOffersHashes = await contract.getSwapOffersForUser(userAddress);
+        const swappyDataContract = new ethers.Contract(contractAddress, swappyDataAbi, getProvider());
+        const swapOffersHashes = await swappyDataContract.getSwapOffersForUser(userAddress);
         return swapOffersHashes;
     } catch (error) {
         console.error('Error fetching destination user swaps:', error);
@@ -220,8 +221,8 @@ export async function getSwapOffersForUser(contractAddress, userAddress){
 
 export async function getSwapOffersTakenByUser(contractAddress, userAddress) {
     try {
-        const contract = new ethers.Contract(contractAddress, swapManagerAbi, getProvider());
-        const swapOffersHashes = await contract.getSwapOffersTakenByUser(userAddress);
+        const swappyDataContract = new ethers.Contract(contractAddress, swappyDataAbi, getProvider());
+        const swapOffersHashes = await swappyDataContract.getSwapOffersTakenByUser(userAddress);
         return swapOffersHashes;
     } catch (error) {
         console.error('Error fetching swap offers taken by user:', error);
@@ -232,14 +233,14 @@ export async function getSwapOffersTakenByUser(contractAddress, userAddress) {
 export async function createSwapForOffer(contractAddress, swapHash, dstTokenAddress, dstAmount, feeAmount) {
     try {
         const signer = getProvider().getSigner();
-        const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
+        const swappyManagerContract = new ethers.Contract(contractAddress, swappyManagerAbi, signer);
         let nativeTokenAmount = 0;
 
         if (dstTokenAddress === ethers.constants.AddressZero) {
             nativeTokenAmount = dstAmount;
         }
 
-        const transaction = await swapManagerContract.createSwapForOffer(swapHash, dstAmount, { value: feeAmount.add(nativeTokenAmount) });
+        const transaction = await swappyManagerContract.createSwapForOffer(swapHash, dstAmount, { value: feeAmount.add(nativeTokenAmount) });
         const receipt = await transaction.wait();
 
         return receipt;
@@ -252,8 +253,8 @@ export async function createSwapForOffer(contractAddress, swapHash, dstTokenAddr
 export async function cancelSwapOffer(contractAddress, swapHash) {
     try {
         const signer = getProvider().getSigner();
-        const swapManagerContract = new ethers.Contract(contractAddress, swapManagerAbi, signer);
-        const transaction = await swapManagerContract.cancelSwapOffer(swapHash);
+        const swappyManagerContract = new ethers.Contract(contractAddress, swappyManagerAbi, signer);
+        const transaction = await swappyManagerContract.cancelSwapOffer(swapHash);
         const receipt = await transaction.wait();
 
         return receipt;

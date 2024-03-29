@@ -1,6 +1,6 @@
 {
-  "SwapManager": {
-    "localhost": "0x1eB5C49630E08e95Ba7f139BcF4B9BA171C9a8C7",
-    "goerli": "0x48e23A1732122B0EB0Cd16B6cca1C80903E192Ee"
+  "localhost": {
+    "SwappyData": "0xF357118EBd576f3C812c7875B1A1651a7f140E9C",
+    "SwappyManager": "0x519b05b3655F4b89731B677d64CEcf761f4076f6"
   }
 }

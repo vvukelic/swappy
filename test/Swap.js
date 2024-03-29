@@ -5,6 +5,7 @@ const { parseBytes32String } = require('ethers/lib/utils');
 const usdcTokenAddr = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 const maticTokenAddr = '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0';
 const wethTokenAddr = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
+const defaultAdminRole = ethers.constants.HashZero;
 
 async function getErc20Contract(tokenAddress) {
     return await ethers.getContractAt('../artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20', tokenAddress);
@@ -27,13 +28,18 @@ describe('SwapManager contract', function () {
         return fullTxInfo['cumulativeGasUsed'].toBigInt() * fullTxInfo['effectiveGasPrice'].toBigInt();
     }
 
-    async function deploySwapManagerFixture() {
-        const SwapManager = await ethers.getContractFactory('contracts/Swap.sol:SwapManager');
+    async function deploySwappyContractsFixture() {
+        const SwappyData = await ethers.getContractFactory('contracts/SwappyData.sol:SwappyData');
+        const hardhatSwappyData = await SwappyData.deploy();
+        await hardhatSwappyData.deployed();
+
+        const SwappyManager = await ethers.getContractFactory('contracts/SwappyManager.sol:SwappyManager');
         const [owner, feeAddr, addr1, addr2, addr3] = await ethers.getSigners();
 
-        const hardhatSwapManager = await SwapManager.deploy(feeAddr.address);
+        const hardhatSwappyManager = await SwappyManager.deploy(hardhatSwappyData.address, feeAddr.address);
+        await hardhatSwappyManager.deployed();
 
-        await hardhatSwapManager.deployed();
+        hardhatSwappyData.connect(owner).addManager(hardhatSwappyManager.address);
 
         // transfer usdc to addr1
         await transferErc20Token(usdcTokenAddr, '0xF977814e90dA44bFA03b6295A0616a897441aceC', addr1.address, 100000000);
@@ -41,32 +47,37 @@ describe('SwapManager contract', function () {
         // transfer matic to addr2
         await transferErc20Token(maticTokenAddr, '0x50d669F43b484166680Ecc3670E4766cdb0945CE', addr2.address, 100000000);
 
-        return { SwapManager, hardhatSwapManager, owner, feeAddr, addr1, addr2, addr3 };
+        return { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2, addr3 };
     }
 
     describe('Deployment', function () {
-        it('Right owner', async function () {
-            const { hardhatSwapManager, owner } = await loadFixture(deploySwapManagerFixture);
-            expect(await hardhatSwapManager.owner()).to.equal(owner.address);
+        it('Deployer has the default admin role (SwappyData)', async function () {
+            const { hardhatSwappyData, owner } = await loadFixture(deploySwappyContractsFixture);
+            expect(await hardhatSwappyData.hasRole(defaultAdminRole, owner.address)).to.equal(true);
+        });
+
+        it('Deployer has the default admin role (SwappyManager)', async function () {
+            const { hardhatSwappyManager, owner } = await loadFixture(deploySwappyContractsFixture);
+            expect(await hardhatSwappyManager.hasRole(defaultAdminRole, owner.address)).to.equal(true);
         });
     });
 
     describe('Swaps', function () {
         it('ERC20 -> ERC20 swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
             const srcAmount = 100000;
             const dstAmount = 100000;
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
             expect(swapObj['status']).to.equal(0);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
-            await usdcContract.connect(addr1).approve(hardhatSwapManager.address, srcAmount);
+            await usdcContract.connect(addr1).approve(hardhatSwappyManager.address, srcAmount);
 
             const maticContract = await getErc20Contract(maticTokenAddr);
-            await maticContract.connect(addr2).approve(hardhatSwapManager.address, dstAmount);
+            await maticContract.connect(addr2).approve(hardhatSwappyManager.address, dstAmount);
 
             const oldBalances = {
                 usdcAddr1: (await usdcContract.balanceOf(addr1.address)),
@@ -77,7 +88,7 @@ describe('SwapManager contract', function () {
                 initialFeeAddrBalance: (await ethers.provider.getBalance(feeAddr.address)),
             };
 
-            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, dstAmount, { value: swapObj.feeAmount });
+            await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, dstAmount, { value: swapObj.feeAmount });
 
             expect(await usdcContract.balanceOf(addr1.address)).to.equal(oldBalances['usdcAddr1'].sub(srcAmount));
             expect(await maticContract.balanceOf(addr1.address)).to.equal(oldBalances['maticAddr1'].add(dstAmount));
@@ -88,12 +99,12 @@ describe('SwapManager contract', function () {
             expect(await usdcContract.balanceOf(owner.address)).to.equal(Number(oldBalances['initialOwnerBalance']));
             expect(await ethers.provider.getBalance(feeAddr.address)).to.equal(oldBalances['initialFeeAddrBalance'].add(swapObj.feeAmount));
 
-            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const swapsForOffer = await hardhatSwappyData.getSwapOfferSwaps(swapHash);
             expect(swapsForOffer.length).to.equal(1);
         });
 
         it('ERC20 -> ETH swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
 
@@ -109,15 +120,15 @@ describe('SwapManager contract', function () {
             const srcAmount = 100000;
             const dstAmount = ethers.utils.parseUnits('1', 'ether');
 
-            const approveTx = await usdcContract.connect(addr1).approve(hardhatSwapManager.address, srcAmount);
+            const approveTx = await usdcContract.connect(addr1).approve(hardhatSwappyManager.address, srcAmount);
             let addr1SpentGas = await calculateTxCost(approveTx);
 
-            const swapTx = await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, ethers.constants.AddressZero, dstAmount, ethers.constants.AddressZero, 0, false);
+            const swapTx = await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, ethers.constants.AddressZero, dstAmount, ethers.constants.AddressZero, 0, false);
             addr1SpentGas += await calculateTxCost(swapTx);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
 
-            const takeSwapTx = await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, dstAmount, { value: dstAmount.add(swapObj.feeAmount) });
+            const takeSwapTx = await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, dstAmount, { value: dstAmount.add(swapObj.feeAmount) });
             const addr2SpentGas = await calculateTxCost(takeSwapTx);
 
             expect(await ethers.provider.getBalance(addr1.address)).to.equal(oldBalances['ethAddr1'].add(dstAmount).sub(addr1SpentGas));
@@ -129,12 +140,12 @@ describe('SwapManager contract', function () {
             expect(await usdcContract.balanceOf(owner.address)).to.equal(oldBalances['initialOwnerBalance']);
             expect(await ethers.provider.getBalance(feeAddr.address)).to.equal(oldBalances['initialFeeAddrBalance'].add(swapObj.feeAmount));
 
-            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const swapsForOffer = await hardhatSwappyData.getSwapOfferSwaps(swapHash);
             expect(swapsForOffer.length).to.equal(1);
         });
 
         it('ETH -> ERC20 swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
             const srcAmount = ethers.utils.parseUnits('1', 'ether');
             const dstAmount = 100000;
@@ -151,18 +162,18 @@ describe('SwapManager contract', function () {
                 initialFeeAddrBalance: (await ethers.provider.getBalance(feeAddr.address)),
             };
 
-            const approveMaticTx = await maticContract.connect(addr2).approve(hardhatSwapManager.address, dstAmount);
+            const approveMaticTx = await maticContract.connect(addr2).approve(hardhatSwappyManager.address, dstAmount);
             let addr2SpentGas = await calculateTxCost(approveMaticTx);
 
-            const swapTx = await hardhatSwapManager.connect(addr1).createSwapOffer(ethers.constants.AddressZero, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, false, { value: srcAmount });
+            const swapTx = await hardhatSwappyManager.connect(addr1).createSwapOffer(ethers.constants.AddressZero, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, false, { value: srcAmount });
             let addr1SpentGas = await calculateTxCost(swapTx);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
 
-            const approveWethTx = await wethContract.connect(addr1).approve(hardhatSwapManager.address, srcAmount);
+            const approveWethTx = await wethContract.connect(addr1).approve(hardhatSwappyManager.address, srcAmount);
             addr1SpentGas += await calculateTxCost(approveWethTx);
 
-            const takeSwapTx = await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, dstAmount, { value: swapObj.feeAmount });
+            const takeSwapTx = await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, dstAmount, { value: swapObj.feeAmount });
             addr2SpentGas += await calculateTxCost(takeSwapTx);
 
             expect(await ethers.provider.getBalance(addr1.address)).to.equal(oldBalances['ethAddr1'].sub(srcAmount).sub(addr1SpentGas));
@@ -174,127 +185,127 @@ describe('SwapManager contract', function () {
             expect(await wethContract.balanceOf(owner.address)).to.equal(oldBalances['initialOwnerBalance']);
             expect(await ethers.provider.getBalance(feeAddr.address)).to.equal(oldBalances['initialFeeAddrBalance'].add(swapObj.feeAmount));
 
-            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const swapsForOffer = await hardhatSwappyData.getSwapOfferSwaps(swapHash);
             expect(swapsForOffer.length).to.equal(1);
         });
 
         it('Cancel a swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
 
-            await hardhatSwapManager.connect(addr1).cancelSwapOffer(swapHash);
+            await hardhatSwappyManager.connect(addr1).cancelSwapOffer(swapHash);
 
-            expect((await hardhatSwapManager.swapOffers(swapHash))['status']).to.equal(1);
+            expect((await hardhatSwappyData.getSwapOffer(swapHash))['status']).to.equal(1);
         });
 
         it('Fail to take own swap', async function () {
-            const { hardhatSwapManager, addr1 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, addr1 } = await loadFixture(deploySwappyContractsFixture);
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
 
-            await expect(hardhatSwapManager.connect(addr1).createSwapForOffer(swapHash, 1)).to.be.revertedWith('Cannot create swap for own swap offer!');
+            await expect(hardhatSwappyManager.connect(addr1).createSwapForOffer(swapHash, 1)).to.be.revertedWith('Cannot create swap for own swap offer!');
         });
 
         it('Fail to take non-existent swap', async function () {
-            const { hardhatSwapManager, addr1 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, addr1 } = await loadFixture(deploySwappyContractsFixture);
 
             const nonExistentSwapHash = ethers.utils.keccak256(ethers.utils.randomBytes(32));
 
-            await expect(hardhatSwapManager.connect(addr1).createSwapForOffer(nonExistentSwapHash, 1)).to.be.revertedWith('Non existing swap offer!');
+            await expect(hardhatSwappyManager.connect(addr1).createSwapForOffer(nonExistentSwapHash, 1)).to.be.revertedWith('Non existing swap offer!');
         });
 
         it("Fail to cancel someone else's swap", async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
 
-            await expect(hardhatSwapManager.connect(addr2).cancelSwapOffer(swapHash)).to.be.revertedWith('Only swap offer initiator can cancel a swap offer!');
+            await expect(hardhatSwappyManager.connect(addr2).cancelSwapOffer(swapHash)).to.be.revertedWith('Only swap offer initiator can cancel a swap offer!');
         });
 
         it('Fail to cancel non-existent swap', async function () {
-            const { hardhatSwapManager, addr1 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, addr1 } = await loadFixture(deploySwappyContractsFixture);
 
             const nonExistentSwapHash = ethers.utils.keccak256(ethers.utils.randomBytes(32));
 
-            await expect(hardhatSwapManager.connect(addr1).cancelSwapOffer(nonExistentSwapHash)).to.be.revertedWith('Non existing swap offer!');
+            await expect(hardhatSwappyManager.connect(addr1).cancelSwapOffer(nonExistentSwapHash)).to.be.revertedWith('Non existing swap offer!');
         });
 
         it('Fail to take an already taken swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2, addr3 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2, addr3 } = await loadFixture(deploySwappyContractsFixture);
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
-            await usdcContract.connect(addr1).approve(hardhatSwapManager.address, 1);
+            await usdcContract.connect(addr1).approve(hardhatSwappyManager.address, 1);
             const maticContract = await getErc20Contract(maticTokenAddr);
-            await maticContract.connect(addr2).approve(hardhatSwapManager.address, 1);
+            await maticContract.connect(addr2).approve(hardhatSwappyManager.address, 1);
 
-            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, 1, { value: swapObj.feeAmount });
+            await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, 1, { value: swapObj.feeAmount });
 
-            await expect(hardhatSwapManager.connect(addr3).createSwapForOffer(swapHash, 1)).to.be.revertedWith("There's not enough resources left in offer for this swap!");
+            await expect(hardhatSwappyManager.connect(addr3).createSwapForOffer(swapHash, 1)).to.be.revertedWith("There's not enough resources left in offer for this swap!");
         });
 
         it('Fail to take a canceled swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
 
-            await hardhatSwapManager.connect(addr1).cancelSwapOffer(swapHash);
+            await hardhatSwappyManager.connect(addr1).cancelSwapOffer(swapHash);
 
-            await expect(hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, 1)).to.be.revertedWith("Can't create swap for offer that is not in OPENED status!");
+            await expect(hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, 1)).to.be.revertedWith("Can't create swap for offer that is not in OPENED status!");
         });
 
         it("Fail to cancel someone else's swap", async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
 
-            await expect(hardhatSwapManager.connect(addr2).cancelSwapOffer(swapHash)).to.be.revertedWith('Only swap offer initiator can cancel a swap offer!');
+            await expect(hardhatSwappyManager.connect(addr2).cancelSwapOffer(swapHash)).to.be.revertedWith('Only swap offer initiator can cancel a swap offer!');
         });
 
         it('Should not allow taking an expired swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
             const latestBlock = await hre.ethers.provider.getBlock('latest');
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 60, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 60, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
 
             await mine(100);
 
-            await expect(hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, 1)).to.be.revertedWith('Swap offer has expired!');
+            await expect(hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, 1)).to.be.revertedWith('Swap offer has expired!');
         });
 
         it('Should allow taking a non-expired swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
             const expiresIn = 3600; // 1 hour from now
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, expiresIn, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, expiresIn, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
-            await usdcContract.connect(addr1).approve(hardhatSwapManager.address, 1);
+            await usdcContract.connect(addr1).approve(hardhatSwappyManager.address, 1);
 
             const maticContract = await getErc20Contract(maticTokenAddr);
-            await maticContract.connect(addr2).approve(hardhatSwapManager.address, 1);
+            await maticContract.connect(addr2).approve(hardhatSwappyManager.address, 1);
 
-            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, 1, { value: swapObj.feeAmount });
+            await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, 1, { value: swapObj.feeAmount });
 
-            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const swapsForOffer = await hardhatSwappyData.getSwapOfferSwaps(swapHash);
             expect(swapsForOffer[0].srcAmount).to.equal(1);
             expect(swapsForOffer[0].dstAmount).to.equal(1);
         });
 
         it('Retrieve swap details', async function () {
-            const { hardhatSwapManager, addr1 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, addr1 } = await loadFixture(deploySwappyContractsFixture);
 
             let swapDetails = {
                 srcToken: usdcTokenAddr,
@@ -307,11 +318,11 @@ describe('SwapManager contract', function () {
                 swapDetails.srcToken = wethTokenAddr;
             }
 
-            const createSwapTx = await hardhatSwapManager.connect(addr1).createSwapOffer(swapDetails.srcToken, swapDetails.srcAmount, swapDetails.dstToken, swapDetails.dstAmount, ethers.constants.AddressZero, 0, false);
+            const createSwapTx = await hardhatSwappyManager.connect(addr1).createSwapOffer(swapDetails.srcToken, swapDetails.srcAmount, swapDetails.dstToken, swapDetails.dstAmount, ethers.constants.AddressZero, 0, false);
             await createSwapTx.wait();
-            const [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            const [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
 
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
 
             expect(swapObj['srcTokenAddress']).to.equal(swapDetails.srcToken);
             expect(swapObj['srcAddress']).to.equal(addr1.address);
@@ -322,47 +333,47 @@ describe('SwapManager contract', function () {
         });
 
         it('Should allow taking a swap by the specified destination address', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
-            await usdcContract.connect(addr1).approve(hardhatSwapManager.address, 1);
+            await usdcContract.connect(addr1).approve(hardhatSwappyManager.address, 1);
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, addr2.address, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, addr2.address, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
 
             const maticContract = await getErc20Contract(maticTokenAddr);
-            await maticContract.connect(addr2).approve(hardhatSwapManager.address, 1);
+            await maticContract.connect(addr2).approve(hardhatSwappyManager.address, 1);
 
-            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, 1, { value: swapObj.feeAmount });
+            await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, 1, { value: swapObj.feeAmount });
 
             // Validate that the swap has been taken successfully
-            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const swapsForOffer = await hardhatSwappyData.getSwapOfferSwaps(swapHash);
             expect(swapsForOffer[0].srcAmount).to.equal(1);
             expect(swapsForOffer[0].dstAmount).to.equal(1);
         });
 
         it('Should fail to take a swap by an unauthorized address', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2, addr3 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2, addr3 } = await loadFixture(deploySwappyContractsFixture);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
-            await usdcContract.connect(addr1).approve(hardhatSwapManager.address, 1);
+            await usdcContract.connect(addr1).approve(hardhatSwappyManager.address, 1);
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, addr2.address, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, addr2.address, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
 
             const maticContract = await getErc20Contract(maticTokenAddr);
-            await maticContract.connect(addr3).approve(hardhatSwapManager.address, 1);
+            await maticContract.connect(addr3).approve(hardhatSwappyManager.address, 1);
 
-            await expect(hardhatSwapManager.connect(addr3).createSwapForOffer(swapHash, 1)).to.be.revertedWith('Only the specified destination address can take this swap offer!');
+            await expect(hardhatSwappyManager.connect(addr3).createSwapForOffer(swapHash, 1)).to.be.revertedWith('Only the specified destination address can take this swap offer!');
         });
 
         it('Should set createdTime on SwapOffer creation', async function () {
-            const { hardhatSwapManager, addr1 } = await loadFixture(deploySwapManagerFixture);
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
+            const { hardhatSwappyData, hardhatSwappyManager, addr1 } = await loadFixture(deploySwappyContractsFixture);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, 1, maticTokenAddr, 1, ethers.constants.AddressZero, 0, false);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
 
-            const swap = await hardhatSwapManager.getSwapOffer(swapHash);
+            const swap = await hardhatSwappyData.getSwapOffer(swapHash);
 
             const latestBlock = await ethers.provider.getBlock('latest');
             expect(latestBlock.timestamp - swap.createdTime).to.be.lt(10);
@@ -371,20 +382,20 @@ describe('SwapManager contract', function () {
 
     describe('Partial swaps', function () {
         it('ERC20 -> ERC20 partial swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
             const srcAmount = 120000;
             const dstAmount = 970399;
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, true);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, true);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
             expect(swapObj['status']).to.equal(0);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
-            await usdcContract.connect(addr1).approve(hardhatSwapManager.address, srcAmount);
+            await usdcContract.connect(addr1).approve(hardhatSwappyManager.address, srcAmount);
 
             const maticContract = await getErc20Contract(maticTokenAddr);
-            await maticContract.connect(addr2).approve(hardhatSwapManager.address, dstAmount);
+            await maticContract.connect(addr2).approve(hardhatSwappyManager.address, dstAmount);
 
             const oldBalances = {
                 usdcAddr1: await usdcContract.balanceOf(addr1.address),
@@ -397,7 +408,7 @@ describe('SwapManager contract', function () {
             const partialDstAmount = 40000;
             const expectedSrcAmount = Math.floor((partialDstAmount * srcAmount) / dstAmount);
 
-            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
+            await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
 
             expect(await usdcContract.balanceOf(addr1.address)).to.equal(oldBalances['usdcAddr1'].sub(expectedSrcAmount));
             expect(await maticContract.balanceOf(addr1.address)).to.equal(oldBalances['maticAddr1'].add(partialDstAmount));
@@ -407,7 +418,7 @@ describe('SwapManager contract', function () {
 
             expect(await ethers.provider.getBalance(feeAddr.address)).to.equal(oldBalances['initialFeeAddrBalance'].add(swapObj.feeAmount));
 
-            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const swapsForOffer = await hardhatSwappyData.getSwapOfferSwaps(swapHash);
             const latestBlock = await ethers.provider.getBlock('latest');
             
             expect(swapsForOffer.length).to.equal(1);
@@ -417,7 +428,7 @@ describe('SwapManager contract', function () {
         });
 
         it('ERC20 -> ETH partial swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
 
@@ -432,18 +443,18 @@ describe('SwapManager contract', function () {
             const srcAmount = 100000;
             const dstAmount = ethers.utils.parseUnits('1', 'ether');
 
-            const approveTx = await usdcContract.connect(addr1).approve(hardhatSwapManager.address, srcAmount);
+            const approveTx = await usdcContract.connect(addr1).approve(hardhatSwappyManager.address, srcAmount);
             let addr1SpentGas = await calculateTxCost(approveTx);
 
-            const swapTx = await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, ethers.constants.AddressZero, dstAmount, ethers.constants.AddressZero, 0, true);
+            const swapTx = await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, ethers.constants.AddressZero, dstAmount, ethers.constants.AddressZero, 0, true);
             addr1SpentGas += await calculateTxCost(swapTx);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
 
             const partialDstAmount = 40000;
             const expectedSrcAmount = Math.floor((partialDstAmount * srcAmount) / dstAmount);
 
-            const takeSwapTx = await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount.add(partialDstAmount) });
+            const takeSwapTx = await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount.add(partialDstAmount) });
             const addr2SpentGas = await calculateTxCost(takeSwapTx);
 
             expect(await ethers.provider.getBalance(addr1.address)).to.equal(oldBalances['ethAddr1'].add(partialDstAmount).sub(addr1SpentGas));
@@ -454,7 +465,7 @@ describe('SwapManager contract', function () {
 
             expect(await ethers.provider.getBalance(feeAddr.address)).to.equal(oldBalances['initialFeeAddrBalance'].add(swapObj.feeAmount));
 
-            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const swapsForOffer = await hardhatSwappyData.getSwapOfferSwaps(swapHash);
             const latestBlock = await ethers.provider.getBlock('latest');
 
             expect(swapsForOffer.length).to.equal(1);
@@ -464,7 +475,7 @@ describe('SwapManager contract', function () {
         });
 
         it('ETH -> ERC20 partial swap', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
 
             const srcAmount = ethers.utils.parseUnits('1', 'ether');
             // const srcAmount = ethers.BigNumber.from(483289478);
@@ -473,12 +484,12 @@ describe('SwapManager contract', function () {
             const maticContract = await getErc20Contract(maticTokenAddr);
             const wethContract = await getErc20Contract(wethTokenAddr);
 
-            const approveMaticTx = await maticContract.connect(addr2).approve(hardhatSwapManager.address, dstAmount);
+            const approveMaticTx = await maticContract.connect(addr2).approve(hardhatSwappyManager.address, dstAmount);
 
-            const swapTx = await hardhatSwapManager.connect(addr1).createSwapOffer(ethers.constants.AddressZero, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, true, { value: srcAmount });
+            const swapTx = await hardhatSwappyManager.connect(addr1).createSwapOffer(ethers.constants.AddressZero, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, true, { value: srcAmount });
             let addr1SpentGas = await calculateTxCost(swapTx);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
 
             const oldBalances = {
                 ethAddr1: await wethContract.balanceOf(addr1.address),
@@ -488,13 +499,13 @@ describe('SwapManager contract', function () {
                 initialFeeAddrBalance: await ethers.provider.getBalance(feeAddr.address),
             };
 
-            const approveWethTx = await wethContract.connect(addr1).approve(hardhatSwapManager.address, srcAmount);
+            const approveWethTx = await wethContract.connect(addr1).approve(hardhatSwappyManager.address, srcAmount);
             addr1SpentGas += await calculateTxCost(approveWethTx);
 
             const partialDstAmount = ethers.BigNumber.from(12321);
             const expectedSrcAmount = partialDstAmount.mul(srcAmount).div(dstAmount);
 
-            const takeSwapTx = await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
+            const takeSwapTx = await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
             const addr2SpentGas = await calculateTxCost(takeSwapTx);
 
             expect(await wethContract.balanceOf(addr1.address)).to.equal(oldBalances['ethAddr1'].sub(expectedSrcAmount));
@@ -505,25 +516,25 @@ describe('SwapManager contract', function () {
 
             expect(await ethers.provider.getBalance(feeAddr.address)).to.equal(oldBalances['initialFeeAddrBalance'].add(swapObj.feeAmount));
 
-            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const swapsForOffer = await hardhatSwappyData.getSwapOfferSwaps(swapHash);
             expect(swapsForOffer.length).to.equal(1);
         });
 
         it('ERC20 -> ERC20 partial swap (100% fill)', async function () {
-            const { hardhatSwapManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwapManagerFixture);
+            const { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2 } = await loadFixture(deploySwappyContractsFixture);
             const srcAmount = 93029302;
             const dstAmount = 100000;
 
-            await hardhatSwapManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, true);
-            [swapHash] = await hardhatSwapManager.getUserSwapOffers(addr1.address);
-            const swapObj = await hardhatSwapManager.getSwapOffer(swapHash);
+            await hardhatSwappyManager.connect(addr1).createSwapOffer(usdcTokenAddr, srcAmount, maticTokenAddr, dstAmount, ethers.constants.AddressZero, 0, true);
+            [swapHash] = await hardhatSwappyData.getUserSwapOffers(addr1.address);
+            const swapObj = await hardhatSwappyData.getSwapOffer(swapHash);
             expect(swapObj['status']).to.equal(0);
 
             const usdcContract = await getErc20Contract(usdcTokenAddr);
-            await usdcContract.connect(addr1).approve(hardhatSwapManager.address, srcAmount);
+            await usdcContract.connect(addr1).approve(hardhatSwappyManager.address, srcAmount);
 
             const maticContract = await getErc20Contract(maticTokenAddr);
-            await maticContract.connect(addr2).approve(hardhatSwapManager.address, dstAmount);
+            await maticContract.connect(addr2).approve(hardhatSwappyManager.address, dstAmount);
 
             const oldBalances = {
                 usdcAddr1: await usdcContract.balanceOf(addr1.address),
@@ -536,21 +547,21 @@ describe('SwapManager contract', function () {
             let partialDstAmount = 40000;
             let expectedSrcAmount = Math.floor((partialDstAmount * srcAmount) / dstAmount);
 
-            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
+            await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
 
             partialDstAmount = 40000;
             expectedSrcAmount = Math.floor((partialDstAmount * srcAmount) / dstAmount);
 
-            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
+            await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
 
             partialDstAmount = 20000;
             expectedSrcAmount = Math.floor((partialDstAmount * srcAmount) / dstAmount);
 
-            await hardhatSwapManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
+            await hardhatSwappyManager.connect(addr2).createSwapForOffer(swapHash, partialDstAmount, { value: swapObj.feeAmount });
 
             expect(await ethers.provider.getBalance(feeAddr.address)).to.equal(oldBalances['initialFeeAddrBalance'].add(swapObj.feeAmount.mul(3)));
 
-            const swapsForOffer = await hardhatSwapManager.getSwapsForOffer(swapHash);
+            const swapsForOffer = await hardhatSwappyData.getSwapOfferSwaps(swapHash);
             const latestBlock = await ethers.provider.getBlock('latest');
 
             expect(swapsForOffer.length).to.equal(3);

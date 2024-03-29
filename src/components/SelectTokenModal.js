@@ -107,7 +107,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
     return (
         <StyledDialog onClose={onClose} open={open}>
             <StyledDialogTitle>{title}</StyledDialogTitle>
-            <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+            <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} />
             <ScrollableListContainer>
                 <List>
                     {filteredTokens.length > 0 ? (

@@ -32,7 +32,7 @@ const StyledBox = styled(Box)`
 const StyledTypography = styled(Typography)`
     display: inline-flex;
 
-    & > *:first-child {
+    & > *:first-of-type {
         margin-right: 0.3em;
     }
 `;
@@ -90,7 +90,7 @@ function SwapOfferDetails({ hash }) {
                 tokenBalance = await getNativeTokenBalance(defaultAccount);
                 setTokenApproved(tokenBalance > 0);
             } else {
-                tokenBalance = await getAllowance(swapOffer.dstTokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
+                tokenBalance = await getAllowance(swapOffer.dstTokenAddress, defaultAccount, contractAddresses[network].SwappyManager);
                 setTokenApproved(tokenBalance > 0);
             }
         }
@@ -152,7 +152,7 @@ function SwapOfferDetails({ hash }) {
                 startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
 
                 try {
-                    const receipt = await createSwapForOffer(contractAddresses.SwapManager[network], hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
+                    const receipt = await createSwapForOffer(contractAddresses[network].SwappyManager, hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
 
                     if (receipt.status === 1) {
                         endTransaction(true, `Swap taken successfully!`);
@@ -174,7 +174,7 @@ function SwapOfferDetails({ hash }) {
             startTransaction(`Please go to your wallet and approve ${swapOffer.dstTokenName}`);
 
             try {
-                const receipt = await approveToken(swapOffer.dstTokenAddress, contractAddresses.SwapManager[network]);
+                const receipt = await approveToken(swapOffer.dstTokenAddress, contractAddresses[network].SwappyManager);
 
                 if (receipt.status === 1) {
                     endTransaction(true, `You successfuly approved ${swapOffer.dstTokenName}!`);
@@ -194,7 +194,7 @@ function SwapOfferDetails({ hash }) {
             startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap offer.`);
 
             try {
-                const receipt = await cancelSwapOffer(contractAddresses.SwapManager[network], hash);
+                const receipt = await cancelSwapOffer(contractAddresses[network].SwappyManager, hash);
 
                 if (receipt.status === 1) {
                     endTransaction(true, `Swap offer canceled successfully!`);

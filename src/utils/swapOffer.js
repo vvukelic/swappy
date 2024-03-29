@@ -8,7 +8,7 @@ const contractAddresses = require('../contracts/contract-address.json');
 
 class SwapOffer {
     constructor(network) {
-        this.contractAddress = contractAddresses.SwapManager[network];
+        this.dataContractAddress = contractAddresses[network].SwappyData;
         this.network = network;
     }
 
@@ -45,7 +45,7 @@ class SwapOffer {
     }
 
     async getSwaps() {
-        const rawSwaps = await getSwapsForOffer(this.contractAddress, this.hash);
+        const rawSwaps = await getSwapsForOffer(this.dataContractAddress, this.hash);
         const swaps = [];
 
         for (let i = 0; i < rawSwaps.length; i++) {
@@ -69,7 +69,7 @@ class SwapOffer {
     }
 
     async load(swapOfferHash) {
-        const swapOffer = await getSwapOfferRaw(this.contractAddress, swapOfferHash);
+        const swapOffer = await getSwapOfferRaw(this.dataContractAddress, swapOfferHash);
         this.hash = swapOfferHash;
         this.srcAddress = swapOffer.srcAddress;
         this.dstAddress = swapOffer.dstAddress;

@@ -1,0 +1,668 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "previousAdminRole",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "newAdminRole",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RoleAdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "RoleGranted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "RoleRevoked",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "DEFAULT_ADMIN_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MANAGER_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newManager",
+        "type": "address"
+      }
+    ],
+    "name": "addManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferHash",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "dstAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "srcAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "dstAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "feeAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closedTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct SwappyData.Swap",
+        "name": "swap",
+        "type": "tuple"
+      }
+    ],
+    "name": "addSwap",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferHash",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "srcAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "dstAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "srcTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "srcAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "dstTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "dstAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "feeTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "feeAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createdTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expirationTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "partialFillEnabled",
+            "type": "bool"
+          },
+          {
+            "internalType": "enum SwappyData.SwapStatus",
+            "name": "status",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct SwappyData.SwapOffer",
+        "name": "swapOffer",
+        "type": "tuple"
+      }
+    ],
+    "name": "addSwapOffer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "addSwapOfferForUser",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "addSwapOfferTakenByUser",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "addUserSwapOffer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getRoleAdmin",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getSwapOffer",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "srcAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "dstAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "srcTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "srcAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "dstTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "dstAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "feeTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "feeAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createdTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expirationTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "partialFillEnabled",
+            "type": "bool"
+          },
+          {
+            "internalType": "enum SwappyData.SwapStatus",
+            "name": "status",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct SwappyData.SwapOffer",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getSwapOfferSwaps",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "dstAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "srcAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "dstAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "feeAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closedTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct SwappyData.Swap[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getSwapOffersForUser",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "startIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "endIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSwapOffersRange",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getSwapOffersTakenByUser",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTotalSwapOffers",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getUserSwapOffers",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "grantRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "hasRole",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "manager",
+        "type": "address"
+      }
+    ],
+    "name": "removeManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "renounceRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "revokeRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "swapOfferHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "enum SwappyData.SwapStatus",
+        "name": "newStatus",
+        "type": "uint8"
+      }
+    ],
+    "name": "updateSwapOfferStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

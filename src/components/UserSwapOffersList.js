@@ -25,7 +25,7 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
 
     useEffect(() => {
         const fetchUserSwapOffers = async () => {
-            const swapOffersHashes = await getUserSwapOffers(contractAddresses.SwapManager[network], userAddress);
+            const swapOffersHashes = await getUserSwapOffers(contractAddresses[network].SwappyData, userAddress);
 
             const swapsWithHash = await Promise.all(
                 swapOffersHashes.map(async (hash) => {
@@ -38,7 +38,7 @@ const UserSwapOffersList = ({ userAddress, network, activeSwapOffersListTab }) =
         };
 
         const fetchSwapOffersForUser = async () => {
-            const swapOffersHashes = await getSwapOffersForUser(contractAddresses.SwapManager[network], userAddress);
+            const swapOffersHashes = await getSwapOffersForUser(contractAddresses[network].SwappyData, userAddress);
             const swapsWithHash = await Promise.all(
                 swapOffersHashes.map(async (hash) => {
                     const swapOffer = new SwapOffer(network);

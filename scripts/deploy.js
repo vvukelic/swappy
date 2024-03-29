@@ -1,50 +1,37 @@
-const { network } = require('hardhat');
+const { ethers } = require('hardhat');
 const path = require('path');
 
+
 async function main() {
-    // This is just a convenience check
-    if (network.name === 'hardhat') {
-        console.warn('You are trying to deploy a contract to the Hardhat Network, which' + 'gets automatically created and destroyed every time. Use the Hardhat' + " option '--network localhost'");
-    }
-
-    // ethers is available in the global scope
     const [deployer] = await ethers.getSigners();
-    console.log('Network:', network.name);
-    console.log('Deploying the contracts with the account:', await deployer.getAddress());
-    console.log('Account balance:', (await deployer.getBalance()).toString());
+    console.log(`Deploying contracts to the ${network.name} network`);
+    console.log(`Deployer: ${await deployer.getAddress()}`);
+    console.log(`Deployer balance: ${(await deployer.getBalance()).toString()}`);
 
-    let contractPath = 'contracts/Swap.sol:SwapManager';
-    
-    if (network.name !== 'localhost' && network.name !== 'ethereum') {
-        contractPath = `contracts/Swap_${network.name}.sol:SwapManager`;
-    }
+    let deployedAddresses = {};
 
-    const SwapFactory = await ethers.getContractFactory(contractPath);
-    const swapFactory = await SwapFactory.deploy('0x4A0245f825446e9CaFa51F1206bB0b961538441B');
-    await swapFactory.deployed();
+    console.log('Deploying SwappyData...');
+    const SwappyDataFactory = await ethers.getContractFactory('SwappyData');
+    const swappyData = await SwappyDataFactory.deploy();
+    await swappyData.deployed();
+    console.log('SwappyData deployed to:', swappyData.address);
+    deployedAddresses.SwappyData = swappyData.address;
 
-    console.log('SwapManager address:', swapFactory.address);
+    console.log('Deploying SwappyManager...');
+    const SwappyManagerFactory = await ethers.getContractFactory('SwappyManager');
+    const swappyManager = await SwappyManagerFactory.deploy(deployedAddresses.SwappyData, '0x4A0245f825446e9CaFa51F1206bB0b961538441B');
+    await swappyManager.deployed();
+    console.log('SwappyManager deployed to:', swappyManager.address);
+    deployedAddresses.SwappyManager = swappyManager.address;
 
-    // We also save the contract's artifacts and address in the frontend directory
-    saveFrontendFiles(swapFactory);
+    console.log('Adding SwappyManager as a manager in SwappyData...');
+    await swappyData.addManager(swappyManager.address);
+    console.log('SwappyManager added as manager.');
+
+    saveFrontendFiles(deployedAddresses);
 }
 
-// function saveFrontendFiles(swapFactory) {
-//     const fs = require('fs');
-//     const contractsDir = path.join(__dirname, '..', 'frontend', 'src', 'contracts');
-
-//     if (!fs.existsSync(contractsDir)) {
-//         fs.mkdirSync(contractsDir);
-//     }
-
-//     fs.writeFileSync(path.join(contractsDir, 'contract-address.json'), JSON.stringify({ SwapManager: swapFactory.address }, undefined, 2));
-
-//     const SwapFactoryArtifact = artifacts.readArtifactSync('SwapManager');
-
-//     fs.writeFileSync(path.join(contractsDir, 'Swap.json'), JSON.stringify(SwapFactoryArtifact, null, 2));
-// }
-
-function saveFrontendFiles(swapFactory) {
+function saveFrontendFiles(deployedAddresses) {
     const fs = require('fs');
     const contractsDir = path.join(__dirname, '..', 'src', 'contracts');
 
@@ -60,26 +47,25 @@ function saveFrontendFiles(swapFactory) {
         contractAddresses = JSON.parse(fs.readFileSync(addressFilePath));
     }
 
-    // Add the current network and contract address
-    if (!contractAddresses.SwapManager) {
-        contractAddresses.SwapManager = {};
+    if (!contractAddresses[network.name]) {
+        contractAddresses[network.name] = deployedAddresses;
+    } else {
+        if (deployedAddresses.SwappyData) {
+            contractAddresses[network.name].SwappyData = deployedAddresses.SwappyData;
+        }
+        
+        if (deployedAddresses.SwappyManager) {
+            contractAddresses[network.name].SwappyManager = deployedAddresses.SwappyManager;
+        }
     }
-
-    contractAddresses.SwapManager[network.name] = swapFactory.address;
 
     fs.writeFileSync(addressFilePath, JSON.stringify(contractAddresses, undefined, 2));
 
-    let contractPath = 'contracts/Swap.sol:SwapManager';
-
-    if (network.name !== 'localhost' && network.name !== 'ethereum') {
-        contractPath = `contracts/Swap_${network.name}.sol:SwapManager`;
+    for (let contractName of Object.keys(deployedAddresses)) {
+        const artifact = artifacts.readArtifactSync(contractName);
+        fs.writeFileSync(path.join(contractsDir, `${contractName}.json`), JSON.stringify(artifact.abi, null, 2));
     }
-
-    const SwapFactoryArtifact = artifacts.readArtifactSync(contractPath);
-
-    fs.writeFileSync(path.join(contractsDir, 'Swap.json'), JSON.stringify(SwapFactoryArtifact.abi, null, 2));
 }
-
 
 main()
     .then(() => process.exit(0))
