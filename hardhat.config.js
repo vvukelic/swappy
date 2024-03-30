@@ -13,8 +13,8 @@ module.exports = {
                 // blockNumber: 55099794
             },
         },
-        goerli: {
-            url: secret['goerli_url'],
+        sepolia: {
+            url: secret['sepolia_url'],
             accounts: {
                 mnemonic: secret['wallet_mnemonic'],
             },

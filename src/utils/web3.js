@@ -6,6 +6,7 @@ const erc20Abi = require('../contracts/Erc20.json');
 const swappyManagerAbi = require('../contracts/SwappyManager.json');
 const swappyDataAbi = require('../contracts/SwappyData.json');
 
+
 export function getProvider() {
     let provider;
 

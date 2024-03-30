@@ -1,4 +1,4 @@
-const { ethers } = require('hardhat');
+const { ethers, network } = require('hardhat');
 const path = require('path');
 
 
@@ -18,7 +18,7 @@ async function main() {
     deployedAddresses.SwappyData = swappyData.address;
 
     console.log('Deploying SwappyManager...');
-    const SwappyManagerFactory = await ethers.getContractFactory('SwappyManager');
+    const SwappyManagerFactory = await ethers.getContractFactory(`contracts/${network.name}/SwappyManager.sol:SwappyManager`);
     const swappyManager = await SwappyManagerFactory.deploy(deployedAddresses.SwappyData, '0x4A0245f825446e9CaFa51F1206bB0b961538441B');
     await swappyManager.deployed();
     console.log('SwappyManager deployed to:', swappyManager.address);
@@ -61,10 +61,11 @@ function saveFrontendFiles(deployedAddresses) {
 
     fs.writeFileSync(addressFilePath, JSON.stringify(contractAddresses, undefined, 2));
 
-    for (let contractName of Object.keys(deployedAddresses)) {
-        const artifact = artifacts.readArtifactSync(contractName);
-        fs.writeFileSync(path.join(contractsDir, `${contractName}.json`), JSON.stringify(artifact.abi, null, 2));
-    }
+    const swappyDataArtifact = artifacts.readArtifactSync('SwappyData');
+    fs.writeFileSync(path.join(contractsDir, 'SwappyData.json'), JSON.stringify(swappyDataArtifact.abi, null, 2));
+
+    const swappyManagerArtifact = artifacts.readArtifactSync(`contracts/${network.name}/SwappyManager.sol:SwappyManager`);
+    fs.writeFileSync(path.join(contractsDir, 'SwappyManager.json'), JSON.stringify(swappyManagerArtifact.abi, null, 2));
 }
 
 main()

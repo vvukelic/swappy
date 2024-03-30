@@ -33,7 +33,7 @@ describe('SwapManager contract', function () {
         const hardhatSwappyData = await SwappyData.deploy();
         await hardhatSwappyData.deployed();
 
-        const SwappyManager = await ethers.getContractFactory('contracts/SwappyManager.sol:SwappyManager');
+        const SwappyManager = await ethers.getContractFactory('contracts/localhost/SwappyManager.sol:SwappyManager');
         const [owner, feeAddr, addr1, addr2, addr3] = await ethers.getSigners();
 
         const hardhatSwappyManager = await SwappyManager.deploy(hardhatSwappyData.address, feeAddr.address);

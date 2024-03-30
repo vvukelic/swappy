@@ -72,6 +72,20 @@ const networks = {
         logo: '/images/eth-logo.png',
         blockExplorerUrls: ['https://goerli.etherscan.io'],
     },
+    sepolia: {
+        chainId: '0xaa36a7',
+        chainName: 'Ethereum Sepolia',
+        displayName: 'sepolia',
+        nativeCurrency: {
+            name: 'Sepolia Ether',
+            symbol: 'SepoliaETH',
+            decimals: 18,
+        },
+        wrappedNativeCurrencyAddress: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
+        color: '#3d5dd7',
+        logo: '/images/eth-logo.png',
+        blockExplorerUrls: ['https://sepolia.etherscan.io'],
+    },
     localhost: {
         chainId: '0x7a69',
         chainName: 'localhost',

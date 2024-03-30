@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "hardhat/console.sol";
-import "./SwappyData.sol";
+import "../SwappyData.sol";
 
 contract SwappyManager is AccessControl, ReentrancyGuard {
     SwappyData private _dataContract;
