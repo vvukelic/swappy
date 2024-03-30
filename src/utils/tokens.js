@@ -43,11 +43,6 @@ export function getTokenByAddress(address, network) {
     return tokensByAddress[address] || null;
 };
 
-export function getTokenByName(name) {
-    const tokensByName = indexTokensByName();
-    return tokensByName[name] || null;
-};
-
 export function getTokenImageUrl(token) {
     if (token && token.logo) {
         return token.logo;

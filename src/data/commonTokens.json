@@ -17,7 +17,8 @@
             "ethereum": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
             "goerli": "0xd35CCeEAD182dcee0F148EbaC9447DA2c4D449c4",
             "polygon": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-            "bnb smart chain": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"
+            "bnb smart chain": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+            "bnb smart chain testnet": "0x64544969ed7EBf5f083679233325356EbE738930"
         }
     },
     {
@@ -78,7 +79,8 @@
             "ethereum": "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
             "goerli": "",
             "polygon": "",
-            "bnb smart chain": "0x0000000000000000000000000000000000000000"
+            "bnb smart chain": "0x0000000000000000000000000000000000000000",
+            "bnb smart chain testnet": "0x0000000000000000000000000000000000000000"
         },
         "logo": "/images/bnb-logo.png"
     },
@@ -89,7 +91,8 @@
             "ethereum": "0x418D75f65a02b3D53B2418FB8E1fe493759c7605",
             "goerli": "",
             "polygon": "0xeCDCB5B88F8e3C15f95c720C51c71c9E2080525d",
-            "bnb smart chain": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
+            "bnb smart chain": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+            "bnb smart chain testnet": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"
         },
         "logo": "/images/bnb-logo.png"
     },

@@ -6,7 +6,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
-import { getTokenByName, updateCustomTokensList, toSmallestUnit, toBaseUnit, getTokenBalance } from '../utils/tokens';
+import { getTokenByAddress, updateCustomTokensList, toSmallestUnit, toBaseUnit, getTokenBalance } from '../utils/tokens';
 import { getAllowance, approveToken, createSwapOffer, getTokenDecimals } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
@@ -14,6 +14,7 @@ import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import networks from '../data/networks';
+import commonTokens from '../data/commonTokens.json';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -88,7 +89,7 @@ function SwapOffer({
             let tokenAddress = token.networkSpecificAddress[network];
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByName(networks[network].wrappedNativeCurrencySymbol).networkSpecificAddress[network];
+                tokenAddress = getTokenByAddress(networks[network].wrappedNativeCurrencyAddress, network).networkSpecificAddress[network];
             }
 
             const availableTokenBalance = await getAllowance(tokenAddress, defaultAccount, contractAddresses[network].SwappyManager);
@@ -106,12 +107,12 @@ function SwapOffer({
 
     useEffect(() => {
         if (network && networks[network]?.nativeCurrency) {
-            handleTokenSelection(getTokenByName(networks[network].nativeCurrency.symbol), 'src');
+            handleTokenSelection(getTokenByAddress(ethers.constants.AddressZero, network), 'src');
         } else {
-            handleTokenSelection(getTokenByName('ETH'), 'src');
+            handleTokenSelection(commonTokens[0], 'src');  // ETH
         }
 
-        handleTokenSelection(getTokenByName('USDC'), 'dst');
+        handleTokenSelection(commonTokens[1], 'dst');  // USDC
     }, [defaultAccount, network]);
 
     useEffect(() => {
@@ -190,7 +191,7 @@ function SwapOffer({
             let tokenAddress = selectedSrcToken.networkSpecificAddress[network];
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByName(networks[network].wrappedNativeCurrencySymbol).networkSpecificAddress[network];
+                tokenAddress = getTokenByAddress(networks[network].wrappedNativeCurrencyAddress, network).networkSpecificAddress[network];
             }
 
             startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
@@ -271,7 +272,7 @@ function SwapOffer({
 
         let newSrcTokenAddress = selectedDstToken.networkSpecificAddress[network];
         if (newSrcTokenAddress === ethers.constants.AddressZero) {
-            newSrcTokenAddress = getTokenByName(networks[network].wrappedNativeCurrencySymbol).networkSpecificAddress[network];
+            newSrcTokenAddress = getTokenByAddress(networks[network].wrappedNativeCurrencyAddress, network).networkSpecificAddress[network];
         }
 
         const availableTokenBalance = await getAllowance(newSrcTokenAddress, defaultAccount, contractAddresses[network].SwappyManager);
