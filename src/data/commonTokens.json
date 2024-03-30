@@ -24,6 +24,12 @@
         }
     },
     {
+        "name": "USDC",
+        "networkSpecificAddress": {
+            "sepolia": "0xf08A50178dfcDe18524640EA6618a1f965821715"
+        }
+    },
+    {
         "name": "LEO",
         "networkSpecificAddress": {
             "localhost": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
@@ -160,6 +166,7 @@
             "localhost": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
             "ethereum": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
             "goerli": "",
+            "sepolia": "0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0",
             "polygon": ""
         }
     },

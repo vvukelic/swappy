@@ -85,6 +85,7 @@ class SwapOffer {
         this.srcTokenDecimals = this.srcTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(this.srcTokenAddress);
         this.dstTokenDecimals = this.dstTokenAddress === ethers.constants.AddressZero ? 18 : await getTokenDecimals(this.dstTokenAddress);
         this.srcToken = await getTokenByAddress(this.srcTokenAddress, this.network);
+        console.log(this.dstTokenAddress);
         this.dstToken = await getTokenByAddress(this.dstTokenAddress, this.network);
         this.srcTokenName = this.srcToken.name.toUpperCase();
         this.dstTokenName = this.dstToken.name.toUpperCase();

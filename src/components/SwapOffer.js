@@ -13,6 +13,7 @@ import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
+import { useNotification } from './NotificationProvider';
 import networks from '../data/networks';
 import commonTokens from '../data/commonTokens.json';
 
@@ -65,6 +66,7 @@ function SwapOffer({
     const [selectedSrcTokenDecimals, setSelectedSrcTokenDecimals] = useState(0);
     const [selectedDstTokenDecimals, setSelectedDstTokenDecimals] = useState(0);
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
+    const { addNotification, updateNotification } = useNotification();
 
     const openModal = (type) => {
         setModalType(type);
@@ -194,18 +196,38 @@ function SwapOffer({
                 tokenAddress = getTokenByAddress(networks[network].wrappedNativeCurrencyAddress, network).networkSpecificAddress[network];
             }
 
+            const notificationId = addNotification({
+                message: `Approving ${selectedSrcToken.name.toUpperCase()}...`,
+                sevirity: 'info',
+                duration: 2000,
+            });
             startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
 
             try {
                 const receipt = await approveToken(tokenAddress, contractAddresses[network].SwappyManager);
 
                 if (receipt.status === 1) {
+                    updateNotification(notificationId, {
+                        message: `${selectedSrcToken.name.toUpperCase()} approved!`,
+                        severity: 'success',
+                        duration: 5000,
+                    });
                     endTransaction(true, `You successfuly approved ${selectedSrcToken.name.toUpperCase()}!`);
                     setTokenApproved(true);
                 } else {
+                    updateNotification(notificationId, {
+                        message: `There was an error approving ${selectedSrcToken.name.toUpperCase()}!`,
+                        severity: 'error',
+                        duration: 5000,
+                    });
                     endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`);
                 }
             } catch (error) {
+                updateNotification(notificationId, {
+                    message: `There was an error approving ${selectedSrcToken.name.toUpperCase()}!`,
+                    severity: 'error',
+                    duration: 5000,
+                });
                 endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`, error.toString());
                 return;
             }
@@ -223,6 +245,11 @@ function SwapOffer({
                 _dstAddress = ethers.constants.AddressZero;
             }
 
+            const notificationId = addNotification({
+                message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()}...`,
+                sevirity: 'info',
+                duration: null,
+            });
             startTransaction(`Please go to your wallet and confirm the transaction for the swap.`);
 
             try {
@@ -243,16 +270,36 @@ function SwapOffer({
                     if (swapOfferCreatedEvent) {
                         const swapOfferHash = swapOfferCreatedEvent.args[1];
                         window.location.href = `/swap/${swapOfferHash}`;
+                        updateNotification(notificationId, {
+                            message: `Swap created!`,
+                            severity: 'success',
+                            duration: 5000,
+                        });
                         endTransaction(true, `You successfuly created a swap offer!`);
                     } else {
+                        updateNotification(notificationId, {
+                            message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
+                            severity: 'error',
+                            duration: 5000,
+                        });
                         endTransaction(false, `Transaction for creating a swap offer failed.`);
                         console.error("Couldn't find SwapCreated event in transaction receipt");
                     }
                 } else {
+                    updateNotification(notificationId, {
+                        message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
+                        severity: 'error',
+                        duration: 5000,
+                    });
                     endTransaction(false, `Transaction for creating a swap offer failed.`);
                 }
             } catch (error) {
                 console.error(error);
+                updateNotification(notificationId, {
+                    message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
+                    severity: 'error',
+                    duration: 5000,
+                });
                 endTransaction(false, 'Transaction for creating a swap offer failed.', error.toString());
                 return;
             }
