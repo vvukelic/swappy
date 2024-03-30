@@ -76,7 +76,7 @@ function SwapOffer({
     };
 
     const handleTokenSelection = async (token, type) => {
-        if (!network) {
+        if (!network || !networks[network]) {
             return;
         }
 
@@ -105,7 +105,7 @@ function SwapOffer({
     }, []);
 
     useEffect(() => {
-        if (network) {
+        if (network && networks[network]?.nativeCurrency) {
             handleTokenSelection(getTokenByName(networks[network].nativeCurrency.symbol), 'src');
         } else {
             handleTokenSelection(getTokenByName('ETH'), 'src');

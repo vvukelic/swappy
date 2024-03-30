@@ -22,6 +22,10 @@ function CompletedSwapsList() {
 
     useEffect(() => {
         const fetchUserCompletedSwapsList = async () => {
+            if (!network || !contractAddresses[network]) {
+                return;
+            }
+
             const swapOffersTakenByUserHashes = new Set(await getSwapOffersTakenByUser(contractAddresses[network].SwappyData, defaultAccount));
             const swaps = [];
 

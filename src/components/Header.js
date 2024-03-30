@@ -205,8 +205,8 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
 
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
-                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={networkName ? networks[networkName].color : ''}>
-                    <img src={networkName ? networks[networkName].logo : ''} alt='' className='network-icon' />
+                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={networkName && networks[networkName] ? networks[networkName].color : ''}>
+                    <img src={networkName && networks[networkName] ? networks[networkName].logo : ''} alt='' className='network-icon' />
                     {networkName ? networkName : 'Select network'}
                 </NetworkButton>
                 <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
@@ -237,7 +237,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             {isMobile && <Box sx={{ borderTop: 1, color: 'white' }} />}
             {nativeTokenBalance !== null && (
                 <NativeCoinBalance variant='h6' color='white'>
-                    {nativeTokenBalance} {networks[networkName].nativeCurrency.symbol}
+                    {nativeTokenBalance} {networkName && networks[networkName] ? networks[networkName].nativeCurrency.symbol : ''}
                 </NativeCoinBalance>
             )}
             {/* {network !== null && <NetworkSelector networkName={networkName} sx={{ marginRight: '15px' }} />} */}
