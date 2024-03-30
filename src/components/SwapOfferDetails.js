@@ -19,6 +19,7 @@ import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import SwapStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
+import { useNotification } from './NotificationProvider';
 import { Truncate } from '../sharedStyles/general';
 import networks from '../data/networks';
 
@@ -80,6 +81,7 @@ function SwapOfferDetails({ hash }) {
     const [swapDstAmount, setSwapDstAmount] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
+    const { addNotification, updateNotification } = useNotification();
     const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
@@ -148,41 +150,77 @@ function SwapOfferDetails({ hash }) {
 
     const handleCreateSwapForOffer = async () => {
         if (tokenApproved) {
+            const notificationId = addNotification({
+                message: 'Taking a swap...',
+                sevirity: 'info',
+                duration: null,
+            });
+            startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
+            
             try {
-                startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
+                const receipt = await createSwapForOffer(contractAddresses[network].SwappyManager, hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
 
-                try {
-                    const receipt = await createSwapForOffer(contractAddresses[network].SwappyManager, hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
-
-                    if (receipt.status === 1) {
-                        endTransaction(true, `Swap taken successfully!`);
-                        console.log('Swap taken successfully!');
-                    } else {
-                        endTransaction(false, `Failed to take the swap.`);
-                        console.error('Failed to take swap');
-                    }
-                } catch (error) {
-                    endTransaction(false, 'Failed to take the swap.', error.toString());
-                    return;
+                if (receipt.status === 1) {
+                    updateNotification(notificationId, {
+                        message: 'Swap taken successfully!',
+                        severity: 'success',
+                        duration: 5000,
+                    });
+                    endTransaction(true, `Swap taken successfully!`);
+                    console.log('Swap taken successfully!');
+                } else {
+                    updateNotification(notificationId, {
+                        message: 'Failed to take the swap!',
+                        severity: 'error',
+                        duration: 5000,
+                    });
+                    endTransaction(false, `Failed to take the swap.`);
+                    console.error('Failed to take swap');
                 }
-
-                window.location.reload();
-            } catch (err) {
-                console.error(err);
+            } catch (error) {
+                updateNotification(notificationId, {
+                    message: 'Failed to take the swap!',
+                    severity: 'error',
+                    duration: 5000,
+                });
+                endTransaction(false, 'Failed to take the swap.', error.toString());
+                return;
             }
+
+            window.location.reload();
         } else {
+            const notificationId = addNotification({
+                message: `Approving ${swapOffer.dstTokenName}...`,
+                sevirity: 'info',
+                duration: null,
+            });
             startTransaction(`Please go to your wallet and approve ${swapOffer.dstTokenName}`);
 
             try {
                 const receipt = await approveToken(swapOffer.dstTokenAddress, contractAddresses[network].SwappyManager);
 
                 if (receipt.status === 1) {
+                    updateNotification(notificationId, {
+                        message: `${swapOffer.dstTokenName} approved!`,
+                        severity: 'success',
+                        duration: 5000,
+                    });
                     endTransaction(true, `You successfuly approved ${swapOffer.dstTokenName}!`);
                     setTokenApproved(true);
                 } else {
+                    updateNotification(notificationId, {
+                        message: `There was an error approving ${swapOffer.dstTokenName}!`,
+                        severity: 'error',
+                        duration: 5000,
+                    });
                     endTransaction(false, `There was an error approving ${swapOffer.dstTokenName}.`);
                 }
             } catch (error) {
+                updateNotification(notificationId, {
+                    message: `There was an error approving ${swapOffer.dstTokenName}!`,
+                    severity: 'error',
+                    duration: 5000,
+                });
                 endTransaction(false, `There was an error approving ${swapOffer.dstTokenName}.`, error.toString());
                 return;
             }
@@ -190,28 +228,44 @@ function SwapOfferDetails({ hash }) {
     };
 
     const handleCancelSwapOffer = async () => {
+        const notificationId = addNotification({
+            message: `Canceling swap offer...`,
+            sevirity: 'info',
+            duration: null,
+        });
+        startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap offer.`);
+
         try {
-            startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap offer.`);
+            const receipt = await cancelSwapOffer(contractAddresses[network].SwappyManager, hash);
 
-            try {
-                const receipt = await cancelSwapOffer(contractAddresses[network].SwappyManager, hash);
-
-                if (receipt.status === 1) {
-                    endTransaction(true, `Swap offer canceled successfully!`);
-                    console.log('Swap offer canceled successfully!');
-                } else {
-                    endTransaction(false, `Failed to cancel the swap offer.`);
-                    console.error('Failed to cancel the swap offer.');
-                }
-            } catch (error) {
-                endTransaction(false, 'Failed to cancel the swap offer.', error.toString());
-                return;
+            if (receipt.status === 1) {
+                updateNotification(notificationId, {
+                    message: 'Swap offer canceled successfully!',
+                    severity: 'success',
+                    duration: 5000,
+                });
+                endTransaction(true, `Swap offer canceled successfully!`);
+                console.log('Swap offer canceled successfully!');
+            } else {
+                updateNotification(notificationId, {
+                    message: 'Failed to cancel the swap offer!`',
+                    severity: 'error',
+                    duration: 5000,
+                });
+                endTransaction(false, `Failed to cancel the swap offer.`);
+                console.error('Failed to cancel the swap offer.');
             }
-
-            window.location.reload();
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            updateNotification(notificationId, {
+                message: 'Failed to cancel the swap offer!`',
+                severity: 'error',
+                duration: 5000,
+            });
+            endTransaction(false, 'Failed to cancel the swap offer.', error.toString());
+            return;
         }
+
+        window.location.reload();
     };
 
     if (!swapOffer) {
