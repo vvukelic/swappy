@@ -44,6 +44,10 @@ const StyledTabButton = styled(({ isActive, ...props }) => <Button {...props} />
     }
 `;
 
+const StyledTabMenuButton = styled(StyledTabButton)`
+    margin-left: 0;
+`;
+
 const StyledHoverMenu = styled(Box)`
     position: absolute;
     width: ${(props) => props.width};
@@ -187,12 +191,12 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                 Swap Offers
             </StyledTabButton>
             <StyledHoverMenu show={showSwapOffersHoverMenu} width='170px'>
-                <StyledTabButton isActive={activeSwapOffersListTab === 'yourSwapOffers'} onClick={() => handleSwapOffersListTabClick('yourSwapOffers')}>
+                <StyledTabMenuButton isActive={activeSwapOffersListTab === 'yourSwapOffers'} onClick={() => handleSwapOffersListTabClick('yourSwapOffers')}>
                     Your Swap Offers
-                </StyledTabButton>
-                <StyledTabButton isActive={activeSwapOffersListTab === 'swapOffersForYou'} onClick={() => handleSwapOffersListTabClick('swapOffersForYou')}>
+                </StyledTabMenuButton>
+                <StyledTabMenuButton isActive={activeSwapOffersListTab === 'swapOffersForYou'} onClick={() => handleSwapOffersListTabClick('swapOffersForYou')}>
                     Swap Offers for You
-                </StyledTabButton>
+                </StyledTabMenuButton>
             </StyledHoverMenu>
         </RelativePositionContainer>
     );

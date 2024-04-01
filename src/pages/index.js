@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { Card, CardMedia, Box, AppBar, Toolbar } from '@mui/material';
 import PrimaryButton from '../components/PrimaryButton';
 import { BackgroundBox } from '../sharedStyles/general';
@@ -78,7 +79,13 @@ const FooterContainer = styled(Box)`
     margin-top: auto;
 `;
 
+const BoldText = styled.span`
+    font-weight: bold;
+`;
+
 export default () => {
+    const isMobile = useMediaQuery('(max-width:600px)');
+
     function onDappBtnClick() {
         window.location.href = '/swap';
     }
@@ -112,12 +119,16 @@ export default () => {
                 <ContentContainer>
                     <TextContainer>
                         <h1>What is Swappy?</h1>
-                        <p>Swappy is a platform facilitating decentralized, peer-to-peer (P2P) swaps, offering users a trustless environment for over-the-counter (OTC) trading.</p>
+                        <p>
+                            Swappy is a platform facilitating decentralized, <BoldText>peer-to-peer (P2P)</BoldText> swaps, offering users a trustless environment for <BoldText>over-the-counter (OTC)</BoldText> trading.
+                        </p>
                         <PrimaryButton onClick={onDappBtnClick} buttonText='Try it out' />
                     </TextContainer>
-                    <ImageContainer>
-                        <img src='/images/swappy_logo.png' alt='Descriptive Alt Text' style={{ maxWidth: '100%', height: 'auto' }} />
-                    </ImageContainer>
+                    {!isMobile && (
+                        <ImageContainer>
+                            <img src='/images/swappy_logo.png' alt='Descriptive Alt Text' style={{ maxWidth: '100%', height: 'auto' }} />
+                        </ImageContainer>
+                    )}
                 </ContentContainer>
                 <ContentContainer>
                     <ImageContainer>
@@ -137,6 +148,11 @@ export default () => {
                     </TextContainer>
                 </ContentContainer>
                 <ContentContainer>
+                    {isMobile && (
+                        <ImageContainer>
+                            <img src='/images/swappy_thinking.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
+                        </ImageContainer>
+                    )}
                     <TextContainer>
                         <h1>Why Swappy?</h1>
                         <ul>
@@ -147,9 +163,11 @@ export default () => {
                             <li>User-friendly interface for easy trading</li>
                         </ul>
                     </TextContainer>
-                    <ImageContainer>
-                        <img src='/images/swappy_thinking.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
-                    </ImageContainer>
+                    {!isMobile && (
+                        <ImageContainer>
+                            <img src='/images/swappy_thinking.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
+                        </ImageContainer>
+                    )}
                 </ContentContainer>
             </FrontpageBackgroundBox>
             <FooterContainer>© 2024 Swappy</FooterContainer>
