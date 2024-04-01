@@ -4,7 +4,6 @@ import commonTokens from '../data/commonTokens.json';
 import { getTokenDecimals, getNativeTokenBalance, getErc20TokenBalance } from './web3';
 
 let tokensByAddressCache = {};
-let tokensByNameCache = {};
 
 const indexTokensByAddress = (network) => {
     if (tokensByAddressCache[network]) {
@@ -22,26 +21,15 @@ const indexTokensByAddress = (network) => {
     return tokenIndex;
 };
 
-const indexTokensByName = () => {
-    if (Object.keys(tokensByNameCache).length) {
-        return tokensByNameCache;
-    }
-
-    const tokenIndex = {};
-
-    commonTokens.forEach((token) => {
-        tokenIndex[token.name] = token;
-    });
-
-    tokensByNameCache = tokenIndex;
-
-    return tokenIndex;
-};
-
 export function getTokenByAddress(address, network) {
     const tokensByAddress = indexTokensByAddress(network);
     return tokensByAddress[address] || null;
 };
+
+export function getNativeToken(network) {
+    const tokensByAddress = indexTokensByAddress(network);
+    return tokensByAddress[ethers.constants.AddressZero] || null;
+}
 
 export function getTokenImageUrl(token) {
     if (token && token.logo) {
@@ -83,7 +71,6 @@ export function addCustomToken(customToken) {
     saveCustomTokensList(customTokensList);
 
     tokensByAddressCache = {};
-    tokensByNameCache = {};
 };
 
 export function getAllTokens() {
@@ -109,7 +96,6 @@ export function updateCustomTokensList() {
     saveCustomTokensList(customTokensList);
 
     tokensByAddressCache = {};
-    tokensByNameCache = {};
 };
 
 export async function toSmallestUnit(amount, tokenContractAddress) {

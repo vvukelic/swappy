@@ -28,6 +28,8 @@ contract SwappyData is AccessControl {
         address feeTokenAddress;
         uint feeAmount;
 
+        bool convertSrcTokenToNative;
+
         uint256 createdTime;
         uint256 expirationTime;
 

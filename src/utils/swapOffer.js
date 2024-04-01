@@ -78,6 +78,7 @@ class SwapOffer {
         this.srcAmount = swapOffer.srcAmount;
         this.dstAmount = swapOffer.dstAmount;
         this.feeAmount = swapOffer.feeAmount;
+        this.convertSrcTokenToNative = swapOffer.convertSrcTokenToNative;
         this.createdTime = swapOffer.createdTime;
         this.expirationTime = swapOffer.expirationTime;
         this.partialFillEnabled = swapOffer.partialFillEnabled;

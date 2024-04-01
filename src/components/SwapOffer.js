@@ -6,7 +6,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
-import { getTokenByAddress, updateCustomTokensList, toSmallestUnit, toBaseUnit, getTokenBalance } from '../utils/tokens';
+import { getTokenByAddress, updateCustomTokensList, toSmallestUnit, toBaseUnit, getTokenBalance, getNativeToken } from '../utils/tokens';
 import { getAllowance, approveToken, createSwapOffer, getTokenDecimals, waitForTxToBeMined } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
@@ -109,7 +109,7 @@ function SwapOffer({
 
     useEffect(() => {
         if (network && networks[network]?.nativeCurrency) {
-            handleTokenSelection(getTokenByAddress(ethers.constants.AddressZero, network), 'src');
+            handleTokenSelection(getNativeToken(network), 'src');
         } else {
             handleTokenSelection(commonTokens[0], 'src');  // ETH
         }

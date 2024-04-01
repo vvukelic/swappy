@@ -19,6 +19,7 @@ import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import SwapStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
+import { getNativeToken } from '../utils/tokens';
 import { useNotification } from './NotificationProvider';
 import { Truncate } from '../sharedStyles/general';
 import networks from '../data/networks';
@@ -278,7 +279,9 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' />
+                {swapOffer.convertSrcTokenToNative ?
+                    <SwapOfferDetailsTokenInfo token={getNativeToken(network)} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> :
+                    <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> }
 
                 <Grid item sx={{ height: '42px' }} />
 

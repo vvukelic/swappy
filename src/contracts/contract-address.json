@@ -4,7 +4,7 @@
     "SwappyManager": "0x798f111c92E38F102931F34D1e0ea7e671BDBE31"
   },
   "sepolia": {
-    "SwappyData": "0x87164a449ca27FDf786DAc5f81f6d77dF4b4D9d9",
-    "SwappyManager": "0xB4D099bdc067c998e977B7F30eD34c62Ab38D812"
+    "SwappyData": "0xd40C74f3CB040FEaC8F9d3812A3274cdEC6D3FA3",
+    "SwappyManager": "0xC358ADb030Cd647413c7B9A178eF0391f4F1E0b2"
   }
 }

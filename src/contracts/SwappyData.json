@@ -213,6 +213,11 @@
             "type": "uint256"
           },
           {
+            "internalType": "bool",
+            "name": "convertSrcTokenToNative",
+            "type": "bool"
+          },
+          {
             "internalType": "uint256",
             "name": "createdTime",
             "type": "uint256"
@@ -367,6 +372,11 @@
             "internalType": "uint256",
             "name": "feeAmount",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "convertSrcTokenToNative",
+            "type": "bool"
           },
           {
             "internalType": "uint256",
