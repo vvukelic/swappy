@@ -159,8 +159,7 @@ export async function approveToken(tokenContractAddress, spenderAddress) {
 
     try {
         const tx = await tokenContract.approve(spenderAddress, ethers.constants.MaxUint256);
-        const receipt = await tx.wait();
-        return receipt;
+        return tx;
     } catch (error) {
         console.error('Error approving token:', error);
         throw error;
@@ -177,9 +176,8 @@ export async function createSwapOffer(contractAddress, srcTokenAddress, srcAmoun
     }
 
     try {
-        const result = await swapManagerContract.createSwapOffer(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn, partialFillEnabled, { value: ethValue });
-        const receipt = await result.wait();
-        return receipt;
+        const tx = await swapManagerContract.createSwapOffer(srcTokenAddress, srcAmount, dstTokenAddress, dstAmount, dstAddress, expiresIn, partialFillEnabled, { value: ethValue });
+        return tx;
     } catch (error) {
         console.error('Error creating swap', error);
         throw error;
@@ -241,10 +239,8 @@ export async function createSwapForOffer(contractAddress, swapHash, dstTokenAddr
             nativeTokenAmount = dstAmount;
         }
 
-        const transaction = await swappyManagerContract.createSwapForOffer(swapHash, dstAmount, { value: feeAmount.add(nativeTokenAmount) });
-        const receipt = await transaction.wait();
-
-        return receipt;
+        const tx = await swappyManagerContract.createSwapForOffer(swapHash, dstAmount, { value: feeAmount.add(nativeTokenAmount) });
+        return tx;
     } catch (error) {
         console.error('Error taking the swap:', error);
         throw error;
@@ -255,13 +251,21 @@ export async function cancelSwapOffer(contractAddress, swapHash) {
     try {
         const signer = getProvider().getSigner();
         const swappyManagerContract = new ethers.Contract(contractAddress, swappyManagerAbi, signer);
-        const transaction = await swappyManagerContract.cancelSwapOffer(swapHash);
-        const receipt = await transaction.wait();
-
-        return receipt;
+        
+        const tx = await swappyManagerContract.cancelSwapOffer(swapHash);
+        return tx
     } catch (error) {
         console.error('Error canceling the swap:', error);
         throw error;
     }
 }
 
+export async function waitForTxToBeMined(tx) {
+    try {
+        const receipt = await tx.wait();
+        return receipt;
+    } catch (error) {
+        console.error('Transaction error:', error);
+        throw error;
+    }
+}

@@ -5,7 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { createSwapForOffer, cancelSwapOffer, approveToken, getNativeTokenBalance, getAllowance } from '../utils/web3';
+import { createSwapForOffer, cancelSwapOffer, approveToken, getNativeTokenBalance, getAllowance, waitForTxToBeMined } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
@@ -150,18 +150,21 @@ function SwapOfferDetails({ hash }) {
 
     const handleCreateSwapForOffer = async () => {
         if (tokenApproved) {
-            const notificationId = addNotification({
-                message: 'Taking a swap...',
-                sevirity: 'info',
-                duration: null,
-            });
             startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
             
             try {
-                const receipt = await createSwapForOffer(contractAddresses[network].SwappyManager, hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
+                const tx = await createSwapForOffer(contractAddresses[network].SwappyManager, hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
+
+                addNotification(tx.hash, {
+                    message: 'Taking a swap...',
+                    sevirity: 'info',
+                    duration: null,
+                });
+
+                const receipt = await waitForTxToBeMined(tx);
 
                 if (receipt.status === 1) {
-                    updateNotification(notificationId, {
+                    updateNotification(receipt.transactionHash, {
                         message: 'Swap taken successfully!',
                         severity: 'success',
                         duration: 5000,
@@ -169,7 +172,7 @@ function SwapOfferDetails({ hash }) {
                     endTransaction(true, `Swap taken successfully!`);
                     console.log('Swap taken successfully!');
                 } else {
-                    updateNotification(notificationId, {
+                    updateNotification(receipt.transactionHash, {
                         message: 'Failed to take the swap!',
                         severity: 'error',
                         duration: 5000,
@@ -178,29 +181,27 @@ function SwapOfferDetails({ hash }) {
                     console.error('Failed to take swap');
                 }
             } catch (error) {
-                updateNotification(notificationId, {
-                    message: 'Failed to take the swap!',
-                    severity: 'error',
-                    duration: 5000,
-                });
                 endTransaction(false, 'Failed to take the swap.', error.toString());
                 return;
             }
 
             window.location.reload();
         } else {
-            const notificationId = addNotification({
-                message: `Approving ${swapOffer.dstTokenName}...`,
-                sevirity: 'info',
-                duration: null,
-            });
             startTransaction(`Please go to your wallet and approve ${swapOffer.dstTokenName}`);
 
             try {
-                const receipt = await approveToken(swapOffer.dstTokenAddress, contractAddresses[network].SwappyManager);
+                const tx = await approveToken(swapOffer.dstTokenAddress, contractAddresses[network].SwappyManager);
+
+                addNotification(tx.hash, {
+                    message: `Approving ${swapOffer.dstTokenName}...`,
+                    sevirity: 'info',
+                    duration: null,
+                });
+
+                const receipt = await waitForTxToBeMined(tx);
 
                 if (receipt.status === 1) {
-                    updateNotification(notificationId, {
+                    updateNotification(tx.transactionHash, {
                         message: `${swapOffer.dstTokenName} approved!`,
                         severity: 'success',
                         duration: 5000,
@@ -208,7 +209,7 @@ function SwapOfferDetails({ hash }) {
                     endTransaction(true, `You successfuly approved ${swapOffer.dstTokenName}!`);
                     setTokenApproved(true);
                 } else {
-                    updateNotification(notificationId, {
+                    updateNotification(tx.transactionHash, {
                         message: `There was an error approving ${swapOffer.dstTokenName}!`,
                         severity: 'error',
                         duration: 5000,
@@ -216,11 +217,6 @@ function SwapOfferDetails({ hash }) {
                     endTransaction(false, `There was an error approving ${swapOffer.dstTokenName}.`);
                 }
             } catch (error) {
-                updateNotification(notificationId, {
-                    message: `There was an error approving ${swapOffer.dstTokenName}!`,
-                    severity: 'error',
-                    duration: 5000,
-                });
                 endTransaction(false, `There was an error approving ${swapOffer.dstTokenName}.`, error.toString());
                 return;
             }
@@ -228,18 +224,21 @@ function SwapOfferDetails({ hash }) {
     };
 
     const handleCancelSwapOffer = async () => {
-        const notificationId = addNotification({
-            message: `Canceling swap offer...`,
-            sevirity: 'info',
-            duration: null,
-        });
         startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap offer.`);
 
         try {
-            const receipt = await cancelSwapOffer(contractAddresses[network].SwappyManager, hash);
+            const tx = await cancelSwapOffer(contractAddresses[network].SwappyManager, hash);
+
+            addNotification(tx.hash, {
+                message: `Canceling swap offer...`,
+                sevirity: 'info',
+                duration: null,
+            });
+
+            const receipt = await waitForTxToBeMined(tx);
 
             if (receipt.status === 1) {
-                updateNotification(notificationId, {
+                updateNotification(receipt.transactionHash, {
                     message: 'Swap offer canceled successfully!',
                     severity: 'success',
                     duration: 5000,
@@ -247,7 +246,7 @@ function SwapOfferDetails({ hash }) {
                 endTransaction(true, `Swap offer canceled successfully!`);
                 console.log('Swap offer canceled successfully!');
             } else {
-                updateNotification(notificationId, {
+                updateNotification(receipt.transactionHash, {
                     message: 'Failed to cancel the swap offer!`',
                     severity: 'error',
                     duration: 5000,
@@ -256,11 +255,6 @@ function SwapOfferDetails({ hash }) {
                 console.error('Failed to cancel the swap offer.');
             }
         } catch (error) {
-            updateNotification(notificationId, {
-                message: 'Failed to cancel the swap offer!`',
-                severity: 'error',
-                duration: 5000,
-            });
             endTransaction(false, 'Failed to cancel the swap offer.', error.toString());
             return;
         }

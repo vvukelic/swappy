@@ -27,10 +27,8 @@ const StyledCircularProgress = styled(CircularProgress)`
 export const NotificationProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);
 
-    const addNotification = useCallback(({ message, severity = 'info', duration = 6000 }) => {
-        const id = Math.random().toString(36).substr(2, 9);
+    const addNotification = useCallback((id, { message, severity = 'info', duration = 6000 }) => {
         setNotifications((prevNotifications) => [...prevNotifications, { id, message, severity, duration }]);
-        return id;
     }, []);
 
     const updateNotification = useCallback(

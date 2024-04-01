@@ -7,7 +7,7 @@ import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
 import { getTokenByAddress, updateCustomTokensList, toSmallestUnit, toBaseUnit, getTokenBalance } from '../utils/tokens';
-import { getAllowance, approveToken, createSwapOffer, getTokenDecimals } from '../utils/web3';
+import { getAllowance, approveToken, createSwapOffer, getTokenDecimals, waitForTxToBeMined } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
@@ -196,18 +196,21 @@ function SwapOffer({
                 tokenAddress = getTokenByAddress(networks[network].wrappedNativeCurrencyAddress, network).networkSpecificAddress[network];
             }
 
-            const notificationId = addNotification({
-                message: `Approving ${selectedSrcToken.name.toUpperCase()}...`,
-                sevirity: 'info',
-                duration: 2000,
-            });
             startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
 
             try {
-                const receipt = await approveToken(tokenAddress, contractAddresses[network].SwappyManager);
+                const tx = await approveToken(tokenAddress, contractAddresses[network].SwappyManager);
+
+                addNotification(tx.hash, {
+                    message: `Approving ${selectedSrcToken.name.toUpperCase()}...`,
+                    sevirity: 'info',
+                    duration: null,
+                });
+
+                const receipt = await waitForTxToBeMined(tx);
 
                 if (receipt.status === 1) {
-                    updateNotification(notificationId, {
+                    updateNotification(receipt.transactionHash, {
                         message: `${selectedSrcToken.name.toUpperCase()} approved!`,
                         severity: 'success',
                         duration: 5000,
@@ -215,7 +218,7 @@ function SwapOffer({
                     endTransaction(true, `You successfuly approved ${selectedSrcToken.name.toUpperCase()}!`);
                     setTokenApproved(true);
                 } else {
-                    updateNotification(notificationId, {
+                    updateNotification(receipt.transactionHash, {
                         message: `There was an error approving ${selectedSrcToken.name.toUpperCase()}!`,
                         severity: 'error',
                         duration: 5000,
@@ -223,11 +226,6 @@ function SwapOffer({
                     endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`);
                 }
             } catch (error) {
-                updateNotification(notificationId, {
-                    message: `There was an error approving ${selectedSrcToken.name.toUpperCase()}!`,
-                    severity: 'error',
-                    duration: 5000,
-                });
                 endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`, error.toString());
                 return;
             }
@@ -245,15 +243,10 @@ function SwapOffer({
                 _dstAddress = ethers.constants.AddressZero;
             }
 
-            const notificationId = addNotification({
-                message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()}...`,
-                sevirity: 'info',
-                duration: null,
-            });
             startTransaction(`Please go to your wallet and confirm the transaction for the swap.`);
 
             try {
-                const receipt = await createSwapOffer(
+                const tx = await createSwapOffer(
                     contractAddresses[network].SwappyManager,
                     selectedSrcToken.networkSpecificAddress[network],
                     srcAmountInt,
@@ -263,6 +256,14 @@ function SwapOffer({
                     expiresIn,
                     partialFillEnabled
                 );
+
+                addNotification(tx.hash, {
+                    message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()}...`,
+                    sevirity: 'info',
+                    duration: null,
+                });
+
+                const receipt = await waitForTxToBeMined(tx);
                 
                 if (receipt.status === 1) {
                     const swapOfferCreatedEvent = receipt.events?.find((e) => e.event === 'SwapOfferCreated');
@@ -270,14 +271,14 @@ function SwapOffer({
                     if (swapOfferCreatedEvent) {
                         const swapOfferHash = swapOfferCreatedEvent.args[1];
                         window.location.href = `/swap/${swapOfferHash}`;
-                        updateNotification(notificationId, {
+                        updateNotification(receipt.transactionHash, {
                             message: `Swap created!`,
                             severity: 'success',
                             duration: 5000,
                         });
                         endTransaction(true, `You successfuly created a swap offer!`);
                     } else {
-                        updateNotification(notificationId, {
+                        updateNotification(receipt.transactionHash, {
                             message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
                             severity: 'error',
                             duration: 5000,
@@ -286,7 +287,7 @@ function SwapOffer({
                         console.error("Couldn't find SwapCreated event in transaction receipt");
                     }
                 } else {
-                    updateNotification(notificationId, {
+                    updateNotification(receipt.transactionHash, {
                         message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
                         severity: 'error',
                         duration: 5000,
@@ -295,11 +296,6 @@ function SwapOffer({
                 }
             } catch (error) {
                 console.error(error);
-                updateNotification(notificationId, {
-                    message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
-                    severity: 'error',
-                    duration: 5000,
-                });
                 endTransaction(false, 'Transaction for creating a swap offer failed.', error.toString());
                 return;
             }
