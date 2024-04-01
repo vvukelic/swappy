@@ -1,6 +1,10 @@
 {
-  "SwapManager": {
-    "localhost": "0xCdb63c58b907e76872474A0597C5252eDC97c883",
-    "goerli": "0x48e23A1732122B0EB0Cd16B6cca1C80903E192Ee"
+  "localhost": {
+    "SwappyData": "0xfb6dAB6200b8958C2655C3747708F82243d3F32E",
+    "SwappyManager": "0x798f111c92E38F102931F34D1e0ea7e671BDBE31"
+  },
+  "sepolia": {
+    "SwappyData": "0xd40C74f3CB040FEaC8F9d3812A3274cdEC6D3FA3",
+    "SwappyManager": "0xC358ADb030Cd647413c7B9A178eF0391f4F1E0b2"
   }
 }

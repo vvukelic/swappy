@@ -131,18 +131,14 @@ function SwapOfferDetailsPartialFillTokenForm({ token, amount, maxAmount, setAmo
                     </StyledAvatarBox>
                 </Grid>
                 <StyledAmountGrid item xs={9}>
-                    <StyledTextField value={displayAmount} onChange={handleAmountOnChange} onBlur={handleAmountOnBlur} inputProps={{ 'aria-label': 'amount' }} />
+                    <StyledTextField value={displayAmount} onChange={handleAmountOnChange} onBlur={handleAmountOnBlur} />
                     {token && <Typography>{token.name.toUpperCase()}</Typography>}
                     <StyledSlider
-                        value={sliderValue}
+                        value={parseFloat(sliderValue)}
                         onChange={handleSliderChange}
                         min={0}
-                        max={ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals)}
+                        max={parseFloat(ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals))}
                         step={stepValue}
-                        inputProps={{
-                            'aria-label': '',
-                            autoComplete: 'off'
-                        }}
                     />
                 </StyledAmountGrid>
             </StyledContainerGrid>

@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { getEthBalance, getNetworkName, switchNetwork } from '../utils/web3';
+import { getNativeTokenBalance, getNetworkName, switchNetwork } from '../utils/web3';
 import { sliceAddress } from '../utils/general';
 import networks from '../data/networks';
 import PrimaryButton from './PrimaryButton';
@@ -32,7 +32,7 @@ const RelativePositionContainer = styled.div`
     display: grid;
 `;
 
-const StyledTabButton = styled(Button)`
+const StyledTabButton = styled(({ isActive, ...props }) => <Button {...props} />)`
     margin-left: 10px;
     color: white;
     background-color: ${(props) => (props.isActive ? '#396777' : 'transparent')};
@@ -42,6 +42,10 @@ const StyledTabButton = styled(Button)`
         background-color: ${(props) => (props.isActive ? '#396777' : '#396777')};
         border-color: #ffffff;
     }
+`;
+
+const StyledTabMenuButton = styled(StyledTabButton)`
+    margin-left: 0;
 `;
 
 const StyledHoverMenu = styled(Box)`
@@ -64,8 +68,7 @@ const StyledHoverMenu = styled(Box)`
         width: auto;
     }
 `;
-
-const NetworkButton = styled(Button)`
+const NetworkButton = styled(({ bgColor, ...props }) => <Button {...props} />)`
     color: white;
     background-color: ${(props) => props.bgColor || 'transparent'};
     display: flex;
@@ -114,7 +117,7 @@ const NativeCoinBalance = styled(Typography)`
 
 function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
     const { defaultAccount, connectWallet, network } = useWalletConnect();
-    const [ethBalance, setEthBalance] = useState(null);
+    const [nativeTokenBalance, setNativeTokenBalance] = useState(null);
     const [networkName, setNetworkName] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:900px)');
@@ -125,10 +128,10 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     useEffect(() => {
         const fetchBalance = async () => {
             if (defaultAccount) {
-                let balance = await getEthBalance(defaultAccount);
+                let balance = await getNativeTokenBalance(defaultAccount);
                 balance = ethers.utils.formatEther(balance);
                 balance = parseFloat(balance).toFixed(2);
-                setEthBalance(balance);
+                setNativeTokenBalance(balance);
             }
         };
 
@@ -188,12 +191,12 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                 Swap Offers
             </StyledTabButton>
             <StyledHoverMenu show={showSwapOffersHoverMenu} width='170px'>
-                <StyledTabButton isActive={activeSwapOffersListTab === 'yourSwapOffers'} onClick={() => handleSwapOffersListTabClick('yourSwapOffers')}>
+                <StyledTabMenuButton isActive={activeSwapOffersListTab === 'yourSwapOffers'} onClick={() => handleSwapOffersListTabClick('yourSwapOffers')}>
                     Your Swap Offers
-                </StyledTabButton>
-                <StyledTabButton isActive={activeSwapOffersListTab === 'swapOffersForYou'} onClick={() => handleSwapOffersListTabClick('swapOffersForYou')}>
+                </StyledTabMenuButton>
+                <StyledTabMenuButton isActive={activeSwapOffersListTab === 'swapOffersForYou'} onClick={() => handleSwapOffersListTabClick('swapOffersForYou')}>
                     Swap Offers for You
-                </StyledTabButton>
+                </StyledTabMenuButton>
             </StyledHoverMenu>
         </RelativePositionContainer>
     );
@@ -206,8 +209,8 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
 
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
-                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={networkName ? networks[networkName].color : ''}>
-                    <img src={networkName ? networks[networkName].logo : ''} alt='' className='network-icon' />
+                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={networkName && networks[networkName] ? networks[networkName].color : ''}>
+                    <img src={networkName && networks[networkName] ? networks[networkName].logo : ''} alt='' className='network-icon' />
                     {networkName ? networkName : 'Select network'}
                 </NetworkButton>
                 <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
@@ -236,9 +239,9 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             </StyledTabButton>
             <Box flexGrow={1} />
             {isMobile && <Box sx={{ borderTop: 1, color: 'white' }} />}
-            {ethBalance !== null && (
+            {nativeTokenBalance !== null && (
                 <NativeCoinBalance variant='h6' color='white'>
-                    {ethBalance} ETH
+                    {nativeTokenBalance} {networkName && networks[networkName] ? networks[networkName].nativeCurrency.symbol : ''}
                 </NativeCoinBalance>
             )}
             {/* {network !== null && <NetworkSelector networkName={networkName} sx={{ marginRight: '15px' }} />} */}

@@ -5,7 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { createSwapForOffer, cancelSwapOffer, approveToken, getEthBalance, getAllowance } from '../utils/web3';
+import { createSwapForOffer, cancelSwapOffer, approveToken, getNativeTokenBalance, getAllowance, waitForTxToBeMined } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
@@ -19,7 +19,10 @@ import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import SwapStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
+import { getNativeToken } from '../utils/tokens';
+import { useNotification } from './NotificationProvider';
 import { Truncate } from '../sharedStyles/general';
+import networks from '../data/networks';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -31,7 +34,7 @@ const StyledBox = styled(Box)`
 const StyledTypography = styled(Typography)`
     display: inline-flex;
 
-    & > *:first-child {
+    & > *:first-of-type {
         margin-right: 0.3em;
     }
 `;
@@ -79,6 +82,7 @@ function SwapOfferDetails({ hash }) {
     const [swapDstAmount, setSwapDstAmount] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
+    const { addNotification, updateNotification } = useNotification();
     const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
@@ -86,10 +90,10 @@ function SwapOfferDetails({ hash }) {
             let tokenBalance = null;
 
             if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
-                tokenBalance = await getEthBalance(defaultAccount);
+                tokenBalance = await getNativeTokenBalance(defaultAccount);
                 setTokenApproved(tokenBalance > 0);
             } else {
-                tokenBalance = await getAllowance(swapOffer.dstTokenAddress, defaultAccount, contractAddresses.SwapManager[network]);
+                tokenBalance = await getAllowance(swapOffer.dstTokenAddress, defaultAccount, contractAddresses[network].SwappyManager);
                 setTokenApproved(tokenBalance > 0);
             }
         }
@@ -105,7 +109,7 @@ function SwapOfferDetails({ hash }) {
                 setSwapButtonText('Take swap');
             } else {
                 if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
-                    setSwapButtonText('ETH balance too low');
+                    setSwapButtonText(`${networks[network].wrappedNativeCurrencySymbol} balance too low`);
                 } else {
                     setSwapButtonText(`Approve ${swapOffer.dstTokenName} Token`);
                 }
@@ -147,38 +151,70 @@ function SwapOfferDetails({ hash }) {
 
     const handleCreateSwapForOffer = async () => {
         if (tokenApproved) {
+            startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
+            
             try {
-                startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
+                const tx = await createSwapForOffer(contractAddresses[network].SwappyManager, hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
 
-                try {
-                    const receipt = await createSwapForOffer(contractAddresses.SwapManager[network], hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
+                addNotification(tx.hash, {
+                    message: 'Taking a swap...',
+                    sevirity: 'info',
+                    duration: null,
+                });
 
-                    if (receipt.status === 1) {
-                        endTransaction(true, `Swap taken successfully!`);
-                        console.log('Swap taken successfully!');
-                    } else {
-                        endTransaction(false, `Failed to take the swap.`);
-                        console.error('Failed to take swap');
-                    }
-                } catch (error) {
-                    endTransaction(false, 'Failed to take the swap.', error.toString());
-                    return;
+                const receipt = await waitForTxToBeMined(tx);
+
+                if (receipt.status === 1) {
+                    updateNotification(receipt.transactionHash, {
+                        message: 'Swap taken successfully!',
+                        severity: 'success',
+                        duration: 5000,
+                    });
+                    endTransaction(true, `Swap taken successfully!`);
+                    console.log('Swap taken successfully!');
+                } else {
+                    updateNotification(receipt.transactionHash, {
+                        message: 'Failed to take the swap!',
+                        severity: 'error',
+                        duration: 5000,
+                    });
+                    endTransaction(false, `Failed to take the swap.`);
+                    console.error('Failed to take swap');
                 }
-
-                window.location.reload();
-            } catch (err) {
-                console.error(err);
+            } catch (error) {
+                endTransaction(false, 'Failed to take the swap.', error.toString());
+                return;
             }
+
+            window.location.reload();
         } else {
             startTransaction(`Please go to your wallet and approve ${swapOffer.dstTokenName}`);
 
             try {
-                const receipt = await approveToken(swapOffer.dstTokenAddress, contractAddresses.SwapManager[network]);
+                const tx = await approveToken(swapOffer.dstTokenAddress, contractAddresses[network].SwappyManager);
+
+                addNotification(tx.hash, {
+                    message: `Approving ${swapOffer.dstTokenName}...`,
+                    sevirity: 'info',
+                    duration: null,
+                });
+
+                const receipt = await waitForTxToBeMined(tx);
 
                 if (receipt.status === 1) {
+                    updateNotification(tx.transactionHash, {
+                        message: `${swapOffer.dstTokenName} approved!`,
+                        severity: 'success',
+                        duration: 5000,
+                    });
                     endTransaction(true, `You successfuly approved ${swapOffer.dstTokenName}!`);
                     setTokenApproved(true);
                 } else {
+                    updateNotification(tx.transactionHash, {
+                        message: `There was an error approving ${swapOffer.dstTokenName}!`,
+                        severity: 'error',
+                        duration: 5000,
+                    });
                     endTransaction(false, `There was an error approving ${swapOffer.dstTokenName}.`);
                 }
             } catch (error) {
@@ -189,28 +225,42 @@ function SwapOfferDetails({ hash }) {
     };
 
     const handleCancelSwapOffer = async () => {
+        startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap offer.`);
+
         try {
-            startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap offer.`);
+            const tx = await cancelSwapOffer(contractAddresses[network].SwappyManager, hash);
 
-            try {
-                const receipt = await cancelSwapOffer(contractAddresses.SwapManager[network], hash);
+            addNotification(tx.hash, {
+                message: `Canceling swap offer...`,
+                sevirity: 'info',
+                duration: null,
+            });
 
-                if (receipt.status === 1) {
-                    endTransaction(true, `Swap offer canceled successfully!`);
-                    console.log('Swap offer canceled successfully!');
-                } else {
-                    endTransaction(false, `Failed to cancel the swap offer.`);
-                    console.error('Failed to cancel the swap offer.');
-                }
-            } catch (error) {
-                endTransaction(false, 'Failed to cancel the swap offer.', error.toString());
-                return;
+            const receipt = await waitForTxToBeMined(tx);
+
+            if (receipt.status === 1) {
+                updateNotification(receipt.transactionHash, {
+                    message: 'Swap offer canceled successfully!',
+                    severity: 'success',
+                    duration: 5000,
+                });
+                endTransaction(true, `Swap offer canceled successfully!`);
+                console.log('Swap offer canceled successfully!');
+            } else {
+                updateNotification(receipt.transactionHash, {
+                    message: 'Failed to cancel the swap offer!`',
+                    severity: 'error',
+                    duration: 5000,
+                });
+                endTransaction(false, `Failed to cancel the swap offer.`);
+                console.error('Failed to cancel the swap offer.');
             }
-
-            window.location.reload();
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            endTransaction(false, 'Failed to cancel the swap offer.', error.toString());
+            return;
         }
+
+        window.location.reload();
     };
 
     if (!swapOffer) {
@@ -229,7 +279,9 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' />
+                {swapOffer.convertSrcTokenToNative ?
+                    <SwapOfferDetailsTokenInfo token={getNativeToken(network)} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> :
+                    <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> }
 
                 <Grid item sx={{ height: '42px' }} />
 
@@ -307,7 +359,7 @@ function SwapOfferDetails({ hash }) {
                                     <Tooltip title={swapOffer.feeAmountInBaseUnit}>
                                         <Truncate>{swapOffer.feeAmountInBaseUnit}</Truncate>
                                     </Tooltip>
-                                    ETH
+                                    {networks[network].nativeCurrency.symbol}
                                 </StyledTypography>
                             </StyledBox>
                             {swapOffer.displayExpirationTime && (

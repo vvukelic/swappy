@@ -26,7 +26,7 @@ async function transferErc20Token(tokenAddress, srcAddress, dstAddress, amount) 
 async function main() {
     await transferErc20Token(usdcTokenAddr, usdcWhaleAddr, '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 100000000);
     await transferErc20Token(maticTokenAddr, maticWhaleAddr, '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 100000000000000000000n);
-    console.log(`Transfered 100 USDC aaaa`);
+    console.log(`Transfered 100 USDC`);
 }
 
 main()
