@@ -15,6 +15,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
     IWETH constant private _weth = IWETH(_wethAddress);
     address payable public _feeAddress;
     AggregatorV3Interface private _priceFeed;
+    uint256 private _feeAmountInCents = 200;
 
     constructor(address dataContractAddress, address payable feeAddress) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -26,16 +27,20 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
     event SwapOfferCreated(address indexed creator, bytes32 swapHash);
     error SwapFailed();
 
-    function createSwapOffer(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiresIn, bool partialFillEnabled) public payable {
+    function createSwapOffer(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiresIn, bool partialFillEnabled) public payable nonReentrant {
+        SwappyData.SwapOffer memory newSwapOffer;
+
         if (srcTokenAddress == address(0)) {
             require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
 
             _weth.deposit{value: srcAmount}();
             assert(_weth.transfer(msg.sender, srcAmount));
             srcTokenAddress = _wethAddress;
+            newSwapOffer.convertSrcTokenToNative = true;
+        } else {
+            newSwapOffer.convertSrcTokenToNative = false;
         }
 
-        SwappyData.SwapOffer memory newSwapOffer;
         newSwapOffer.status = SwappyData.SwapStatus.OPENED;
         newSwapOffer.srcAddress = payable(msg.sender);
         newSwapOffer.srcTokenAddress = srcTokenAddress;
@@ -70,7 +75,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         emit SwapOfferCreated(msg.sender, newSwapOfferHash);
     }
 
-    function createSwapForOffer(bytes32 swapOfferHash, uint partialDstAmount) public payable {
+    function createSwapForOffer(bytes32 swapOfferHash, uint partialDstAmount) public payable nonReentrant {
         address swapManagerAddress = address(this);
         SwappyData.SwapOffer memory swapOffer = _dataContract.getSwapOffer(swapOfferHash);
         SwappyData.Swap[] memory swapOfferSwaps = _dataContract.getSwapOfferSwaps(swapOfferHash);
@@ -168,6 +173,10 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         _priceFeed = AggregatorV3Interface(newPriceFeedAddress);
     }
 
+    function setFeeAmountInCents(uint256 feeAmount) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _feeAmountInCents = feeAmount;
+    }
+
     function _getEthUsdPrice() private view returns (uint256) {
         (,int price,,,) = _priceFeed.latestRoundData();
         return uint256(price / 1e8);
@@ -175,8 +184,8 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
 
     function _calculateEthFee() private view returns (uint256) {
         uint256 ethUsdPrice = _getEthUsdPrice();
-        uint256 feeInETH = 1e18 / ethUsdPrice; // $1 in ETH
-        return feeInETH;
+        uint256 feeInEth = (_feeAmountInCents * 1e20) / ethUsdPrice / 1e2;
+        return feeInEth;
     }
 
     receive() external payable {}

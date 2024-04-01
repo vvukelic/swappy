@@ -15,6 +15,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
     IWETH constant private _weth = IWETH(_wethAddress);
     address payable public _feeAddress;
     AggregatorV3Interface private _priceFeed;
+    uint256 private _feeAmountInCents = 200;
 
     constructor(address dataContractAddress, address payable feeAddress) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -172,6 +173,10 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         _priceFeed = AggregatorV3Interface(newPriceFeedAddress);
     }
 
+    function setFeeAmountInCents(uint256 feeAmount) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _feeAmountInCents = feeAmount;
+    }
+
     function _getEthUsdPrice() private view returns (uint256) {
         (,int price,,,) = _priceFeed.latestRoundData();
         return uint256(price / 1e8);
@@ -179,8 +184,8 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
 
     function _calculateEthFee() private view returns (uint256) {
         uint256 ethUsdPrice = _getEthUsdPrice();
-        uint256 feeInETH = 1e18 / ethUsdPrice; // $1 in ETH
-        return feeInETH;
+        uint256 feeInEth = (_feeAmountInCents * 1e20) / ethUsdPrice / 1e2;
+        return feeInEth;
     }
 
     receive() external payable {}
