@@ -97,7 +97,7 @@ export async function getErc20TokenBalance(tokenContractAddress, accountAddress)
     }
 }
 
-export const getCurrentBlockTimestamp = async () => {
+export async function getCurrentBlockTimestamp() {
     const blockNumber = await getProvider().getBlockNumber();
     const block = await getProvider().getBlock(blockNumber);
     return block.timestamp;
