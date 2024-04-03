@@ -44,6 +44,7 @@ const MaxButton = styled(Button)`
     color: black;
     min-width: 32px;
     height: 20px;
+    line-height: 1.5em;
     font-size: 0.75rem;
     padding:  4px 8px;
 
