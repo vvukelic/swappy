@@ -43,6 +43,7 @@
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.15",
     "@openzeppelin/contracts": "^4.8.1",
+    "@walletconnect/web3-provider": "^1.8.0",
     "next": "^13.2.1",
     "next-routes": "^1.4.2",
     "react": "^18.2.0",

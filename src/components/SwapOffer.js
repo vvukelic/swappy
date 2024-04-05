@@ -243,7 +243,7 @@ function SwapOffer({
                 _dstAddress = ethers.constants.AddressZero;
             }
 
-            startTransaction(`Please go to your wallet and confirm the transaction for the swap.`);
+            startTransaction(`Please go to your wallet and confirm the transaction for the swap offer.`);
 
             try {
                 const tx = await createSwapOffer(
@@ -258,7 +258,7 @@ function SwapOffer({
                 );
 
                 addNotification(tx.hash, {
-                    message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()}...`,
+                    message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()}...`,
                     sevirity: 'info',
                     duration: null,
                 });
@@ -272,14 +272,14 @@ function SwapOffer({
                         const swapOfferHash = swapOfferCreatedEvent.args[1];
                         window.location.href = `/swap/${swapOfferHash}`;
                         updateNotification(receipt.transactionHash, {
-                            message: `Swap created!`,
+                            message: `Swap offer created!`,
                             severity: 'success',
                             duration: 5000,
                         });
                         endTransaction(true, `You successfuly created a swap offer!`);
                     } else {
                         updateNotification(receipt.transactionHash, {
-                            message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
+                            message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
                             severity: 'error',
                             duration: 5000,
                         });
@@ -288,7 +288,7 @@ function SwapOffer({
                     }
                 } else {
                     updateNotification(receipt.transactionHash, {
-                        message: `Creating a swap ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
+                        message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
                         severity: 'error',
                         duration: 5000,
                     });
