@@ -331,19 +331,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "feeAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "setFeeAmountInDollars",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "newPriceFeedAddress",
         "type": "address"
