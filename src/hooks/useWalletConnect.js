@@ -49,7 +49,7 @@ export const useWalletConnect = () => {
     const connectWallet = async () => {
         try {
             const signer = provider.getSigner();
-            const accounts = await provider.send('eth_requestAccounts');
+            await provider.send('eth_requestAccounts');
             const account = await signer.getAddress();
             setDefaultAccount(account);
             const networkName = await getNetworkName();
