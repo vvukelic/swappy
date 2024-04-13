@@ -5,7 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { waitForTxToBeMined } from '../utils/web3';
+import { waitForTxToBeMined } from '../utils/general';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
@@ -22,10 +22,7 @@ import SwapOffer from '../utils/swapOffer';
 import { getNativeToken } from '../utils/tokens';
 import { useNotification } from './NotificationProvider';
 import { Truncate } from '../sharedStyles/general';
-import networks from '../data/networks';
 
-
-const contractAddresses = require('../contracts/contract-address.json');
 
 const StyledBox = styled(Box)`
     min-height: 2.5em;

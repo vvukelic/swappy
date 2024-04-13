@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
+import { useWeb3Modal } from '@web3modal/ethers5/react';
 import { Grid, TextField, FormControlLabel, Switch, Tooltip } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -7,7 +8,7 @@ import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
 import { getTokenByAddress, updateCustomTokensList, getNativeToken } from '../utils/tokens';
-import { waitForTxToBeMined } from '../utils/web3';
+import { waitForTxToBeMined } from '../utils/general';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
@@ -67,6 +68,7 @@ function SwapOffer({
     const [selectedDstTokenDecimals, setSelectedDstTokenDecimals] = useState(0);
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const { addNotification, updateNotification } = useNotification();
+    const { open } = useWeb3Modal();
 
     const openModal = (type) => {
         setModalType(type);
@@ -106,6 +108,12 @@ function SwapOffer({
     useEffect(() => {
         updateCustomTokensList();
     }, []);
+
+    useEffect(() => {
+        if (!isAccountConnected) {
+            setSwapOfferButtonText('Connect wallet');
+        }
+    }, [isAccountConnected]);
 
     useEffect(() => {
         if (network && networks[network.chainId]?.nativeCurrency) {
@@ -165,7 +173,7 @@ function SwapOffer({
             }
         }
 
-        if (defaultAccount && selectedSrcToken && network) {
+        if (defaultAccount && selectedSrcToken && network && blockchainUtil) {
             srcTokenHoldingsAmount();
             getSrcTokenDecimals();
         }
@@ -181,13 +189,15 @@ function SwapOffer({
             }
         }
 
-        if (defaultAccount && selectedDstToken && network   ) {
+        if (defaultAccount && selectedDstToken && network && blockchainUtil) {
             getDstTokenDecimals();
         }
     }, [network, defaultAccount, selectedDstToken]);
 
     const handleSwapOfferButtonClick = async () => {
-        if (!tokenApproved && !insufficientSrcTokenAmount) {
+        if (!isAccountConnected) {
+            open();
+        } else if (!tokenApproved && !insufficientSrcTokenAmount) {
             let tokenAddress = selectedSrcToken.networkSpecificAddress[network.uniqueName];
 
             if (tokenAddress === ethers.constants.AddressZero) {
@@ -369,12 +379,11 @@ function SwapOffer({
                 </Grid>
 
                 <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
-                    {isAccountConnected ? <PrimaryButton onClick={handleSwapOfferButtonClick} buttonText={swapOfferButtonText} /> : <w3m-button />}
-                    {/* <w3m-button /> */}
+                    <PrimaryButton onClick={handleSwapOfferButtonClick} buttonText={swapOfferButtonText} />
                 </Grid>
             </MainContentContainer>
 
-            <SelectTokenModal open={modalOpen} onClose={closeModal} handleTokenSelection={(token) => handleTokenSelection(token, modalType)} title={modalType === 'src' ? 'Select a token to send' : 'Select a token to receive'} network={network} />
+            <SelectTokenModal open={modalOpen} onClose={closeModal} handleTokenSelection={(token) => handleTokenSelection(token, modalType)} title={modalType === 'src' ? 'Select a token to send' : 'Select a token to receive'} />
 
             <TransactionStatusModal open={txModalOpen} status={txStatus} statusTxt={txStatusTxt} errorTxt={txErrorTxt} onClose={() => setTxModalOpen(false)} />
         </>

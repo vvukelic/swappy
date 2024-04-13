@@ -13,10 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { getNativeTokenBalance, getNetworkName } from '../utils/web3';
-import { sliceAddress } from '../utils/general';
 import networks from '../data/networks';
-import PrimaryButton from './PrimaryButton';
 
 
 const StyledToolbar = styled(Toolbar)`
