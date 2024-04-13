@@ -224,12 +224,6 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             </StyledTabButton>
             <Box flexGrow={1} />
             {isMobile && <Box sx={{ borderTop: 1, color: 'white' }} />}
-            {nativeTokenBalance !== null && (
-                <NativeCoinBalance variant='h6' color='white'>
-                    {nativeTokenBalance} {network ? network.nativeCurrency.symbol : ''}
-                </NativeCoinBalance>
-            )}
-            {/* {network !== null && <NetworkSelector networkName={networkName} sx={{ marginRight: '15px' }} />} */}
             <SelectNetworkButtonWithMenu />
             <w3m-button />
         </>

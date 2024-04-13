@@ -115,7 +115,7 @@ function SwapOffer({
         }
 
         handleTokenSelection(commonTokens[1], 'dst');  // USDC
-    }, [defaultAccount, network, blockchainUtil]);
+    }, [network, blockchainUtil]);
 
     useEffect(() => {
         async function swapOfferButtonText() {
@@ -165,7 +165,7 @@ function SwapOffer({
             }
         }
 
-        if (defaultAccount && selectedSrcToken) {
+        if (defaultAccount && selectedSrcToken && network) {
             srcTokenHoldingsAmount();
             getSrcTokenDecimals();
         }
@@ -181,7 +181,7 @@ function SwapOffer({
             }
         }
 
-        if (defaultAccount && selectedDstToken) {
+        if (defaultAccount && selectedDstToken && network   ) {
             getDstTokenDecimals();
         }
     }, [network, defaultAccount, selectedDstToken]);
@@ -197,7 +197,6 @@ function SwapOffer({
             startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
 
             try {
-                // const tx = await approveToken(tokenAddress, contractAddresses[network].SwappyManager);
                 const tx = await blockchainUtil.approveTokenForSwappy(tokenAddress);
 
                 addNotification(tx.hash, {
