@@ -14,7 +14,7 @@ export const useWalletConnect = () => {
 
     useEffect(() => {
         if (typeof window !== 'undefined' && network && walletProvider) {
-            setBlockchainUtil(new BlockchainUtil(network.uniqueName, new ethers.providers.Web3Provider(walletProvider)));
+            setBlockchainUtil(new BlockchainUtil(network, new ethers.providers.Web3Provider(walletProvider)));
         }
     }, [network, walletProvider]);
 

@@ -5,7 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { createSwapForOffer, cancelSwapOffer, approveToken, getNativeTokenBalance, getAllowance, waitForTxToBeMined } from '../utils/web3';
+import { waitForTxToBeMined } from '../utils/web3';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
@@ -75,7 +75,7 @@ const StyledInfoValues = styled(Grid)`
 `;
 
 function SwapOfferDetails({ hash }) {
-    const { defaultAccount, connectWallet, network } = useWalletConnect();
+    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const [swapOffer, setSwapOffer] = useState(null);
     const [swapSrcAmount, setSwapSrcAmount] = useState(null);
@@ -90,18 +90,18 @@ function SwapOfferDetails({ hash }) {
             let tokenBalance = null;
 
             if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
-                tokenBalance = await getNativeTokenBalance(defaultAccount);
+                tokenBalance = await blockchainUtil.getNativeTokenBalance(defaultAccount);
                 setTokenApproved(tokenBalance > 0);
             } else {
-                tokenBalance = await getAllowance(swapOffer.dstTokenAddress, defaultAccount, contractAddresses[network].SwappyManager);
+                tokenBalance = await blockchainUtil.getSwappyAllowance(swapOffer.dstTokenAddress, defaultAccount);
                 setTokenApproved(tokenBalance > 0);
             }
         }
 
-        if (swapOffer) {
+        if (defaultAccount && swapOffer && blockchainUtil) {
             checkTokenApproved();
         }
-    }, [defaultAccount, network, swapOffer]);
+    }, [defaultAccount, swapOffer, blockchainUtil]);
 
     useEffect(() => {
         if (defaultAccount && swapOffer) {
@@ -109,7 +109,7 @@ function SwapOfferDetails({ hash }) {
                 setSwapButtonText('Take swap');
             } else {
                 if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
-                    setSwapButtonText(`${networks[network].wrappedNativeCurrencySymbol} balance too low`);
+                    setSwapButtonText(`${network.wrappedNativeCurrencySymbol} balance too low`);
                 } else {
                     setSwapButtonText(`Approve ${swapOffer.dstTokenName} Token`);
                 }
@@ -120,7 +120,7 @@ function SwapOfferDetails({ hash }) {
     useEffect(() => {
         async function getSwapOfferDetails() {
             try {
-                const swapOffer = new SwapOffer(network);
+                const swapOffer = new SwapOffer(blockchainUtil);
                 await swapOffer.load(hash);
                 setSwapOffer(swapOffer);
                 setSwapSrcAmount(swapOffer.remainingSrcAmountSum);
@@ -154,7 +154,7 @@ function SwapOfferDetails({ hash }) {
             startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
             
             try {
-                const tx = await createSwapForOffer(contractAddresses[network].SwappyManager, hash, swapOffer.dstToken.networkSpecificAddress[network], swapDstAmount, swapOffer.feeAmount);
+                const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.networkSpecificAddress[network.uniqueName], swapDstAmount, swapOffer.feeAmount);
 
                 addNotification(tx.hash, {
                     message: 'Taking a swap...',
@@ -191,7 +191,7 @@ function SwapOfferDetails({ hash }) {
             startTransaction(`Please go to your wallet and approve ${swapOffer.dstTokenName}`);
 
             try {
-                const tx = await approveToken(swapOffer.dstTokenAddress, contractAddresses[network].SwappyManager);
+                const tx = await blockchainUtil.approveTokenForSwappy(swapOffer.dstTokenAddress);
 
                 addNotification(tx.hash, {
                     message: `Approving ${swapOffer.dstTokenName}...`,
@@ -228,7 +228,7 @@ function SwapOfferDetails({ hash }) {
         startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap offer.`);
 
         try {
-            const tx = await cancelSwapOffer(contractAddresses[network].SwappyManager, hash);
+            const tx = await blockchainUtil.cancelSwapOffer(hash);
 
             addNotification(tx.hash, {
                 message: `Canceling swap offer...`,
@@ -280,7 +280,7 @@ function SwapOfferDetails({ hash }) {
                 </Grid>
 
                 {swapOffer.convertSrcTokenToNative ?
-                    <SwapOfferDetailsTokenInfo token={getNativeToken(network)} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> :
+                    <SwapOfferDetailsTokenInfo token={getNativeToken(network?.uniqueName)} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> :
                     <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> }
 
                 <Grid item sx={{ height: '42px' }} />
@@ -359,7 +359,7 @@ function SwapOfferDetails({ hash }) {
                                     <Tooltip title={swapOffer.feeAmountInBaseUnit}>
                                         <Truncate>{swapOffer.feeAmountInBaseUnit}</Truncate>
                                     </Tooltip>
-                                    {networks[network].nativeCurrency.symbol}
+                                    {network?.nativeCurrency.symbol}
                                 </StyledTypography>
                             </StyledBox>
                             {swapOffer.displayExpirationTime && (

@@ -4,7 +4,6 @@ import { Paper, TableBody, TableRow, Tooltip } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MainContentContainer from './MainContentContainer';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { getUserSwapOffers, getSwapOffersTakenByUser } from '../utils/web3';
 import { Truncate } from '../sharedStyles/general';
 import SwapOffer from '../utils/swapOffer';
 import { sliceAddress } from '../utils/general';
@@ -16,21 +15,21 @@ const contractAddresses = require('../contracts/contract-address.json');
 
 
 function CompletedSwapsList() {
-    const { defaultAccount, connectWallet, network } = useWalletConnect();
+    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
     const [swapsTakenByUser, setSwapsTakenByUser] = useState([]);
     const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         const fetchUserCompletedSwapsList = async () => {
-            if (!network || !contractAddresses[network]) {
+            if (!network || !contractAddresses[network.uniqueName] || !blockchainUtil) {
                 return;
             }
 
-            const swapOffersTakenByUserHashes = new Set(await getSwapOffersTakenByUser(contractAddresses[network].SwappyData, defaultAccount));
+            const swapOffersTakenByUserHashes = new Set(await blockchainUtil.getSwapOffersTakenByUser(defaultAccount));
             const swaps = [];
 
             for (const swapOfferHash of swapOffersTakenByUserHashes) {
-                const swapOffer = new SwapOffer(network);
+                const swapOffer = new SwapOffer(blockchainUtil);
                 await swapOffer.load(swapOfferHash);
 
                 swapOffer.swaps.map((swap, index) => {
@@ -51,11 +50,11 @@ function CompletedSwapsList() {
                 });
             };
 
-            const userSwapOffersHashes = await getUserSwapOffers(contractAddresses[network].SwappyData, defaultAccount);
+            const userSwapOffersHashes = await blockchainUtil.getUserSwapOffers(defaultAccount);
 
             await Promise.all(
                 userSwapOffersHashes.map(async (hash) => {
-                    const swapOffer = new SwapOffer(network);
+                    const swapOffer = new SwapOffer(blockchainUtil);
                     await swapOffer.load(hash);
 
                     swapOffer.swaps.map((swap, index) => {
@@ -79,7 +78,7 @@ function CompletedSwapsList() {
         };
 
         fetchUserCompletedSwapsList();
-    }, [defaultAccount, network]);
+    }, [defaultAccount, network, blockchainUtil]);
 
     const handleRowClick = (swapOfferHash) => {
         window.open(`/swap/${swapOfferHash}`, '_blank');

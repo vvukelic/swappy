@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import Layout from '../components/Layout';
 import SwapOffer from '../components/SwapOffer';
-import SwapOffersList from '../components/SwapOffersList';
+import UserSwapOffersList from '../components/UserSwapOffersList';
 import CompletedSwapsList from '../components/CompletedSwapsList';
 import { getTokenImageUrl } from '../utils/tokens';
 
@@ -58,7 +58,7 @@ export default () => {
                 selectedSrcTokenImg={selectedSrcTokenImg}
                 selectedDstTokenImg={selectedDstTokenImg}
             />)}
-            {activeTab === 'swapOffersList' && <SwapOffersList activeSwapOffersListTab={activeSwapOffersListTab} />}
+            {activeTab === 'swapOffersList' && <UserSwapOffersList activeSwapOffersListTab={activeSwapOffersListTab} />}
             {activeTab === 'completedSwapsList' && <CompletedSwapsList />}
         </Layout>
     );

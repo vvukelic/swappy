@@ -7,10 +7,11 @@ const contractAddresses = require('../contracts/contract-address.json');
 
 
 export class BlockchainUtil {
-    constructor(networkName, provider) {
+    constructor(network, provider) {
         this.provider = provider;
-        this.swappyDataContract = new ethers.Contract(contractAddresses[networkName].SwappyData, swappyDataAbi, this.provider.getSigner());
-        this.swappyManagerContract = new ethers.Contract(contractAddresses[networkName].SwappyManager, swappyManagerAbi, this.provider.getSigner());
+        this.network = network;
+        this.swappyDataContract = new ethers.Contract(contractAddresses[network.uniqueName].SwappyData, swappyDataAbi, this.provider.getSigner());
+        this.swappyManagerContract = new ethers.Contract(contractAddresses[network.uniqueName].SwappyManager, swappyManagerAbi, this.provider.getSigner());
     }
 
     async switchNetwork(network) {
@@ -198,7 +199,7 @@ export class BlockchainUtil {
         }
     }
 
-    async getSwapOfferRaw(swapOfferHash) {
+    async getSwapOffer(swapOfferHash) {
         const swapOffer = await this.swappyDataContract.getSwapOffer(swapOfferHash);
         return swapOffer;
     }
