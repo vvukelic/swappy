@@ -1,8 +1,8 @@
 const networks = {
-    ethereum: {
-        chainId: '0x1',
+    0x1: {
+        chainId: 0x1,
         chainName: 'Ethereum Mainnet',
-        displayName: 'ethereum',
+        uniqueName: 'ethereum',
         color: '#3d5dd7',
         logo: '/images/eth-logo.png',
         nativeCurrency: {
@@ -13,10 +13,10 @@ const networks = {
         wrappedNativeCurrencyAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
         blockExplorerUrls: ['https://etherscan.io'],
     },
-    polygon: {
-        chainId: '0x89',
+    0x89: {
+        chainId: 0x89,
         chainName: 'Polygon Mainnet',
-        displayName: 'polygon',
+        uniqueName: 'polygon',
         rpcUrls: ['https://polygon-rpc.com'],
         nativeCurrency: {
             name: 'MATIC',
@@ -28,10 +28,10 @@ const networks = {
         logo: '/images/matic-logo.png',
         blockExplorerUrls: ['https://polygonscan.com'],
     },
-    'bnb smart chain': {
-        chainId: '0x38',
+    0x38: {
+        chainId: 0x38,
         chainName: 'BNB Smart Chain Mainnet',
-        displayName: 'bnb smart chain',
+        uniqueName: 'bnb smart chain',
         rpcUrls: ['https://bsc-dataseed.binance.org/'],
         color: '#b98b05',
         logo: '/images/bnb-logo.png',
@@ -43,10 +43,10 @@ const networks = {
         wrappedNativeCurrencyAddress: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
         blockExplorerUrls: ['https://bscscan.com'],
     },
-    'bnb smart chain testnet': {
-        chainId: '0x61',
+    0x61: {
+        chainId: 0x61,
         chainName: 'BNB Smart Chain Testnet',
-        displayName: 'bnb smart chain testnet',
+        uniqueName: 'bnb smart chain testnet',
         rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
         color: '#b98b05',
         logo: '/images/bnb-logo.png',
@@ -58,10 +58,10 @@ const networks = {
         wrappedNativeCurrencyAddress: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
         blockExplorerUrls: ['https://testnet.bscscan.com'],
     },
-    goerli: {
-        chainId: '0x5',
+    0x5: {
+        chainId: 0x5,
         chainName: 'Goerli Testnet',
-        displayName: 'goerli',
+        uniqueName: 'goerli',
         nativeCurrency: {
             name: 'Goerli Ether',
             symbol: 'gETH',
@@ -72,10 +72,10 @@ const networks = {
         logo: '/images/eth-logo.png',
         blockExplorerUrls: ['https://goerli.etherscan.io'],
     },
-    sepolia: {
-        chainId: '0xaa36a7',
+    0xaa36a7: {
+        chainId: 0xaa36a7,
         chainName: 'Ethereum Sepolia',
-        displayName: 'sepolia',
+        uniqueName: 'sepolia',
         nativeCurrency: {
             name: 'Sepolia Ether',
             symbol: 'SepoliaETH',
@@ -86,10 +86,10 @@ const networks = {
         logo: '/images/eth-logo.png',
         blockExplorerUrls: ['https://sepolia.etherscan.io'],
     },
-    localhost: {
-        chainId: '0x7a69',
+    0x7a69: {
+        chainId: 0x7a69,
         chainName: 'localhost',
-        displayName: 'localhost',
+        uniqueName: 'localhost',
         rpcUrls: ['http://localhost:8545'],
         nativeCurrency: {
             name: 'Ether',

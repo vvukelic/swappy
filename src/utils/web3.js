@@ -34,7 +34,7 @@ export async function getNetworkName() {
     let networkName = 'Unsupported Network';
 
     Object.keys(networks).forEach((key) => {
-        if (networks[key].chainId === ethers.utils.hexValue(network.chainId)) {
+        if (networks[key].chainId === network.chainId) {
             networkName = networks[key].displayName;
         }
     });

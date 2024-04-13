@@ -68,7 +68,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
                 setCustomToken({
                     'name': tokenName,
                     'networkSpecificAddress': {
-                        [network]: searchInput
+                        [network.uniqueName]: searchInput
                     }
                 });
             } catch (err) {
@@ -84,8 +84,8 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
     useEffect(() => {
         setfilteredTokens(
             getAllTokens().filter(token =>
-                token.networkSpecificAddress[network] && 
-                (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[network].includes(searchInput))
+                token.networkSpecificAddress[network?.uniqueName] && 
+                (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[network?.uniqueName].includes(searchInput))
             )
         );
     }, [network, searchInput]);

@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { getNativeTokenBalance, getNetworkName, switchNetwork } from '../utils/web3';
+import { getNativeTokenBalance, getNetworkName } from '../utils/web3';
 import { sliceAddress } from '../utils/general';
 import networks from '../data/networks';
 import PrimaryButton from './PrimaryButton';
@@ -116,9 +116,8 @@ const NativeCoinBalance = styled(Typography)`
 `;
 
 function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
-    const { defaultAccount, connectWallet, network } = useWalletConnect();
+    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
     const [nativeTokenBalance, setNativeTokenBalance] = useState(null);
-    const [networkName, setNetworkName] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:900px)');
     const router = useRouter();
@@ -128,31 +127,17 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     useEffect(() => {
         const fetchBalance = async () => {
             if (defaultAccount) {
-                let balance = await getNativeTokenBalance(defaultAccount);
+                let balance = await blockchainUtil.getNativeTokenBalance(defaultAccount);
                 balance = ethers.utils.formatEther(balance);
                 balance = parseFloat(balance).toFixed(2);
                 setNativeTokenBalance(balance);
             }
         };
 
-        fetchBalance();
-    }, [defaultAccount, network]);
-
-    useEffect(() => {
-        const updateNetworkName = async () => {
-            if (network) {
-                const name = await getNetworkName(network);
-                setNetworkName(name);
-            }
-        };
-
-        updateNetworkName();
-    }, [network]);
-
-    let connectBtnText = 'Connect';
-    if (defaultAccount) {
-        connectBtnText = sliceAddress(defaultAccount);
-    }
+        if (blockchainUtil) {
+            fetchBalance();
+        }
+    }, [blockchainUtil, defaultAccount]);
 
     const handleSwapOfferNavigationButtonClick = (newActiveTab) => {
         if (activeTab === 'createSwapOffer' || activeTab === 'swapOffersList' || activeTab === 'completedSwapsList') {
@@ -202,24 +187,24 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     );
 
     const SelectNetworkButtonWithMenu = () => {
-        const handleNetworkSelect = (networkKey) => {
-            switchNetwork(networkKey);
+        const handleNetworkSelect = async (network) => {
+            await blockchainUtil.switchNetwork(network);
             setShowNetworksHoverMenu(false);
         };
 
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
-                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={networkName && networks[networkName] ? networks[networkName].color : ''}>
-                    <img src={networkName && networks[networkName] ? networks[networkName].logo : ''} alt='' className='network-icon' />
-                    {networkName ? networkName : 'Select network'}
+                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={network ? network.color : ''}>
+                    <img src={network ? network.logo : ''} alt='' className='network-icon' />
+                    {network ? network.uniqueName : 'Select network'}
                 </NetworkButton>
                 <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
                     {Object.keys(networks).map((networkKey) => {
-                        const { displayName, logo } = networks[networkKey];
+                        const network = networks[networkKey];
                         return (
-                            <SelectNetworkButton key={networkKey} onClick={() => handleNetworkSelect(networkKey)}>
-                                <NetworkIcon src={logo} alt={`${displayName} icon`} />
-                                {displayName}
+                            <SelectNetworkButton key={networkKey} onClick={() => handleNetworkSelect(network)}>
+                                <NetworkIcon src={network.logo} alt={`${network.uniqueName} icon`} />
+                                {network.uniqueName}
                             </SelectNetworkButton>
                         );
                     })}
@@ -241,12 +226,12 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             {isMobile && <Box sx={{ borderTop: 1, color: 'white' }} />}
             {nativeTokenBalance !== null && (
                 <NativeCoinBalance variant='h6' color='white'>
-                    {nativeTokenBalance} {networkName && networks[networkName] ? networks[networkName].nativeCurrency.symbol : ''}
+                    {nativeTokenBalance} {network ? network.nativeCurrency.symbol : ''}
                 </NativeCoinBalance>
             )}
             {/* {network !== null && <NetworkSelector networkName={networkName} sx={{ marginRight: '15px' }} />} */}
             <SelectNetworkButtonWithMenu />
-            <PrimaryButton onClick={connectWallet} buttonText={connectBtnText} />
+            <w3m-button />
         </>
     );
 
