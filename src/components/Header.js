@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import networks from '../data/networks';
+import { getSupportedNetworks } from '../utils/general';
 
 
 const StyledToolbar = styled(Toolbar)`
@@ -113,7 +113,7 @@ const NativeCoinBalance = styled(Typography)`
 `;
 
 function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
-    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
+    const { defaultAccount, network, blockchainUtil } = useWalletConnect();
     const [nativeTokenBalance, setNativeTokenBalance] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:900px)');
@@ -185,7 +185,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
 
     const SelectNetworkButtonWithMenu = () => {
         const handleNetworkSelect = async (network) => {
-            await blockchainUtil.switchNetwork(network);
+            await blockchainUtil?.switchNetwork(network);
             setShowNetworksHoverMenu(false);
         };
 
@@ -196,10 +196,9 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                     {network ? network.uniqueName : 'Select network'}
                 </NetworkButton>
                 <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
-                    {Object.keys(networks).map((networkKey) => {
-                        const network = networks[networkKey];
+                    {Object.values(getSupportedNetworks()).map((network) => {
                         return (
-                            <SelectNetworkButton key={networkKey} onClick={() => handleNetworkSelect(network)}>
+                            <SelectNetworkButton key={network.uniqueName} onClick={() => handleNetworkSelect(network)}>
                                 <NetworkIcon src={network.logo} alt={`${network.uniqueName} icon`} />
                                 {network.uniqueName}
                             </SelectNetworkButton>

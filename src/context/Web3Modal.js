@@ -1,6 +1,7 @@
 import React from 'react';
 import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5/react';
 import networks from '../data/networks';
+import { getSupportedNetworks } from '../utils/general';
 
 const secret = require('../../secret.json');
 
@@ -8,24 +9,8 @@ const secret = require('../../secret.json');
 const projectId = secret['wallet_connect'];
 
 // 2. Set chains
-// const sepolia = {
-//     chainId: 0xaa36a7,
-//     name: 'Sepolia',
-//     currency: 'SepoliaETH',
-//     explorerUrl: 'https://sepolia.etherscan.io',
-//     rpcUrl: 'https://rpc.sepolia.org',
-// };
-
-// const localhost = {
-//     chainId: 0x7a69,
-//     name: 'localhost',
-//     currency: 'ETH',
-//     explorerUrl: '',
-//     rpcUrl: 'http://localhost:8545',
-// };
 function extractNetworkInfo(networks) {
-    return Object.keys(networks).map((key) => {
-        const network = networks[key];
+    return Object.values(getSupportedNetworks()).map((network) => {
         return {
             chainId: network.chainId,
             name: network.chainName,

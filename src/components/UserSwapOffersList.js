@@ -57,7 +57,7 @@ const UserSwapOffersList = ({ activeSwapOffersListTab }) => {
             fetchUserSwapOffers();
             fetchSwapOffersForUser();
         }
-    }, [defaultAccount, network], blockchainUtil);
+    }, [defaultAccount, network, blockchainUtil]);
 
     const handleRowClick = (swapOfferHash) => {
         window.open(`/swap/${swapOfferHash}`, '_blank');

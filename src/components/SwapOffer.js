@@ -15,11 +15,8 @@ import PrimaryButton from './PrimaryButton';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import { useNotification } from './NotificationProvider';
-import networks from '../data/networks';
 import commonTokens from '../data/commonTokens.json';
 
-
-const contractAddresses = require('../contracts/contract-address.json');
 
 const StyledSwitch = styled(Switch)`
     & .MuiSwitch-switchBase.Mui-checked {
@@ -81,7 +78,7 @@ function SwapOffer({
     };
 
     const handleTokenSelection = async (token, type) => {
-        if (!network || !networks[network.chainId] || !blockchainUtil) {
+        if (!network || !network.chainId || !blockchainUtil) {
             return;
         }
 
@@ -93,7 +90,7 @@ function SwapOffer({
             let tokenAddress = token.networkSpecificAddress[network.uniqueName];
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByAddress(networks[network.chainId].wrappedNativeCurrencyAddress, network.uniqueName).networkSpecificAddress[network.uniqueName];
+                tokenAddress = getTokenByAddress(network.wrappedNativeCurrencyAddress, network.uniqueName).networkSpecificAddress[network.uniqueName];
             }
 
             const availableTokenBalance = await blockchainUtil.getSwappyAllowance(tokenAddress, defaultAccount);
@@ -112,11 +109,12 @@ function SwapOffer({
     useEffect(() => {
         if (!isAccountConnected) {
             setSwapOfferButtonText('Connect wallet');
+            setDefaultAccountSrcTokenBalance(null);
         }
     }, [isAccountConnected]);
 
     useEffect(() => {
-        if (network && networks[network.chainId]?.nativeCurrency) {
+        if (network && network.chainId?.nativeCurrency) {
             handleTokenSelection(getNativeToken(network.uniqueName), 'src');
         } else {
             handleTokenSelection(commonTokens[0], 'src');  // ETH
@@ -131,7 +129,6 @@ function SwapOffer({
 
             if (tokenAddress) {
                 const defaultAccountSrcTokenBalance = await blockchainUtil.getTokenBalance(defaultAccount, tokenAddress);
-
                 const srcAmountInt = await blockchainUtil.toSmallestUnit(srcAmount, tokenAddress);
 
                 if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
@@ -152,7 +149,7 @@ function SwapOffer({
         if (defaultAccount && selectedSrcToken && blockchainUtil) {
             swapOfferButtonText();
         }
-    }, [network, blockchainUtil, selectedSrcToken, tokenApproved, srcAmount]);
+    }, [network, blockchainUtil, selectedSrcToken, tokenApproved, srcAmount, isAccountConnected]);
 
     useEffect(() => {
         async function srcTokenHoldingsAmount() {
@@ -162,7 +159,7 @@ function SwapOffer({
                 const tokenBalance = await blockchainUtil.getTokenBalance(defaultAccount, tokenContract);
                 setDefaultAccountSrcTokenBalance(await blockchainUtil.toBaseUnit(tokenBalance, tokenContract));
             }
-        }
+        };
 
         async function getSrcTokenDecimals() {
             const tokenAddress = selectedSrcToken.networkSpecificAddress[network.uniqueName];
@@ -171,13 +168,13 @@ function SwapOffer({
                 const srcTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await blockchainUtil.getTokenDecimals(tokenAddress);
                 setSelectedSrcTokenDecimals(srcTokenDecimals);
             }
-        }
+        };
 
         if (defaultAccount && selectedSrcToken && network && blockchainUtil) {
             srcTokenHoldingsAmount();
             getSrcTokenDecimals();
         }
-    }, [network, defaultAccount, selectedSrcToken]);
+    }, [network, defaultAccount, selectedSrcToken, blockchainUtil]);
 
     useEffect(() => {
         async function getDstTokenDecimals() {

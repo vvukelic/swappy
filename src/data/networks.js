@@ -1,5 +1,5 @@
 const networks = {
-    0x1: {
+    ethereum: {
         chainId: 0x1,
         chainName: 'Ethereum Mainnet',
         uniqueName: 'ethereum',
@@ -13,7 +13,7 @@ const networks = {
         wrappedNativeCurrencyAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
         blockExplorerUrls: ['https://etherscan.io'],
     },
-    0x89: {
+    polygon: {
         chainId: 0x89,
         chainName: 'Polygon Mainnet',
         uniqueName: 'polygon',
@@ -28,7 +28,7 @@ const networks = {
         logo: '/images/matic-logo.png',
         blockExplorerUrls: ['https://polygonscan.com'],
     },
-    0x38: {
+    'bnb smart chain': {
         chainId: 0x38,
         chainName: 'BNB Smart Chain Mainnet',
         uniqueName: 'bnb smart chain',
@@ -43,7 +43,7 @@ const networks = {
         wrappedNativeCurrencyAddress: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
         blockExplorerUrls: ['https://bscscan.com'],
     },
-    0x61: {
+    'bnb smart chain testnet': {
         chainId: 0x61,
         chainName: 'BNB Smart Chain Testnet',
         uniqueName: 'bnb smart chain testnet',
@@ -58,7 +58,7 @@ const networks = {
         wrappedNativeCurrencyAddress: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
         blockExplorerUrls: ['https://testnet.bscscan.com'],
     },
-    0x5: {
+    goerli: {
         chainId: 0x5,
         chainName: 'Goerli Testnet',
         uniqueName: 'goerli',
@@ -72,10 +72,11 @@ const networks = {
         logo: '/images/eth-logo.png',
         blockExplorerUrls: ['https://goerli.etherscan.io'],
     },
-    0xaa36a7: {
+    sepolia: {
         chainId: 0xaa36a7,
         chainName: 'Ethereum Sepolia',
         uniqueName: 'sepolia',
+        rpcUrls: ['https://sepolia.gateway.tenderly.co'],
         nativeCurrency: {
             name: 'Sepolia Ether',
             symbol: 'SepoliaETH',
@@ -86,7 +87,7 @@ const networks = {
         logo: '/images/eth-logo.png',
         blockExplorerUrls: ['https://sepolia.etherscan.io'],
     },
-    0x7a69: {
+    localhost: {
         chainId: 0x7a69,
         chainName: 'localhost',
         uniqueName: 'localhost',
