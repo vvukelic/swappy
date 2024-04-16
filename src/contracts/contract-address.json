@@ -1,7 +1,7 @@
 {
   "localhost": {
-    "SwappyData": "0x64079a2Edd1104a2323E2b732A1244BCE011B1F5",
-    "SwappyManager": "0x0Deeb4b6492C1a55Bb7C0555AaFf65fF6dC424B2"
+    "SwappyData": "0x0b27a79cb9C0B38eE06Ca3d94DAA68e0Ed17F953",
+    "SwappyManager": "0x7bdd3b028C4796eF0EAf07d11394d0d9d8c24139"
   },
   "sepolia": {
     "SwappyData": "0x64f596959C1Abd3E34017292c2CB29D96cAEE4f7",

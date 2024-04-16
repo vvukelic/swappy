@@ -44,8 +44,8 @@
     "@mui/material": "^5.11.15",
     "@openzeppelin/contracts": "^4.8.1",
     "@walletconnect/web3-provider": "^1.8.0",
+    "@web3modal/ethers5": "^4.1.6",
     "next": "^13.2.1",
-    "next-routes": "^1.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   }

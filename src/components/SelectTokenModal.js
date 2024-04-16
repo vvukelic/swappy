@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import styled from '@emotion/styled';
 import { getTokenImageUrl, addCustomToken, getAllTokens } from '../utils/tokens';
-import { getTokenSymbol } from '../utils/web3';
+import { useWalletConnect } from '../hooks/useWalletConnect';
 
 
 const StyledDialog = styled(Dialog)`
@@ -56,7 +56,8 @@ const isValidEthereumAddress = (address) => {
     return /^(0x)?[0-9a-fA-F]{40}$/.test(address);
 };
 
-function SelectTokenModal({ open, onClose, handleTokenSelection, title, network }) {
+function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
+    const { network, blockchainUtil } = useWalletConnect();
     const [searchInput, setSearchInput] = useState('');
     const [customToken, setCustomToken] = useState(null);
     const [filteredTokens, setfilteredTokens] = useState([]);
@@ -64,11 +65,11 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
     useEffect(() => {
         async function processSearchInput() {
             try {
-                const tokenName = await getTokenSymbol(searchInput);
+                const tokenName = await blockchainUtil.getTokenSymbol(searchInput);
                 setCustomToken({
                     'name': tokenName,
                     'networkSpecificAddress': {
-                        [network]: searchInput
+                        [network.uniqueName]: searchInput
                     }
                 });
             } catch (err) {
@@ -84,8 +85,8 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, network 
     useEffect(() => {
         setfilteredTokens(
             getAllTokens().filter(token =>
-                token.networkSpecificAddress[network] && 
-                (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[network].includes(searchInput))
+                token.networkSpecificAddress[network?.uniqueName] && 
+                (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[network?.uniqueName].includes(searchInput))
             )
         );
     }, [network, searchInput]);

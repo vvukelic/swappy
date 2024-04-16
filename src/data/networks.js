@@ -1,8 +1,8 @@
 const networks = {
     ethereum: {
-        chainId: '0x1',
+        chainId: 0x1,
         chainName: 'Ethereum Mainnet',
-        displayName: 'ethereum',
+        uniqueName: 'ethereum',
         color: '#3d5dd7',
         logo: '/images/eth-logo.png',
         nativeCurrency: {
@@ -14,9 +14,9 @@ const networks = {
         blockExplorerUrls: ['https://etherscan.io'],
     },
     polygon: {
-        chainId: '0x89',
+        chainId: 0x89,
         chainName: 'Polygon Mainnet',
-        displayName: 'polygon',
+        uniqueName: 'polygon',
         rpcUrls: ['https://polygon-rpc.com'],
         nativeCurrency: {
             name: 'MATIC',
@@ -29,9 +29,9 @@ const networks = {
         blockExplorerUrls: ['https://polygonscan.com'],
     },
     'bnb smart chain': {
-        chainId: '0x38',
+        chainId: 0x38,
         chainName: 'BNB Smart Chain Mainnet',
-        displayName: 'bnb smart chain',
+        uniqueName: 'bnb smart chain',
         rpcUrls: ['https://bsc-dataseed.binance.org/'],
         color: '#b98b05',
         logo: '/images/bnb-logo.png',
@@ -44,9 +44,9 @@ const networks = {
         blockExplorerUrls: ['https://bscscan.com'],
     },
     'bnb smart chain testnet': {
-        chainId: '0x61',
+        chainId: 0x61,
         chainName: 'BNB Smart Chain Testnet',
-        displayName: 'bnb smart chain testnet',
+        uniqueName: 'bnb smart chain testnet',
         rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
         color: '#b98b05',
         logo: '/images/bnb-logo.png',
@@ -59,9 +59,9 @@ const networks = {
         blockExplorerUrls: ['https://testnet.bscscan.com'],
     },
     goerli: {
-        chainId: '0x5',
+        chainId: 0x5,
         chainName: 'Goerli Testnet',
-        displayName: 'goerli',
+        uniqueName: 'goerli',
         nativeCurrency: {
             name: 'Goerli Ether',
             symbol: 'gETH',
@@ -73,9 +73,10 @@ const networks = {
         blockExplorerUrls: ['https://goerli.etherscan.io'],
     },
     sepolia: {
-        chainId: '0xaa36a7',
+        chainId: 0xaa36a7,
         chainName: 'Ethereum Sepolia',
-        displayName: 'sepolia',
+        uniqueName: 'sepolia',
+        rpcUrls: ['https://sepolia.gateway.tenderly.co'],
         nativeCurrency: {
             name: 'Sepolia Ether',
             symbol: 'SepoliaETH',
@@ -87,9 +88,9 @@ const networks = {
         blockExplorerUrls: ['https://sepolia.etherscan.io'],
     },
     localhost: {
-        chainId: '0x7a69',
+        chainId: 0x7a69,
         chainName: 'localhost',
-        displayName: 'localhost',
+        uniqueName: 'localhost',
         rpcUrls: ['http://localhost:8545'],
         nativeCurrency: {
             name: 'Ether',
