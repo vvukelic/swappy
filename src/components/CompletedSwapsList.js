@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
-import { Paper, TableBody, TableRow, Tooltip } from '@mui/material';
+import { Paper, TableBody, TableRow, Tooltip, CircularProgress } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MainContentContainer from './MainContentContainer';
 import { useWalletConnect } from '../hooks/useWalletConnect';
@@ -17,6 +17,7 @@ const contractAddresses = require('../contracts/contract-address.json');
 function CompletedSwapsList() {
     const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
     const [swapsTakenByUser, setSwapsTakenByUser] = useState([]);
+    const [loadingSwaps, setLoadingSwaps] = useState(false);
     const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
@@ -75,8 +76,10 @@ function CompletedSwapsList() {
             swaps.sort((a, b) => b.closedTime - a.closedTime);
 
             setSwapsTakenByUser(swaps);
+            setLoadingSwaps(false);
         };
 
+        setLoadingSwaps(true);
         fetchUserCompletedSwapsList();
     }, [defaultAccount, network, blockchainUtil]);
 
@@ -102,7 +105,10 @@ function CompletedSwapsList() {
                                 {swapsTakenByUser.length === 0 ? (
                                     <TableRow>
                                         <StyledTableCell colSpan={4} style={{ textAlign: 'center' }}>
-                                            <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
+                                            {loadingSwaps ?
+                                                <CircularProgress color='inherit' /> :
+                                                <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
+                                            }
                                         </StyledTableCell>
                                     </TableRow>
                                 ) : (swapsTakenByUser.map((swap, index) => {

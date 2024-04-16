@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { TableBody, TableRow, Paper, Tooltip } from '@mui/material';
+import { TableBody, TableRow, Paper, Tooltip, CircularProgress } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, StyledTableCell, StyledHeaderTableCell, StyledMessage } from '../sharedStyles/tableStyles';
 import BorderedSection from './BorderSection';
@@ -20,40 +20,46 @@ const UserSwapOffersList = ({ activeSwapOffersListTab }) => {
     const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
     const [userSwapOffers, setUserSwapOffers] = useState([]);
     const [swapOffersForUser, setSwapOffersForUser] = useState([]);
+    const [loadingSwapOffers, setLoadingSwapOffers] = useState(false);
     const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         const fetchUserSwapOffers = async () => {
-            const swapOffersHashes = await blockchainUtil.getUserSwapOffers(defaultAccount);
+            const userSwapOffersHashes = await blockchainUtil.getUserSwapOffers(defaultAccount);
 
-            const swapOffers = await Promise.all(
-                swapOffersHashes.map(async (hash) => {
+            const userSwapOffers = await Promise.all(
+                userSwapOffersHashes.map(async (hash) => {
                     const swapOffer = new SwapOffer(blockchainUtil);
                     await swapOffer.load(hash);
                     return swapOffer;
                 })
             );
 
-            swapOffers.sort((a, b) => b.createdTime - a.createdTime);
-            setUserSwapOffers(swapOffers);
+            userSwapOffers.sort((a, b) => b.createdTime - a.createdTime);
+            setUserSwapOffers(userSwapOffers);
+
+            const swapOffersForUserHashes = await blockchainUtil.getSwapOffersForUser(defaultAccount);
+
+            const swapOffersForUser = await Promise.all(
+                swapOffersForUserHashes.map(async (hash) => {
+                    const swapOffer = new SwapOffer(blockchainUtil);
+                    await swapOffer.load(hash);
+                    return swapOffer;
+                })
+            );
+
+            swapOffersForUser.sort((a, b) => b.createdTime - a.createdTime);
+            setSwapOffersForUser(swapOffersForUser);
+
+            setLoadingSwapOffers(false);
         };
 
         const fetchSwapOffersForUser = async () => {
-            const swapOffersHashes = await blockchainUtil.getSwapOffersForUser(defaultAccount);
 
-            const swapOffers = await Promise.all(
-                swapOffersHashes.map(async (hash) => {
-                    const swapOffer = new SwapOffer(blockchainUtil);
-                    await swapOffer.load(hash);
-                    return swapOffer;
-                })
-            );
-
-            swapOffers.sort((a, b) => b.createdTime - a.createdTime);
-            setSwapOffersForUser(swapOffers);
         };
 
         if (defaultAccount && network && blockchainUtil) {
+            setLoadingSwapOffers(true);
             fetchUserSwapOffers();
             fetchSwapOffersForUser();
         }
@@ -82,7 +88,10 @@ const UserSwapOffersList = ({ activeSwapOffersListTab }) => {
                                 {swapOffers.length === 0 ? (
                                     <TableRow>
                                         <StyledTableCell colSpan={isMobile ? 4 : 5} style={{ textAlign: 'center' }}>
-                                            <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
+                                            {loadingSwapOffers ?
+                                                <CircularProgress color='inherit' /> :
+                                                <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
+                                            }
                                         </StyledTableCell>
                                     </TableRow>
                                 ) : (
