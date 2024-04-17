@@ -66,6 +66,7 @@
             "ethereum": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
             "goerli": "0xA108830A23A9a054FfF4470a8e6292da0886A4D4",
             "polygon": "0x0000000000000000000000000000000000000000",
+            "amoy": "0x0000000000000000000000000000000000000000",
             "bnb smart chain": "0xCC42724C6683B7E57334c4E856f4c9965ED682bD"
         },
         "logo": "/images/matic-logo.png"
@@ -167,7 +168,7 @@
             "ethereum": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
             "goerli": "",
             "sepolia": "0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0",
-            "polygon": ""
+            "polygon": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
         }
     },
     {

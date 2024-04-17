@@ -141,7 +141,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
             }
         }
 
-        if (srcTokenAddress == _wethAddress) {
+        if (srcTokenAddress == _wethAddress && swapOffer.convertSrcTokenToNative) {
             require(srcToken.transferFrom(swapOffer.srcAddress, address(this), swap.srcAmount), "Source amount failed to transfer");
             _weth.withdraw(swap.srcAmount);
             dstAddress.transfer(swap.srcAmount);
@@ -177,15 +177,10 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         _feeAmountInCents = feeAmount;
     }
 
-    function _getEthUsdPrice() private view returns (uint256) {
-        (,int price,,,) = _priceFeed.latestRoundData();
-        return uint256(price / 1e8);
-    }
-
     function _calculateEthFee() private view returns (uint256) {
-        uint256 ethUsdPrice = _getEthUsdPrice();
-        uint256 feeInEth = (_feeAmountInCents * 1e20) / ethUsdPrice / 1e2;
-        return feeInEth;
+        (,int ethUsdPrice,,,) = _priceFeed.latestRoundData();
+        uint8 decimals = _priceFeed.decimals();
+        return (_feeAmountInCents * 1e18) / (uint256(ethUsdPrice) / 10 ** (decimals - 2));
     }
 
     receive() external payable {}

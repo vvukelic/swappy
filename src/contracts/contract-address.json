@@ -1,10 +1,14 @@
 {
   "localhost": {
-    "SwappyData": "0x0b27a79cb9C0B38eE06Ca3d94DAA68e0Ed17F953",
-    "SwappyManager": "0x7bdd3b028C4796eF0EAf07d11394d0d9d8c24139"
+    "SwappyData": "0xfb6dAB6200b8958C2655C3747708F82243d3F32E",
+    "SwappyManager": "0x798f111c92E38F102931F34D1e0ea7e671BDBE31"
   },
   "sepolia": {
     "SwappyData": "0x64f596959C1Abd3E34017292c2CB29D96cAEE4f7",
     "SwappyManager": "0x346f1f522d97DBC1f7d0451AeCC6F05433025903"
+  },
+  "polygon": {
+    "SwappyData": "0x73C014A6EBaBadad4b9cC84Bbe238102FccD1A66",
+    "SwappyManager": "0x51fCAe84DA92294Ae48795D01213f2a008641b20"
   }
 }

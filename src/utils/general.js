@@ -16,7 +16,7 @@ export async function waitForTxToBeMined(tx) {
     }
 }
 
-const supportedNetworkNames = ['localhost', 'sepolia'];
+const supportedNetworkNames = ['localhost', 'sepolia', 'polygon'];
 let supportedNetworks = [];
 
 export function getSupportedNetworks() {

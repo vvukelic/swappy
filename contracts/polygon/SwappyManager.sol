@@ -11,17 +11,17 @@ import "../SwappyData.sol";
 contract SwappyManager is AccessControl, ReentrancyGuard {
     SwappyData private _dataContract;
     uint256 private _nonce;
-    address constant private _wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    IWETH constant private _weth = IWETH(_wethAddress);
+    address constant private _wmaticAddress = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
+    IWMATIC constant private _wmatic = IWMATIC(_wmaticAddress);
     address payable public _feeAddress;
     AggregatorV3Interface private _priceFeed;
-    uint256 private _feeAmountInCents = 200;
+    uint256 private _feeAmountInCents = 100;
 
     constructor(address dataContractAddress, address payable feeAddress) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _dataContract = SwappyData(dataContractAddress);
         _feeAddress = feeAddress;
-        _priceFeed = AggregatorV3Interface(0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419);
+        _priceFeed = AggregatorV3Interface(0xAB594600376Ec9fD91F8e885dADF0CE036862dE0);
     }
 
     event SwapOfferCreated(address indexed creator, bytes32 swapHash);
@@ -31,11 +31,11 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         SwappyData.SwapOffer memory newSwapOffer;
 
         if (srcTokenAddress == address(0)) {
-            require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
+            require(msg.value >= srcAmount, "Not enough MATIC to create a swap!");
 
-            _weth.deposit{value: srcAmount}();
-            assert(_weth.transfer(msg.sender, srcAmount));
-            srcTokenAddress = _wethAddress;
+            _wmatic.deposit{value: srcAmount}();
+            require(_wmatic.transfer(msg.sender, srcAmount), "WMATIC transfer failed");
+            srcTokenAddress = _wmaticAddress;
             newSwapOffer.convertSrcTokenToNative = true;
         } else {
             newSwapOffer.convertSrcTokenToNative = false;
@@ -50,7 +50,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         newSwapOffer.dstAddress = dstAddress;
         newSwapOffer.createdTime = block.timestamp;
         newSwapOffer.feeTokenAddress = address(0);
-        newSwapOffer.feeAmount = _calculateEthFee();
+        newSwapOffer.feeAmount = _calculateMaticFee();
         newSwapOffer.partialFillEnabled = partialFillEnabled;
 
         if (expiresIn > 0) {
@@ -128,10 +128,10 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         require(srcToken.allowance(swapOffer.srcAddress, swapManagerAddress) >= swap.srcAmount, "Not enough allowence for source token!");
 
         if (dstTokenAddress == address(0)) {
-            require(msg.value >= (swap.dstAmount + swapOffer.feeAmount), "Not enough ETH to create swap!");
+            require(msg.value >= (swap.dstAmount + swapOffer.feeAmount), "Not enough MATIC to create swap!");
             swapOffer.srcAddress.transfer(swap.dstAmount);
         } else {
-            require(msg.value >= swapOffer.feeAmount, "Not enough ETH to take a swap!");
+            require(msg.value >= swapOffer.feeAmount, "Not enough MATIC to take a swap!");
 
             ERC20 dstToken = ERC20(dstTokenAddress);
             require(dstToken.allowance(msg.sender, swapManagerAddress) >= swap.dstAmount, "Not enough allowence for destination token!");
@@ -141,9 +141,9 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
             }
         }
 
-        if (srcTokenAddress == _wethAddress && swapOffer.convertSrcTokenToNative) {
+        if (srcTokenAddress == _wmaticAddress && swapOffer.convertSrcTokenToNative) {
             require(srcToken.transferFrom(swapOffer.srcAddress, address(this), swap.srcAmount), "Source amount failed to transfer");
-            _weth.withdraw(swap.srcAmount);
+            _wmatic.withdraw(swap.srcAmount);
             dstAddress.transfer(swap.srcAmount);
         } else {
             require(srcToken.transferFrom(swapOffer.srcAddress, msg.sender, swap.srcAmount), "Source amount failed to transfer");
@@ -177,17 +177,17 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         _feeAmountInCents = feeAmount;
     }
 
-    function _calculateEthFee() private view returns (uint256) {
-        (,int ethUsdPrice,,,) = _priceFeed.latestRoundData();
+    function _calculateMaticFee() private view returns (uint256) {
+        (,int maticUsdPrice,,,) = _priceFeed.latestRoundData();
         uint8 decimals = _priceFeed.decimals();
-        return (_feeAmountInCents * 1e18) / (uint256(ethUsdPrice) / 10 ** (decimals - 2));
+        return (_feeAmountInCents * 1e18) / (uint256(maticUsdPrice) / 10 ** (decimals - 2));
     }
 
     receive() external payable {}
     fallback() external payable {}
 }
 
-interface IWETH is IERC20 {
+interface IWMATIC is IERC20 {
     function deposit() external payable;
     function withdraw(uint) external;
 }

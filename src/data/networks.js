@@ -28,6 +28,21 @@ const networks = {
         logo: '/images/matic-logo.png',
         blockExplorerUrls: ['https://polygonscan.com'],
     },
+    amoy: {
+        chainId: 0x13882,
+        chainName: 'Polygon Testnet',
+        uniqueName: 'polygon amoy',
+        rpcUrls: ['https://rpc-amoy.polygon.technology/'],
+        nativeCurrency: {
+            name: 'MATIC',
+            symbol: 'MATIC',
+            decimals: 18,
+        },
+        wrappedNativeCurrencyAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
+        color: '#6a22e4',
+        logo: '/images/matic-logo.png',
+        blockExplorerUrls: ['https://polygonscan.com'],
+    },
     'bnb smart chain': {
         chainId: 0x38,
         chainName: 'BNB Smart Chain Mainnet',
