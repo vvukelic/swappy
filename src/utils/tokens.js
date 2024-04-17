@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
 
 import commonTokens from '../data/commonTokens.json';
-import { getTokenDecimals, getNativeTokenBalance, getErc20TokenBalance } from './web3';
 
 let tokensByAddressCache = {};
 
@@ -97,39 +96,3 @@ export function updateCustomTokensList() {
 
     tokensByAddressCache = {};
 };
-
-export async function toSmallestUnit(amount, tokenContractAddress) {
-    let decimals = null;
-
-    if (tokenContractAddress === ethers.constants.AddressZero) {
-        decimals = 18;
-    } else {
-        decimals = await getTokenDecimals(tokenContractAddress);
-    }
-
-    return ethers.utils.parseUnits(amount, decimals);
-}
-
-export async function toBaseUnit(amount, tokenContractAddress) {
-    let decimals = null;
-
-    if (tokenContractAddress === ethers.constants.AddressZero) {
-        decimals = 18;
-    } else {
-        decimals = await getTokenDecimals(tokenContractAddress);
-    }
-
-    return ethers.utils.formatUnits(amount, decimals);
-}
-
-export async function getTokenBalance(accountAddress, tokenContractAddress) {
-    let tokenBalance = null;
-
-    if (tokenContractAddress === ethers.constants.AddressZero) {
-        tokenBalance = await getNativeTokenBalance(accountAddress);
-    } else {
-        tokenBalance = await getErc20TokenBalance(tokenContractAddress, accountAddress);
-    }
-
-    return tokenBalance;
-}

@@ -8,13 +8,19 @@ module.exports = {
         hardhat: {
             forking: {
                 url: secret['ethereum_url'],
-                blockNumber: 16753978
+                blockNumber: 19675398,
                 // url: secret['polygon_url'],
                 // blockNumber: 55099794
             },
         },
         sepolia: {
             url: secret['sepolia_url'],
+            accounts: {
+                mnemonic: secret['wallet_mnemonic'],
+            },
+        },
+        polygon: {
+            url: secret['polygon_url'],
             accounts: {
                 mnemonic: secret['wallet_mnemonic'],
             },

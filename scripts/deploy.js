@@ -16,16 +16,19 @@ async function main() {
     await swappyData.deployed();
     console.log('SwappyData deployed to:', swappyData.address);
     deployedAddresses.SwappyData = swappyData.address;
+    // const swappyData = await ethers.getContractAt('contracts/SwappyData.sol:SwappyData', '0x73C014A6EBaBadad4b9cC84Bbe238102FccD1A66');
 
     console.log('Deploying SwappyManager...');
     const SwappyManagerFactory = await ethers.getContractFactory(`contracts/${network.name}/SwappyManager.sol:SwappyManager`);
     const swappyManager = await SwappyManagerFactory.deploy(deployedAddresses.SwappyData, '0x4A0245f825446e9CaFa51F1206bB0b961538441B');
+    // const swappyManager = await SwappyManagerFactory.deploy('0x73C014A6EBaBadad4b9cC84Bbe238102FccD1A66', '0x4A0245f825446e9CaFa51F1206bB0b961538441B');
     await swappyManager.deployed();
     console.log('SwappyManager deployed to:', swappyManager.address);
     deployedAddresses.SwappyManager = swappyManager.address;
 
     console.log('Adding SwappyManager as a manager in SwappyData...');
     await swappyData.addManager(swappyManager.address);
+    // await swappyData.removeManager('0x94FB120e084eBa847c94C7bb9f81c161053cc279');
     console.log('SwappyManager added as manager.');
 
     saveFrontendFiles(deployedAddresses);

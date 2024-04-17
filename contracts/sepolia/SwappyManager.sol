@@ -26,16 +26,20 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
     event SwapOfferCreated(address indexed creator, bytes32 swapHash);
     error SwapFailed();
 
-    function createSwapOffer(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiresIn, bool partialFillEnabled) public payable {
+    function createSwapOffer(address srcTokenAddress, uint srcAmount, address dstTokenAddress, uint dstAmount, address dstAddress, uint256 expiresIn, bool partialFillEnabled) public payable nonReentrant {
+        SwappyData.SwapOffer memory newSwapOffer;
+
         if (srcTokenAddress == address(0)) {
             require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
 
             _weth.deposit{value: srcAmount}();
             assert(_weth.transfer(msg.sender, srcAmount));
             srcTokenAddress = _wethAddress;
+            newSwapOffer.convertSrcTokenToNative = true;
+        } else {
+            newSwapOffer.convertSrcTokenToNative = false;
         }
 
-        SwappyData.SwapOffer memory newSwapOffer;
         newSwapOffer.status = SwappyData.SwapStatus.OPENED;
         newSwapOffer.srcAddress = payable(msg.sender);
         newSwapOffer.srcTokenAddress = srcTokenAddress;

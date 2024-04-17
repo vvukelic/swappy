@@ -15,6 +15,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
     IWETH constant private _weth = IWETH(_wethAddress);
     address payable public _feeAddress;
     AggregatorV3Interface private _priceFeed;
+    uint256 private _feeAmountInCents = 200;
 
     constructor(address dataContractAddress, address payable feeAddress) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -140,7 +141,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
             }
         }
 
-        if (srcTokenAddress == _wethAddress) {
+        if (srcTokenAddress == _wethAddress && swapOffer.convertSrcTokenToNative) {
             require(srcToken.transferFrom(swapOffer.srcAddress, address(this), swap.srcAmount), "Source amount failed to transfer");
             _weth.withdraw(swap.srcAmount);
             dstAddress.transfer(swap.srcAmount);
@@ -172,15 +173,14 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         _priceFeed = AggregatorV3Interface(newPriceFeedAddress);
     }
 
-    function _getEthUsdPrice() private view returns (uint256) {
-        (,int price,,,) = _priceFeed.latestRoundData();
-        return uint256(price / 1e8);
+    function setFeeAmountInCents(uint256 feeAmount) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _feeAmountInCents = feeAmount;
     }
 
     function _calculateEthFee() private view returns (uint256) {
-        uint256 ethUsdPrice = _getEthUsdPrice();
-        uint256 feeInETH = 1e18 / ethUsdPrice; // $1 in ETH
-        return feeInETH;
+        (,int ethUsdPrice,,,) = _priceFeed.latestRoundData();
+        uint8 decimals = _priceFeed.decimals();
+        return (_feeAmountInCents * 1e18) / (uint256(ethUsdPrice) / 10 ** (decimals - 2));
     }
 
     receive() external payable {}

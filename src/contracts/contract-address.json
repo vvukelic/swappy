@@ -4,7 +4,11 @@
     "SwappyManager": "0x798f111c92E38F102931F34D1e0ea7e671BDBE31"
   },
   "sepolia": {
-    "SwappyData": "0xd40C74f3CB040FEaC8F9d3812A3274cdEC6D3FA3",
-    "SwappyManager": "0xC358ADb030Cd647413c7B9A178eF0391f4F1E0b2"
+    "SwappyData": "0x64f596959C1Abd3E34017292c2CB29D96cAEE4f7",
+    "SwappyManager": "0x346f1f522d97DBC1f7d0451AeCC6F05433025903"
+  },
+  "polygon": {
+    "SwappyData": "0x73C014A6EBaBadad4b9cC84Bbe238102FccD1A66",
+    "SwappyManager": "0x51fCAe84DA92294Ae48795D01213f2a008641b20"
   }
 }

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
-import { Paper, TableBody, TableRow, Tooltip } from '@mui/material';
+import { Paper, TableBody, TableRow, Tooltip, CircularProgress } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MainContentContainer from './MainContentContainer';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import { getUserSwapOffers, getSwapOffersTakenByUser } from '../utils/web3';
 import { Truncate } from '../sharedStyles/general';
 import SwapOffer from '../utils/swapOffer';
 import { sliceAddress } from '../utils/general';
@@ -16,21 +15,22 @@ const contractAddresses = require('../contracts/contract-address.json');
 
 
 function CompletedSwapsList() {
-    const { defaultAccount, connectWallet, network } = useWalletConnect();
+    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
     const [swapsTakenByUser, setSwapsTakenByUser] = useState([]);
+    const [loadingSwaps, setLoadingSwaps] = useState(false);
     const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         const fetchUserCompletedSwapsList = async () => {
-            if (!network || !contractAddresses[network]) {
+            if (!network || !contractAddresses[network.uniqueName] || !blockchainUtil) {
                 return;
             }
 
-            const swapOffersTakenByUserHashes = new Set(await getSwapOffersTakenByUser(contractAddresses[network].SwappyData, defaultAccount));
+            const swapOffersTakenByUserHashes = new Set(await blockchainUtil.getSwapOffersTakenByUser(defaultAccount));
             const swaps = [];
 
             for (const swapOfferHash of swapOffersTakenByUserHashes) {
-                const swapOffer = new SwapOffer(network);
+                const swapOffer = new SwapOffer(blockchainUtil);
                 await swapOffer.load(swapOfferHash);
 
                 swapOffer.swaps.map((swap, index) => {
@@ -51,11 +51,11 @@ function CompletedSwapsList() {
                 });
             };
 
-            const userSwapOffersHashes = await getUserSwapOffers(contractAddresses[network].SwappyData, defaultAccount);
+            const userSwapOffersHashes = await blockchainUtil.getUserSwapOffers(defaultAccount);
 
             await Promise.all(
                 userSwapOffersHashes.map(async (hash) => {
-                    const swapOffer = new SwapOffer(network);
+                    const swapOffer = new SwapOffer(blockchainUtil);
                     await swapOffer.load(hash);
 
                     swapOffer.swaps.map((swap, index) => {
@@ -76,10 +76,12 @@ function CompletedSwapsList() {
             swaps.sort((a, b) => b.closedTime - a.closedTime);
 
             setSwapsTakenByUser(swaps);
+            setLoadingSwaps(false);
         };
 
+        setLoadingSwaps(true);
         fetchUserCompletedSwapsList();
-    }, [defaultAccount, network]);
+    }, [defaultAccount, network, blockchainUtil]);
 
     const handleRowClick = (swapOfferHash) => {
         window.open(`/swap/${swapOfferHash}`, '_blank');
@@ -103,7 +105,10 @@ function CompletedSwapsList() {
                                 {swapsTakenByUser.length === 0 ? (
                                     <TableRow>
                                         <StyledTableCell colSpan={4} style={{ textAlign: 'center' }}>
-                                            <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
+                                            {loadingSwaps ?
+                                                <CircularProgress color='inherit' /> :
+                                                <StyledMessage variant='subtitle1'>Nothing to show</StyledMessage>
+                                            }
                                         </StyledTableCell>
                                     </TableRow>
                                 ) : (swapsTakenByUser.map((swap, index) => {
