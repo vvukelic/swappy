@@ -127,10 +127,10 @@ function SwapOfferDetails({ hash }) {
             }
         }
 
-        if (network && hash) {
+        if (network && hash && blockchainUtil) {
             getSwapOfferDetails();
         }
-    }, [hash, network]);
+    }, [hash, network, blockchainUtil]);
 
     useEffect(() => {
         if (swapOffer) {
