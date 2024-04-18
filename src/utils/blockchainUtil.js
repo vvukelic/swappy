@@ -115,9 +115,13 @@ export class BlockchainUtil {
     }
 
     async getCurrentBlockTimestamp() {
-        const blockNumber = await this.provider.getBlockNumber();
-        const block = await this.provider.getBlock(blockNumber);
-        return block.timestamp;
+        try {
+            const blockNumber = await this.provider.getBlockNumber();
+            const block = await this.provider.getBlock(blockNumber);
+            return block.timestamp;
+        } catch (error) {
+            console.error('Error getting timestamp:', error);
+        }
     }
 
     async getSwappyAllowance(tokenContractAddress, ownerAddress) {
