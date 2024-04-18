@@ -114,10 +114,10 @@ function SwapOffer({
     }, [isAccountConnected]);
 
     useEffect(() => {
-        if (network && network.chainId?.nativeCurrency) {
+        if (network) {
             handleTokenSelection(getNativeToken(network.uniqueName), 'src');
         } else {
-            handleTokenSelection(commonTokens[0], 'src');  // ETH
+            handleTokenSelection(commonTokens[0], 'src'); // ETH
         }
 
         handleTokenSelection(commonTokens[1], 'dst');  // USDC
@@ -364,7 +364,7 @@ function SwapOffer({
                 </Grid>
 
                 <Grid item xs={12} sx={{ color: 'white', padding: '0 16px' }}>
-                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth InputLabelProps={{ style: { color: 'white' } }} />
+                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
                 </Grid>
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px' }}>
