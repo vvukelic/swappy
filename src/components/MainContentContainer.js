@@ -11,8 +11,9 @@ const StyledGrid = styled(Grid)`
     color: white;
 
     @media (max-width: 600px) {
-        max-width: 95%;
+        max-width: 100%;
         font-size: 0.9rem;
+        margin: 0;
     }
 
     @media (min-width: 600px) {

@@ -23,6 +23,10 @@ const ModalContent = styled.div`
     color: white; // White text
     min-width: 500px;
     width: '80%';
+
+    @media (max-width: 600px) {
+        min-width: 100%;
+    }
 `;
 
 const Title = styled(Typography)`
