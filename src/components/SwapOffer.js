@@ -114,10 +114,10 @@ function SwapOffer({
     }, [isAccountConnected]);
 
     useEffect(() => {
-        if (network && network.chainId?.nativeCurrency) {
+        if (network) {
             handleTokenSelection(getNativeToken(network.uniqueName), 'src');
         } else {
-            handleTokenSelection(commonTokens[0], 'src');  // ETH
+            handleTokenSelection(commonTokens[0], 'src'); // ETH
         }
 
         handleTokenSelection(commonTokens[1], 'dst');  // USDC
