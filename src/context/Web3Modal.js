@@ -3,10 +3,9 @@ import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5/react';
 import networks from '../data/networks';
 import { getSupportedNetworks } from '../utils/general';
 
-const secret = require('../../secret.json');
 
 // 1. Get projectId at https://cloud.walletconnect.com
-const projectId = secret['wallet_connect'];
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT;
 
 // 2. Set chains
 function extractNetworkInfo(networks) {
@@ -52,7 +51,5 @@ const web3Modal = createWeb3Modal({
 });
 
 export function Web3Modal({ children }) {
-    // React.useEffect or any additional logic can be added here if needed
-
     return <>{children}</>;
 }
