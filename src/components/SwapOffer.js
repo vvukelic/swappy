@@ -274,7 +274,7 @@ function SwapOffer({
 
                     if (swapOfferCreatedEvent) {
                         const swapOfferHash = swapOfferCreatedEvent.args[1];
-                        window.location.href = `/swap/${swapOfferHash}`;
+                        window.location.href = `/swap/${swapOfferHash}?network=${network.uniqueName}`;
                         updateNotification(receipt.transactionHash, {
                             message: `Swap offer created!`,
                             severity: 'success',

@@ -31,7 +31,7 @@ const networks = {
     amoy: {
         chainId: 0x13882,
         chainName: 'Polygon Testnet',
-        uniqueName: 'polygon amoy',
+        uniqueName: 'amoy',
         rpcUrls: ['https://rpc-amoy.polygon.technology/'],
         nativeCurrency: {
             name: 'MATIC',
@@ -43,10 +43,10 @@ const networks = {
         logo: '/images/matic-logo.png',
         blockExplorerUrls: ['https://polygonscan.com'],
     },
-    'bnb smart chain': {
+    bsc: {
         chainId: 0x38,
         chainName: 'BNB Smart Chain Mainnet',
-        uniqueName: 'bnb smart chain',
+        uniqueName: 'bsc',
         rpcUrls: ['https://bsc-dataseed.binance.org/'],
         color: '#b98b05',
         logo: '/images/bnb-logo.png',
@@ -58,10 +58,10 @@ const networks = {
         wrappedNativeCurrencyAddress: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
         blockExplorerUrls: ['https://bscscan.com'],
     },
-    'bnb smart chain testnet': {
+    bscTestnet: {
         chainId: 0x61,
         chainName: 'BNB Smart Chain Testnet',
-        uniqueName: 'bnb smart chain testnet',
+        uniqueName: 'bscTestnet',
         rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
         color: '#b98b05',
         logo: '/images/bnb-logo.png',

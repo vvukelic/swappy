@@ -7,7 +7,7 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
-import { Card, CardMedia, Typography } from '@mui/material';
+import { Card, CardMedia } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -218,7 +218,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             <StyledTabButton isActive={activeTab === 'createSwapOffer'} onClick={() => handleSwapOfferNavigationButtonClick('createSwapOffer')}>
                 Create Swap Offer
             </StyledTabButton>
-            <SwapOffersListsButtonWithMenu isActive={activeTab === 'swapOffersList'} onClick={() => setActiveTab('swapOffersList')} onMouseEnter={() => setShowSwapOfferOffersHoverMenu(true)} />
+            <SwapOffersListsButtonWithMenu isActive={activeTab === 'swapOffersList'} onClick={() => setActiveTab('swapOffersList')} />
             <StyledTabButton isActive={activeTab === 'completedSwapsList'} onClick={() => handleSwapOfferNavigationButtonClick('completedSwapsList')}>
                 Completed swaps
             </StyledTabButton>

@@ -84,7 +84,7 @@ function CompletedSwapsList() {
     }, [defaultAccount, network, blockchainUtil]);
 
     const handleRowClick = (swapOfferHash) => {
-        window.open(`/swap/${swapOfferHash}`, '_blank');
+        window.open(`/swap/${swapOfferHash}?network=${network.uniqueName}`, '_blank');
     };
 
     return (

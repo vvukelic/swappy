@@ -7,7 +7,7 @@
             "goerli": "0x0000000000000000000000000000000000000000",
             "sepolia": "0x0000000000000000000000000000000000000000",
             "polygon": "",
-            "bnb smart chain": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8"
+            "bsc": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8"
         },
         "logo": "/images/eth-logo.png"
     },
@@ -19,8 +19,8 @@
             "goerli": "0xd35CCeEAD182dcee0F148EbaC9447DA2c4D449c4",
             "sepolia": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             "polygon": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-            "bnb smart chain": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
-            "bnb smart chain testnet": "0x64544969ed7EBf5f083679233325356EbE738930"
+            "bsc": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+            "bscTestnet": "0x64544969ed7EBf5f083679233325356EbE738930"
         }
     },
     {
@@ -45,7 +45,7 @@
             "ethereum": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
             "goerli": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
             "polygon": "0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39",
-            "bnb smart chain": "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD"
+            "bsc": "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD"
         }
     },
     {
@@ -56,7 +56,7 @@
             "goerli": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
             "sepolia": "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             "polygon": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
-            "bnb smart chain": ""
+            "bsc": ""
         }
     },
     {
@@ -67,7 +67,7 @@
             "goerli": "0xA108830A23A9a054FfF4470a8e6292da0886A4D4",
             "polygon": "0x0000000000000000000000000000000000000000",
             "amoy": "0x0000000000000000000000000000000000000000",
-            "bnb smart chain": "0xCC42724C6683B7E57334c4E856f4c9965ED682bD"
+            "bsc": "0xCC42724C6683B7E57334c4E856f4c9965ED682bD"
         },
         "logo": "/images/matic-logo.png"
     },
@@ -78,7 +78,7 @@
             "ethereum": "",
             "goerli": "",
             "polygon": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-            "bnb smart chain": ""
+            "bsc": ""
         },
         "logo": "/images/matic-logo.png"
     },
@@ -89,8 +89,8 @@
             "ethereum": "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
             "goerli": "",
             "polygon": "",
-            "bnb smart chain": "0x0000000000000000000000000000000000000000",
-            "bnb smart chain testnet": "0x0000000000000000000000000000000000000000"
+            "bsc": "0x0000000000000000000000000000000000000000",
+            "bscTestnet": "0x0000000000000000000000000000000000000000"
         },
         "logo": "/images/bnb-logo.png"
     },
@@ -101,8 +101,8 @@
             "ethereum": "0x418D75f65a02b3D53B2418FB8E1fe493759c7605",
             "goerli": "",
             "polygon": "0xeCDCB5B88F8e3C15f95c720C51c71c9E2080525d",
-            "bnb smart chain": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
-            "bnb smart chain testnet": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"
+            "bsc": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+            "bscTestnet": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"
         },
         "logo": "/images/bnb-logo.png"
     },

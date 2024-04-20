@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip } from '@mui/material';
+import { useRouter } from 'next/router';
+import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip, CircularProgress } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -22,6 +23,8 @@ import SwapOffer from '../utils/swapOffer';
 import { getNativeToken } from '../utils/tokens';
 import { useNotification } from './NotificationProvider';
 import { Truncate } from '../sharedStyles/general';
+import { supportedNetworkNames } from '../utils/general';
+import networks from '../data/networks';
 
 
 const StyledBox = styled(Box)`
@@ -81,6 +84,23 @@ function SwapOfferDetails({ hash }) {
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
     const { addNotification, updateNotification } = useNotification();
     const isMobile = useMediaQuery('(max-width:600px)');
+    const router = useRouter();
+
+
+    useEffect(() => {
+        async function alignNetworks() {
+            const swapOfferNetworkName = router.query.network;
+
+            if (swapOfferNetworkName !== network.uniqueName && supportedNetworkNames.includes(swapOfferNetworkName)) {
+                await blockchainUtil.switchNetwork(networks[swapOfferNetworkName]);
+            }
+        }
+
+        if (router.query.network && blockchainUtil) {
+            alignNetworks();
+        }
+
+    }, [router.query.network, blockchainUtil]);
 
     useEffect(() => {
         async function checkTokenApproved() {
@@ -261,7 +281,11 @@ function SwapOfferDetails({ hash }) {
     };
 
     if (!swapOffer) {
-        return <MainContentContainer sx={{ width: '100%' }}>Loading...</MainContentContainer>;
+        return (
+            <MainContentContainer sx={{ width: '100%' }}>
+                <CircularProgress color='inherit' />
+            </MainContentContainer>
+        );
     }
 
     return (
