@@ -11,6 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import styled from '@emotion/styled';
 import { getTokenImageUrl, addCustomToken, getAllTokens } from '../utils/tokens';
 import { useWalletConnect } from '../hooks/useWalletConnect';
+import networks from '../data/networks';
 
 
 const StyledDialog = styled(Dialog)`
@@ -83,12 +84,14 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
     }, [searchInput]);
 
     useEffect(() => {
+        const selectedNetwork = network ? network : networks.ethereum;
+
         setfilteredTokens(
-            getAllTokens().filter(token =>
-                token.networkSpecificAddress[network?.uniqueName] && 
-                (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[network?.uniqueName].includes(searchInput))
-            )
-        );
+                getAllTokens().filter(token =>
+                    token.networkSpecificAddress[selectedNetwork.uniqueName] &&
+                    (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
+                )
+            );
     }, [network, searchInput]);
 
     const handleSearchChange = (event) => {

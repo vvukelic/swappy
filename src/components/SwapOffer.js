@@ -17,6 +17,7 @@ import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import { useNotification } from './NotificationProvider';
 import commonTokens from '../data/commonTokens.json';
+import networks from '../data/networks';
 
 
 const StyledSwitch = styled(Switch)`
@@ -68,7 +69,6 @@ function SwapOffer({
     const { addNotification, updateNotification } = useNotification();
     const [infoModalMsg, setInfoModalMsg] = useState('');
     const [showInfoModal, setShowInfoModal] = useState(false);
-    const [proceedWithSwapOffer, setProceedWithSwapOffer] = useState(false);
     const { open } = useWeb3Modal();
 
     const openModal = (type) => {
@@ -82,23 +82,23 @@ function SwapOffer({
     };
 
     const handleTokenSelection = async (token, type) => {
-        if (!network || !network.chainId || !blockchainUtil) {
-            return;
-        }
+        const selectedNetwork = network ? network : networks.ethereum;
 
         if (type === 'src') {
             if (token === selectedSrcToken) {
                 return;
             }
 
-            let tokenAddress = token.networkSpecificAddress[network.uniqueName];
+            let tokenAddress = token.networkSpecificAddress[selectedNetwork.uniqueName];
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByAddress(network.wrappedNativeCurrencyAddress, network.uniqueName).networkSpecificAddress[network.uniqueName];
+                tokenAddress = getTokenByAddress(selectedNetwork.wrappedNativeCurrencyAddress, selectedNetwork.uniqueName).networkSpecificAddress[selectedNetwork.uniqueName];
             }
 
-            const availableTokenBalance = await blockchainUtil.getSwappyAllowance(tokenAddress, defaultAccount);
-            setTokenApproved(availableTokenBalance > 0);
+            if (blockchainUtil) {
+                const availableTokenBalance = await blockchainUtil.getSwappyAllowance(tokenAddress, defaultAccount);
+                setTokenApproved(availableTokenBalance > 0);
+            }
 
             setSelectedSrcToken(token);
         } else if (type === 'dst') {
@@ -333,13 +333,11 @@ function SwapOffer({
 
     const handleProceedWithSwap = async () => {
         setShowInfoModal(false);
-        setProceedWithSwapOffer(true);
         openSwapOffer();
     };
 
     const handleAbortSwap = () => {
         setShowInfoModal(false);
-        setProceedWithSwapOffer(false);
     };
 
     return (
@@ -397,7 +395,6 @@ function SwapOffer({
             </MainContentContainer>
 
             <SelectTokenModal open={modalOpen} onClose={closeModal} handleTokenSelection={(token) => handleTokenSelection(token, modalType)} title={modalType === 'src' ? 'Select a token to send' : 'Select a token to receive'} />
-
             <InfoModal open={showInfoModal} msgText={infoModalMsg} onOkClose={handleProceedWithSwap} onCancelClose={handleAbortSwap} />
             <TransactionStatusModal open={txModalOpen} status={txStatus} statusTxt={txStatusTxt} errorTxt={txErrorTxt} onClose={() => setTxModalOpen(false)} />
         </>

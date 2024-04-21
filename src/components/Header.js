@@ -16,6 +16,7 @@ import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getSupportedNetworks } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
+import networks from '../data/networks';
 
 
 const StyledToolbar = styled(Toolbar)`
@@ -195,11 +196,11 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
 
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
-                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={network ? network.color : ''}>
-                    <img src={network ? network.logo : ''} alt='' className='network-icon' />
-                    {network ? network.uniqueName : 'Select network'}
+                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={network ? network.color : networks.ethereum.color}>
+                    <img src={network ? network.logo : networks.ethereum.logo} alt='' className='network-icon' />
+                    {network ? network.uniqueName : networks.ethereum.uniqueName}
                 </NetworkButton>
-                <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
+                {isAccountConnected && <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
                     {Object.values(getSupportedNetworks()).map((network) => {
                         return (
                             <SelectNetworkButton key={network.uniqueName} onClick={() => handleNetworkSelect(network)}>
@@ -208,7 +209,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                             </SelectNetworkButton>
                         );
                     })}
-                </StyledHoverMenu>
+                </StyledHoverMenu>}
             </RelativePositionContainer>
         );
     };
