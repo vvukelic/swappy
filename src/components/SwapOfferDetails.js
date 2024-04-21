@@ -300,9 +300,7 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                {swapOffer.convertSrcTokenToNative ?
-                    <SwapOfferDetailsTokenInfo token={getNativeToken(network?.uniqueName)} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> :
-                    <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> }
+                <SwapOfferDetailsTokenInfo token={swapOffer.getSrcToken()} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' />
 
                 <Grid item sx={{ height: '42px' }} />
 
@@ -364,7 +362,7 @@ function SwapOfferDetails({ hash }) {
                                     <Tooltip title={swapOffer.srcAmountInBaseUnit}>
                                         <Truncate>{swapOffer.srcAmountInBaseUnit}</Truncate>
                                     </Tooltip>
-                                    {swapOffer.srcTokenName}
+                                    {swapOffer.getSrcToken().name}
                                 </StyledTypography>
                             </StyledBox>
                             <StyledBox>
@@ -400,7 +398,7 @@ function SwapOfferDetails({ hash }) {
                                         <Tooltip title={swapOffer.displayExchangeRateSrcDst}>
                                             <Truncate>{swapOffer.displayExchangeRateSrcDst}</Truncate>
                                         </Tooltip>
-                                        {swapOffer.srcTokenName}
+                                        {swapOffer.getSrcToken().name}
                                     </StyledAmountAndToken>
                                 </StyledExchangeRate>
                             </StyledBox>
@@ -442,7 +440,7 @@ function SwapOfferDetails({ hash }) {
                                                     <Tooltip title={swap.srcAmountInBaseUnit}>
                                                         <Truncate>{swap.srcAmountInBaseUnit}</Truncate>
                                                     </Tooltip>
-                                                    {swapOffer.srcTokenName}
+                                                    {swapOffer.getSrcToken().name}
                                                 </StyledTableCell>
                                             </StyledTableRow>
                                         );

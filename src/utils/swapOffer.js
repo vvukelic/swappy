@@ -64,6 +64,10 @@ class SwapOffer {
         return swaps;
     }
 
+    getSrcToken() {
+        return this.convertSrcTokenToNative ? this.blockchainUtil.nativeToken : this.srcToken;
+    }
+
     async load(swapOfferHash) {
         const swapOffer = await this.blockchainUtil.getSwapOffer(swapOfferHash);
         this.hash = swapOfferHash;

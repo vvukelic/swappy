@@ -12,6 +12,7 @@ import { waitForTxToBeMined } from '../utils/general';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
 import PrimaryButton from './PrimaryButton';
+import InfoModal from './InfoModal';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import { useNotification } from './NotificationProvider';
@@ -65,6 +66,9 @@ function SwapOffer({
     const [selectedDstTokenDecimals, setSelectedDstTokenDecimals] = useState(0);
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const { addNotification, updateNotification } = useNotification();
+    const [infoModalMsg, setInfoModalMsg] = useState('');
+    const [showInfoModal, setShowInfoModal] = useState(false);
+    const [proceedWithSwapOffer, setProceedWithSwapOffer] = useState(false);
     const { open } = useWeb3Modal();
 
     const openModal = (type) => {
@@ -191,6 +195,68 @@ function SwapOffer({
         }
     }, [network, defaultAccount, selectedDstToken]);
 
+    async function openSwapOffer() {
+         const srcAmountInt = await blockchainUtil.toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[network.uniqueName]);
+         const dstAmountInt = await blockchainUtil.toSmallestUnit(dstAmount, selectedDstToken.networkSpecificAddress[network.uniqueName]);
+
+         let expiresIn = 0;
+         if (expirationEnabled) {
+             expiresIn = parseInt(expiresInHours) * 60 * 60 + parseInt(expiresInMinutes) * 60;
+         }
+
+         let _dstAddress = dstAddress;
+         if (!_dstAddress) {
+             _dstAddress = ethers.constants.AddressZero;
+         }
+
+         startTransaction('Please go to your wallet and confirm the transaction for the swap offer.');
+
+         try {
+             const tx = await blockchainUtil.createSwapOffer(selectedSrcToken.networkSpecificAddress[network.uniqueName], srcAmountInt, selectedDstToken.networkSpecificAddress[network.uniqueName], dstAmountInt, dstAddress, expiresIn, partialFillEnabled);
+
+             addNotification(tx.hash, {
+                 message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()}...`,
+                 sevirity: 'info',
+                 duration: null,
+             });
+
+             const receipt = await waitForTxToBeMined(tx);
+
+             if (receipt.status === 1) {
+                 const swapOfferCreatedEvent = receipt.events?.find((e) => e.event === 'SwapOfferCreated');
+
+                 if (swapOfferCreatedEvent) {
+                     const swapOfferHash = swapOfferCreatedEvent.args[1];
+                     window.location.href = `/swap/${swapOfferHash}?network=${network.uniqueName}`;
+                     updateNotification(receipt.transactionHash, {
+                         message: `Swap offer created!`,
+                         severity: 'success',
+                         duration: 5000,
+                     });
+                     endTransaction(true, `You successfuly created a swap offer!`);
+                 } else {
+                     updateNotification(receipt.transactionHash, {
+                         message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
+                         severity: 'error',
+                         duration: 5000,
+                     });
+                     endTransaction(false, `Transaction for creating a swap offer failed.`);
+                     console.error("Couldn't find SwapCreated event in transaction receipt");
+                 }
+             } else {
+                 updateNotification(receipt.transactionHash, {
+                     message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
+                     severity: 'error',
+                     duration: 5000,
+                 });
+                 endTransaction(false, `Transaction for creating a swap offer failed.`);
+             }
+         } catch (error) {
+             console.error(error);
+             endTransaction(false, 'Transaction for creating a swap offer failed.', error.toString());
+         }
+    }
+
     const handleSwapOfferButtonClick = async () => {
         if (!isAccountConnected) {
             open();
@@ -235,73 +301,12 @@ function SwapOffer({
                 return;
             }
         } else if (!insufficientSrcTokenAmount) {
-            const srcAmountInt = await blockchainUtil.toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[network.uniqueName]);
-            const dstAmountInt = await blockchainUtil.toSmallestUnit(dstAmount, selectedDstToken.networkSpecificAddress[network.uniqueName]);
-
-            let expiresIn = 0;
-            if (expirationEnabled) {
-                expiresIn = parseInt(expiresInHours) * 60 * 60 + parseInt(expiresInMinutes) * 60;
-            }
-
-            let _dstAddress = dstAddress;
-            if (!_dstAddress) {
-                _dstAddress = ethers.constants.AddressZero;
-            }
-
-            startTransaction(`Please go to your wallet and confirm the transaction for the swap offer.`);
-
-            try {
-                const tx = await blockchainUtil.createSwapOffer(
-                    selectedSrcToken.networkSpecificAddress[network.uniqueName],
-                    srcAmountInt,
-                    selectedDstToken.networkSpecificAddress[network.uniqueName],
-                    dstAmountInt,
-                    dstAddress,
-                    expiresIn,
-                    partialFillEnabled
-                );
-
-                addNotification(tx.hash, {
-                    message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()}...`,
-                    sevirity: 'info',
-                    duration: null,
-                });
-
-                const receipt = await waitForTxToBeMined(tx);
-                
-                if (receipt.status === 1) {
-                    const swapOfferCreatedEvent = receipt.events?.find((e) => e.event === 'SwapOfferCreated');
-
-                    if (swapOfferCreatedEvent) {
-                        const swapOfferHash = swapOfferCreatedEvent.args[1];
-                        window.location.href = `/swap/${swapOfferHash}?network=${network.uniqueName}`;
-                        updateNotification(receipt.transactionHash, {
-                            message: `Swap offer created!`,
-                            severity: 'success',
-                            duration: 5000,
-                        });
-                        endTransaction(true, `You successfuly created a swap offer!`);
-                    } else {
-                        updateNotification(receipt.transactionHash, {
-                            message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
-                            severity: 'error',
-                            duration: 5000,
-                        });
-                        endTransaction(false, `Transaction for creating a swap offer failed.`);
-                        console.error("Couldn't find SwapCreated event in transaction receipt");
-                    }
-                } else {
-                    updateNotification(receipt.transactionHash, {
-                        message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
-                        severity: 'error',
-                        duration: 5000,
-                    });
-                    endTransaction(false, `Transaction for creating a swap offer failed.`);
-                }
-            } catch (error) {
-                console.error(error);
-                endTransaction(false, 'Transaction for creating a swap offer failed.', error.toString());
-                return;
+            if (selectedSrcToken.networkSpecificAddress[network.uniqueName] === ethers.constants.AddressZero) {
+                const nativeTokenName = selectedSrcToken.name.toUpperCase();
+                setInfoModalMsg(`For this swap offer, your ${nativeTokenName} will be converted to W${nativeTokenName}. Once the offer is accepted, the W${nativeTokenName} will be seamlessly reverted back to ${nativeTokenName} and sent to the swap taker.`);
+                setShowInfoModal(true);
+            } else {
+                openSwapOffer();
             }
         }
     };
@@ -324,6 +329,17 @@ function SwapOffer({
 
         const availableTokenBalance = await blockchainUtil.getSwappyAllowance(newSrcTokenAddress, defaultAccount);
         setTokenApproved(availableTokenBalance > 0);
+    };
+
+    const handleProceedWithSwap = async () => {
+        setShowInfoModal(false);
+        setProceedWithSwapOffer(true);
+        openSwapOffer();
+    };
+
+    const handleAbortSwap = () => {
+        setShowInfoModal(false);
+        setProceedWithSwapOffer(false);
     };
 
     return (
@@ -382,6 +398,7 @@ function SwapOffer({
 
             <SelectTokenModal open={modalOpen} onClose={closeModal} handleTokenSelection={(token) => handleTokenSelection(token, modalType)} title={modalType === 'src' ? 'Select a token to send' : 'Select a token to receive'} />
 
+            <InfoModal open={showInfoModal} msgText={infoModalMsg} onOkClose={handleProceedWithSwap} onCancelClose={handleAbortSwap} />
             <TransactionStatusModal open={txModalOpen} status={txStatus} statusTxt={txStatusTxt} errorTxt={txErrorTxt} onClose={() => setTxModalOpen(false)} />
         </>
     );

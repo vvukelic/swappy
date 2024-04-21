@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 
 const StyledButton = styled(Button)`
     color: white;
-    background-color: #286a7a;
+    background-color: #225e6d;
     border-radius: 0;
     width: 100%;
     display: flex;

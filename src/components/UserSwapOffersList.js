@@ -102,8 +102,8 @@ const UserSwapOffersList = ({ activeSwapOffersListTab }) => {
                                         const isSwapOffersForYou = activeSwapOffersListTab === 'swapOffersForYou';
                                         const displaySrcAmount = isSwapOffersForYou ? dstAmount : srcAmount;
                                         const displayDstAmount = isSwapOffersForYou ? srcAmount : dstAmount;
-                                        const displaySrcTokenName = isSwapOffersForYou ? swapOffer.dstTokenName : swapOffer.srcTokenName;
-                                        const displayDstTokenName = isSwapOffersForYou ? swapOffer.srcTokenName : swapOffer.dstTokenName;
+                                        const displaySrcTokenName = isSwapOffersForYou ? swapOffer.dstTokenName : swapOffer.getSrcToken().name;
+                                        const displayDstTokenName = isSwapOffersForYou ? swapOffer.getSrcToken().name : swapOffer.dstTokenName;
 
                                         return (
                                             <StyledTableRow key={index} onClick={() => handleRowClick(swapOffer.hash)}>
