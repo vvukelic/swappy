@@ -85,10 +85,6 @@ function SwapOffer({
         const selectedNetwork = network ? network : networks.ethereum;
 
         if (type === 'src') {
-            if (token === selectedSrcToken) {
-                return;
-            }
-
             let tokenAddress = token.networkSpecificAddress[selectedNetwork.uniqueName];
 
             if (tokenAddress === ethers.constants.AddressZero) {
@@ -96,8 +92,11 @@ function SwapOffer({
             }
 
             if (blockchainUtil) {
-                const availableTokenBalance = await blockchainUtil.getSwappyAllowance(tokenAddress, defaultAccount);
-                setTokenApproved(availableTokenBalance > 0);
+                const swappyAllowence = await blockchainUtil.getSwappyAllowance(tokenAddress, defaultAccount);
+
+                if (blockchainUtil.network.chainId === network.chainId) {
+                    setTokenApproved(swappyAllowence > 0);
+                }
             }
 
             setSelectedSrcToken(token);
@@ -128,12 +127,27 @@ function SwapOffer({
     }, [network, blockchainUtil]);
 
     useEffect(() => {
+        let active = true;
+
         async function swapOfferButtonText() {
             const tokenAddress = selectedSrcToken.networkSpecificAddress[network.uniqueName];
 
             if (tokenAddress) {
                 const defaultAccountSrcTokenBalance = await blockchainUtil.getTokenBalance(defaultAccount, tokenAddress);
-                const srcAmountInt = await blockchainUtil.toSmallestUnit(srcAmount, tokenAddress);
+                let srcAmountInt = null;
+
+                try {
+                    srcAmountInt = await blockchainUtil.toSmallestUnit(srcAmount, tokenAddress);
+                } catch (error) {
+                    if (active) {
+                        setSrcAmount('0.0');
+                        return;
+                    }
+                }
+
+                if (!active) {
+                    return;
+                }
 
                 if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
                     setInsufficientSrcTokenAmount(false);
@@ -153,6 +167,10 @@ function SwapOffer({
         if (defaultAccount && selectedSrcToken && blockchainUtil) {
             swapOfferButtonText();
         }
+
+        return () => {
+            active = false;
+        };
     }, [network, blockchainUtil, selectedSrcToken, tokenApproved, srcAmount, isAccountConnected]);
 
     useEffect(() => {
@@ -212,7 +230,15 @@ function SwapOffer({
          startTransaction('Please go to your wallet and confirm the transaction for the swap offer.');
 
          try {
-             const tx = await blockchainUtil.createSwapOffer(selectedSrcToken.networkSpecificAddress[network.uniqueName], srcAmountInt, selectedDstToken.networkSpecificAddress[network.uniqueName], dstAmountInt, dstAddress, expiresIn, partialFillEnabled);
+             const tx = await blockchainUtil.createSwapOffer(
+                selectedSrcToken.networkSpecificAddress[network.uniqueName],
+                srcAmountInt,
+                selectedDstToken.networkSpecificAddress[network.uniqueName],
+                dstAmountInt,
+                dstAddress,
+                expiresIn,
+                partialFillEnabled
+            );
 
              addNotification(tx.hash, {
                  message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()}...`,

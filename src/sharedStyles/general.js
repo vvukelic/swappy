@@ -50,3 +50,13 @@ export const ModalTitle = styled(Typography)`
     text-align: center;
     margin-bottom: 0.5em;
 `;
+
+export const FooterContainer = styled(Box)`
+    width: 100%;
+    padding: 1em 0;
+    background-color: #1b3a47;
+    color: white;
+    text-align: center;
+    font-size: 0.9em;
+    margin-top: auto;
+`;

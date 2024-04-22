@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Card, CardMedia, Box, AppBar, Toolbar } from '@mui/material';
 import PrimaryButton from '../components/PrimaryButton';
-import { BackgroundBox } from '../sharedStyles/general';
+import { BackgroundBox, FooterContainer } from '../sharedStyles/general';
 
 
 const ContentContainer = styled.div`
@@ -67,16 +67,6 @@ const ImageContainer = styled.div`
     @media (max-width: 768px) {
         margin-top: 2em;
     }
-`;
-
-const FooterContainer = styled(Box)`
-    width: 100%;
-    padding: 1em 0;
-    background-color: #1b3a47;
-    color: white;
-    text-align: center;
-    font-size: 0.9em;
-    margin-top: auto;
 `;
 
 const BoldText = styled.span`
