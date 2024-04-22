@@ -291,8 +291,9 @@ function SwapOfferDetails({ hash }) {
     return (
         <>
             <MainContentContainer sx={{ width: '100%' }}>
-                {swapOffer.partialFillEnabled && swapOffer.readableStatus !== 'FILLED' && <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} />}
-                {(!swapOffer.partialFillEnabled || swapOffer.readableStatus === 'FILLED') && <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
+                {swapOffer.partialFillEnabled && swapOffer.readableStatus === 'OPENED' ?
+                    <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} /> :
+                    <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
 
                 <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton variant='outlined' disabled>
