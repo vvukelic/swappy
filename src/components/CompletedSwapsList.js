@@ -15,14 +15,14 @@ const contractAddresses = require('../contracts/contract-address.json');
 
 
 function CompletedSwapsList() {
-    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
+    const { defaultAccount, blockchainUtil } = useWalletConnect();
     const [swapsTakenByUser, setSwapsTakenByUser] = useState([]);
     const [loadingSwaps, setLoadingSwaps] = useState(false);
     const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         const fetchUserCompletedSwapsList = async () => {
-            if (!network || !contractAddresses[network.uniqueName] || !blockchainUtil) {
+            if (!blockchainUtil || !contractAddresses[blockchainUtil.network.uniqueName]) {
                 return;
             }
 
@@ -81,10 +81,10 @@ function CompletedSwapsList() {
 
         setLoadingSwaps(true);
         fetchUserCompletedSwapsList();
-    }, [defaultAccount, network, blockchainUtil]);
+    }, [defaultAccount, blockchainUtil]);
 
     const handleRowClick = (swapOfferHash) => {
-        window.open(`/swap/${swapOfferHash}?network=${network.uniqueName}`, '_blank');
+        window.open(`/swap/${swapOfferHash}?network=${blockchainUtil.network.uniqueName}`, '_blank');
     };
 
     return (

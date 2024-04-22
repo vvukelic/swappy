@@ -75,7 +75,7 @@ const StyledInfoValues = styled(Grid)`
 `;
 
 function SwapOfferDetails({ hash }) {
-    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
+    const { defaultAccount, blockchainUtil } = useWalletConnect();
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const [swapOffer, setSwapOffer] = useState(null);
     const [swapSrcAmount, setSwapSrcAmount] = useState(null);
@@ -91,7 +91,7 @@ function SwapOfferDetails({ hash }) {
         async function alignNetworks() {
             const swapOfferNetworkName = router.query.network;
 
-            if (swapOfferNetworkName !== network.uniqueName && supportedNetworkNames.includes(swapOfferNetworkName)) {
+            if (swapOfferNetworkName !== blockchainUtil.network.uniqueName && supportedNetworkNames.includes(swapOfferNetworkName)) {
                 await blockchainUtil.switchNetwork(networks[swapOfferNetworkName]);
             }
         }
@@ -126,7 +126,7 @@ function SwapOfferDetails({ hash }) {
                 setSwapButtonText('Take swap');
             } else {
                 if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
-                    setSwapButtonText(`${network.wrappedNativeCurrencySymbol} balance too low`);
+                    setSwapButtonText(`${blockchainUtil.network.wrappedNativeCurrencySymbol} balance too low`);
                 } else {
                     setSwapButtonText(`Approve ${swapOffer.dstTokenName} Token`);
                 }
@@ -147,10 +147,10 @@ function SwapOfferDetails({ hash }) {
             }
         }
 
-        if (network && hash && blockchainUtil) {
+        if (hash && blockchainUtil) {
             getSwapOfferDetails();
         }
-    }, [hash, network, blockchainUtil]);
+    }, [hash, blockchainUtil]);
 
     useEffect(() => {
         if (swapOffer) {
@@ -171,7 +171,7 @@ function SwapOfferDetails({ hash }) {
             startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
             
             try {
-                const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.networkSpecificAddress[network.uniqueName], swapDstAmount, swapOffer.feeAmount);
+                const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.networkSpecificAddress[blockchainUtil.network.uniqueName], swapDstAmount, swapOffer.feeAmount);
 
                 addNotification(tx.hash, {
                     message: 'Taking a swap...',
@@ -378,7 +378,7 @@ function SwapOfferDetails({ hash }) {
                                     <Tooltip title={swapOffer.feeAmountInBaseUnit}>
                                         <Truncate>{swapOffer.feeAmountInBaseUnit}</Truncate>
                                     </Tooltip>
-                                    {network?.nativeCurrency.symbol}
+                                    {blockchainUtil.network?.nativeCurrency.symbol}
                                 </StyledTypography>
                             </StyledBox>
                             {swapOffer.displayExpirationTime && (

@@ -17,7 +17,7 @@ const StyledStatusTableCell = styled(StyledTableCell)`
 `;
 
 const UserSwapOffersList = ({ activeSwapOffersListTab }) => {
-    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
+    const { defaultAccount, blockchainUtil } = useWalletConnect();
     const [userSwapOffers, setUserSwapOffers] = useState([]);
     const [swapOffersForUser, setSwapOffersForUser] = useState([]);
     const [loadingSwapOffers, setLoadingSwapOffers] = useState(false);
@@ -58,15 +58,15 @@ const UserSwapOffersList = ({ activeSwapOffersListTab }) => {
 
         };
 
-        if (defaultAccount && network && blockchainUtil) {
+        if (defaultAccount && blockchainUtil) {
             setLoadingSwapOffers(true);
             fetchUserSwapOffers();
             fetchSwapOffersForUser();
         }
-    }, [defaultAccount, network, blockchainUtil]);
+    }, [defaultAccount, blockchainUtil]);
 
     const handleRowClick = (swapOfferHash) => {
-        window.open(`/swap/${swapOfferHash}?network=${network.uniqueName}`, '_blank');
+        window.open(`/swap/${swapOfferHash}?network=${blockchainUtil.network.uniqueName}`, '_blank');
     };
 
     const renderSwapOffersTable = (swapOffers, tableTitle) => {

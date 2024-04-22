@@ -48,7 +48,6 @@ export const useWalletConnect = () => {
 
     return {
         defaultAccount: address,
-        network,
         blockchainUtil,
         isAccountConnected,
     };

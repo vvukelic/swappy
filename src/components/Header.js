@@ -117,7 +117,7 @@ const SwappyHome = styled(CardMedia)`
 `;
 
 function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
-    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
+    const { defaultAccount, blockchainUtil, isAccountConnected } = useWalletConnect();
     const [nativeTokenBalance, setNativeTokenBalance] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:900px)');
@@ -196,20 +196,22 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
 
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
-                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={network ? network.color : networks.ethereum.color}>
-                    <img src={network ? network.logo : networks.ethereum.logo} alt='' className='network-icon' />
-                    {network ? network.uniqueName : networks.ethereum.uniqueName}
+                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={blockchainUtil?.network ? blockchainUtil.network.color : networks.ethereum.color}>
+                    <img src={blockchainUtil?.network ? blockchainUtil.network.logo : networks.ethereum.logo} alt='' className='network-icon' />
+                    {blockchainUtil?.network ? blockchainUtil.network.uniqueName : networks.ethereum.uniqueName}
                 </NetworkButton>
-                {isAccountConnected && <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
-                    {Object.values(getSupportedNetworks()).map((network) => {
-                        return (
-                            <SelectNetworkButton key={network.uniqueName} onClick={() => handleNetworkSelect(network)}>
-                                <NetworkIcon src={network.logo} alt={`${network.uniqueName} icon`} />
-                                {network.uniqueName}
-                            </SelectNetworkButton>
-                        );
-                    })}
-                </StyledHoverMenu>}
+                {isAccountConnected && (
+                    <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
+                        {Object.values(getSupportedNetworks()).map((network) => {
+                            return (
+                                <SelectNetworkButton key={blockchainUtil?.network.uniqueName} onClick={() => handleNetworkSelect(network)}>
+                                    <NetworkIcon src={network.logo} alt={`${network.uniqueName} icon`} />
+                                    {network.uniqueName}
+                                </SelectNetworkButton>
+                            );
+                        })}
+                    </StyledHoverMenu>
+                )}
             </RelativePositionContainer>
         );
     };

@@ -58,7 +58,7 @@ const isValidEthereumAddress = (address) => {
 };
 
 function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
-    const { network, blockchainUtil } = useWalletConnect();
+    const { blockchainUtil } = useWalletConnect();
     const [searchInput, setSearchInput] = useState('');
     const [customToken, setCustomToken] = useState(null);
     const [filteredTokens, setfilteredTokens] = useState([]);
@@ -70,7 +70,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
                 setCustomToken({
                     'name': tokenName,
                     'networkSpecificAddress': {
-                        [network.uniqueName]: searchInput
+                        [blockchainUtil.network.uniqueName]: searchInput
                     }
                 });
             } catch (err) {
@@ -84,7 +84,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
     }, [searchInput]);
 
     useEffect(() => {
-        const selectedNetwork = network ? network : networks.ethereum;
+        const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
 
         setfilteredTokens(
                 getAllTokens().filter(token =>
@@ -92,7 +92,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
                     (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
                 )
             );
-    }, [network, searchInput]);
+    }, [blockchainUtil, searchInput]);
 
     const handleSearchChange = (event) => {
         setSearchInput(event.target.value);
