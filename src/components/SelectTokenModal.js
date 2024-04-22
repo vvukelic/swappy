@@ -11,6 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import styled from '@emotion/styled';
 import { getTokenImageUrl, addCustomToken, getAllTokens } from '../utils/tokens';
 import { useWalletConnect } from '../hooks/useWalletConnect';
+import networks from '../data/networks';
 
 
 const StyledDialog = styled(Dialog)`
@@ -57,7 +58,7 @@ const isValidEthereumAddress = (address) => {
 };
 
 function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
-    const { network, blockchainUtil } = useWalletConnect();
+    const { blockchainUtil } = useWalletConnect();
     const [searchInput, setSearchInput] = useState('');
     const [customToken, setCustomToken] = useState(null);
     const [filteredTokens, setfilteredTokens] = useState([]);
@@ -69,7 +70,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
                 setCustomToken({
                     'name': tokenName,
                     'networkSpecificAddress': {
-                        [network.uniqueName]: searchInput
+                        [blockchainUtil.network.uniqueName]: searchInput
                     }
                 });
             } catch (err) {
@@ -83,13 +84,15 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
     }, [searchInput]);
 
     useEffect(() => {
+        const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
+
         setfilteredTokens(
-            getAllTokens().filter(token =>
-                token.networkSpecificAddress[network?.uniqueName] && 
-                (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[network?.uniqueName].includes(searchInput))
-            )
-        );
-    }, [network, searchInput]);
+                getAllTokens().filter(token =>
+                    token.networkSpecificAddress[selectedNetwork.uniqueName] &&
+                    (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
+                )
+            );
+    }, [blockchainUtil, searchInput]);
 
     const handleSearchChange = (event) => {
         setSearchInput(event.target.value);
@@ -108,7 +111,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
     return (
         <StyledDialog onClose={onClose} open={open}>
             <StyledDialogTitle>{title}</StyledDialogTitle>
-            <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} />
+            <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
             <ScrollableListContainer>
                 <List>
                     {filteredTokens.length > 0 ? (

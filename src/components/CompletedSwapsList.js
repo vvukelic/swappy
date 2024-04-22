@@ -15,14 +15,14 @@ const contractAddresses = require('../contracts/contract-address.json');
 
 
 function CompletedSwapsList() {
-    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
+    const { defaultAccount, blockchainUtil } = useWalletConnect();
     const [swapsTakenByUser, setSwapsTakenByUser] = useState([]);
     const [loadingSwaps, setLoadingSwaps] = useState(false);
     const isMobile = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         const fetchUserCompletedSwapsList = async () => {
-            if (!network || !contractAddresses[network.uniqueName] || !blockchainUtil) {
+            if (!blockchainUtil || !contractAddresses[blockchainUtil.network.uniqueName]) {
                 return;
             }
 
@@ -46,7 +46,7 @@ function CompletedSwapsList() {
                         displayYouSentAmount: swap.dstAmountInBaseUnit,
                         displayYouReceivedAmount: swap.srcAmountInBaseUnit,
                         displayYouSentTokenName: swapOffer.dstTokenName,
-                        displayYouReceivedTokenName: swapOffer.srcTokenName,
+                        displayYouReceivedTokenName: swapOffer.getSrcToken().name,
                     });
                 });
             };
@@ -66,7 +66,7 @@ function CompletedSwapsList() {
                             displayUserAddress: sliceAddress(swap.dstAddress),
                             displayYouSentAmount: swap.srcAmountInBaseUnit,
                             displayYouReceivedAmount: swap.dstAmountInBaseUnit,
-                            displayYouSentTokenName: swapOffer.srcTokenName,
+                            displayYouSentTokenName: swapOffer.getSrcToken().name,
                             displayYouReceivedTokenName: swapOffer.dstTokenName,
                         });
                     });
@@ -81,10 +81,10 @@ function CompletedSwapsList() {
 
         setLoadingSwaps(true);
         fetchUserCompletedSwapsList();
-    }, [defaultAccount, network, blockchainUtil]);
+    }, [defaultAccount, blockchainUtil]);
 
     const handleRowClick = (swapOfferHash) => {
-        window.open(`/swap/${swapOfferHash}`, '_blank');
+        window.open(`/swap/${swapOfferHash}?network=${blockchainUtil.network.uniqueName}`, '_blank');
     };
 
     return (

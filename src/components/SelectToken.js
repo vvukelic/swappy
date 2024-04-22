@@ -85,7 +85,9 @@ function SelectToken({ selectedToken, selectedTokenDecimals, amount, setAmount, 
             value = '0.';
         }
 
-        const regex = new RegExp(`(\\.\\d{0,${selectedTokenDecimals}}).*`);
+        const _selectedTokenDecimals = selectedTokenDecimals ? selectedTokenDecimals : 18;
+
+        const regex = new RegExp(`(\\.\\d{0,${_selectedTokenDecimals}}).*`);
         const formattedValue = value.replace(regex, '$1');
 
         setDisplayAmount(formattedValue);

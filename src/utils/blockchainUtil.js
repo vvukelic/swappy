@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { getNativeToken } from './tokens';
 
 const erc20Abi = require('../contracts/Erc20.json');
 const swappyManagerAbi = require('../contracts/SwappyManager.json');
@@ -10,6 +11,7 @@ export class BlockchainUtil {
     constructor(network, provider) {
         this.provider = provider;
         this.network = network;
+        this.nativeToken = getNativeToken(this.network.uniqueName);
         this.swappyDataContract = new ethers.Contract(contractAddresses[network.uniqueName].SwappyData, swappyDataAbi, this.provider.getSigner());
         this.swappyManagerContract = new ethers.Contract(contractAddresses[network.uniqueName].SwappyManager, swappyManagerAbi, this.provider.getSigner());
     }

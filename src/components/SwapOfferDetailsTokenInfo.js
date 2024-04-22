@@ -25,7 +25,7 @@ const StyledAmountGrid = styled(Grid)`
     min-width: 100px;
 `;
 
-function SwapOfferDetailsYouReceive({ token, amount, labelText }) {
+function SwapOfferDetailsTokenInfo({ token, amount, labelText }) {
     const imageUrl = getTokenImageUrl(token);
 
     return (
@@ -45,4 +45,4 @@ function SwapOfferDetailsYouReceive({ token, amount, labelText }) {
     );
 }
 
-export default SwapOfferDetailsYouReceive;
+export default SwapOfferDetailsTokenInfo;

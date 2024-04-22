@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip } from '@mui/material';
+import { useRouter } from 'next/router';
+import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip, CircularProgress } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -22,6 +23,8 @@ import SwapOffer from '../utils/swapOffer';
 import { getNativeToken } from '../utils/tokens';
 import { useNotification } from './NotificationProvider';
 import { Truncate } from '../sharedStyles/general';
+import { supportedNetworkNames } from '../utils/general';
+import networks from '../data/networks';
 
 
 const StyledBox = styled(Box)`
@@ -72,7 +75,7 @@ const StyledInfoValues = styled(Grid)`
 `;
 
 function SwapOfferDetails({ hash }) {
-    const { defaultAccount, network, blockchainUtil, isAccountConnected } = useWalletConnect();
+    const { defaultAccount, blockchainUtil } = useWalletConnect();
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const [swapOffer, setSwapOffer] = useState(null);
     const [swapSrcAmount, setSwapSrcAmount] = useState(null);
@@ -81,6 +84,23 @@ function SwapOfferDetails({ hash }) {
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
     const { addNotification, updateNotification } = useNotification();
     const isMobile = useMediaQuery('(max-width:600px)');
+    const router = useRouter();
+
+
+    useEffect(() => {
+        async function alignNetworks() {
+            const swapOfferNetworkName = router.query.network;
+
+            if (swapOfferNetworkName !== blockchainUtil.network.uniqueName && supportedNetworkNames.includes(swapOfferNetworkName)) {
+                await blockchainUtil.switchNetwork(networks[swapOfferNetworkName]);
+            }
+        }
+
+        if (router.query.network && blockchainUtil) {
+            alignNetworks();
+        }
+
+    }, [router.query.network, blockchainUtil]);
 
     useEffect(() => {
         async function checkTokenApproved() {
@@ -106,7 +126,7 @@ function SwapOfferDetails({ hash }) {
                 setSwapButtonText('Take swap');
             } else {
                 if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
-                    setSwapButtonText(`${network.wrappedNativeCurrencySymbol} balance too low`);
+                    setSwapButtonText(`${blockchainUtil.network.wrappedNativeCurrencySymbol} balance too low`);
                 } else {
                     setSwapButtonText(`Approve ${swapOffer.dstTokenName} Token`);
                 }
@@ -127,10 +147,10 @@ function SwapOfferDetails({ hash }) {
             }
         }
 
-        if (network && hash && blockchainUtil) {
+        if (hash && blockchainUtil) {
             getSwapOfferDetails();
         }
-    }, [hash, network, blockchainUtil]);
+    }, [hash, blockchainUtil]);
 
     useEffect(() => {
         if (swapOffer) {
@@ -151,7 +171,7 @@ function SwapOfferDetails({ hash }) {
             startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
             
             try {
-                const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.networkSpecificAddress[network.uniqueName], swapDstAmount, swapOffer.feeAmount);
+                const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.networkSpecificAddress[blockchainUtil.network.uniqueName], swapDstAmount, swapOffer.feeAmount);
 
                 addNotification(tx.hash, {
                     message: 'Taking a swap...',
@@ -261,14 +281,19 @@ function SwapOfferDetails({ hash }) {
     };
 
     if (!swapOffer) {
-        return <MainContentContainer sx={{ width: '100%' }}>Loading...</MainContentContainer>;
+        return (
+            <MainContentContainer sx={{ width: '100%' }}>
+                <CircularProgress color='inherit' />
+            </MainContentContainer>
+        );
     }
 
     return (
         <>
             <MainContentContainer sx={{ width: '100%' }}>
-                {swapOffer.partialFillEnabled && swapOffer.readableStatus !== 'FILLED' && <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} />}
-                {(!swapOffer.partialFillEnabled || swapOffer.readableStatus === 'FILLED') && <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
+                {swapOffer.partialFillEnabled && swapOffer.readableStatus === 'OPENED' ?
+                    <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} /> :
+                    <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
 
                 <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton variant='outlined' disabled>
@@ -276,9 +301,7 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                {swapOffer.convertSrcTokenToNative ?
-                    <SwapOfferDetailsTokenInfo token={getNativeToken(network?.uniqueName)} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> :
-                    <SwapOfferDetailsTokenInfo token={swapOffer.srcToken} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' /> }
+                <SwapOfferDetailsTokenInfo token={swapOffer.getSrcToken()} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' />
 
                 <Grid item sx={{ height: '42px' }} />
 
@@ -340,7 +363,7 @@ function SwapOfferDetails({ hash }) {
                                     <Tooltip title={swapOffer.srcAmountInBaseUnit}>
                                         <Truncate>{swapOffer.srcAmountInBaseUnit}</Truncate>
                                     </Tooltip>
-                                    {swapOffer.srcTokenName}
+                                    {swapOffer.getSrcToken().name}
                                 </StyledTypography>
                             </StyledBox>
                             <StyledBox>
@@ -356,7 +379,7 @@ function SwapOfferDetails({ hash }) {
                                     <Tooltip title={swapOffer.feeAmountInBaseUnit}>
                                         <Truncate>{swapOffer.feeAmountInBaseUnit}</Truncate>
                                     </Tooltip>
-                                    {network?.nativeCurrency.symbol}
+                                    {blockchainUtil.network?.nativeCurrency.symbol}
                                 </StyledTypography>
                             </StyledBox>
                             {swapOffer.displayExpirationTime && (
@@ -376,7 +399,7 @@ function SwapOfferDetails({ hash }) {
                                         <Tooltip title={swapOffer.displayExchangeRateSrcDst}>
                                             <Truncate>{swapOffer.displayExchangeRateSrcDst}</Truncate>
                                         </Tooltip>
-                                        {swapOffer.srcTokenName}
+                                        {swapOffer.getSrcToken().name}
                                     </StyledAmountAndToken>
                                 </StyledExchangeRate>
                             </StyledBox>
@@ -418,7 +441,7 @@ function SwapOfferDetails({ hash }) {
                                                     <Tooltip title={swap.srcAmountInBaseUnit}>
                                                         <Truncate>{swap.srcAmountInBaseUnit}</Truncate>
                                                     </Tooltip>
-                                                    {swapOffer.srcTokenName}
+                                                    {swapOffer.getSrcToken().name}
                                                 </StyledTableCell>
                                             </StyledTableRow>
                                         );

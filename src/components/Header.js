@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ethers } from 'ethers';
+import { useWeb3Modal } from '@web3modal/ethers5/react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
-import { Card, CardMedia, Typography } from '@mui/material';
+import { Card, CardMedia } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -14,6 +15,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getSupportedNetworks } from '../utils/general';
+import PrimaryButton from './PrimaryButton';
+import networks from '../data/networks';
 
 
 const StyledToolbar = styled(Toolbar)`
@@ -103,23 +106,25 @@ const NetworkIcon = styled.img`
     margin-right: 10px;
 `;
 
-const NativeCoinBalance = styled(Typography)`
-    margin-right: 15px;
+const SwappyHome = styled(CardMedia)`
+    width: 100px;
+    height: 100px;
+    background-color: transparent;
 
-    @media (max-width: 900px) {
-        text-align: center;
-        margin-right: 0;
+    &:hover {
+        cursor: pointer !important;
     }
 `;
 
 function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
-    const { defaultAccount, network, blockchainUtil } = useWalletConnect();
+    const { defaultAccount, blockchainUtil, isAccountConnected } = useWalletConnect();
     const [nativeTokenBalance, setNativeTokenBalance] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:900px)');
     const router = useRouter();
     const [showSwapOffersHoverMenu, setShowSwapOffersHoverMenu] = useState(false);
     const [showNetworksHoverMenu, setShowNetworksHoverMenu] = useState(false);
+    const { open } = useWeb3Modal();
 
     useEffect(() => {
         const fetchBalance = async () => {
@@ -191,20 +196,22 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
 
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
-                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={network ? network.color : ''}>
-                    <img src={network ? network.logo : ''} alt='' className='network-icon' />
-                    {network ? network.uniqueName : 'Select network'}
+                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={blockchainUtil?.network ? blockchainUtil.network.color : networks.ethereum.color}>
+                    <img src={blockchainUtil?.network ? blockchainUtil.network.logo : networks.ethereum.logo} alt='' className='network-icon' />
+                    {blockchainUtil?.network ? blockchainUtil.network.uniqueName : networks.ethereum.uniqueName}
                 </NetworkButton>
-                <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
-                    {Object.values(getSupportedNetworks()).map((network) => {
-                        return (
-                            <SelectNetworkButton key={network.uniqueName} onClick={() => handleNetworkSelect(network)}>
-                                <NetworkIcon src={network.logo} alt={`${network.uniqueName} icon`} />
-                                {network.uniqueName}
-                            </SelectNetworkButton>
-                        );
-                    })}
-                </StyledHoverMenu>
+                {isAccountConnected && (
+                    <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
+                        {Object.values(getSupportedNetworks()).map((network) => {
+                            return (
+                                <SelectNetworkButton key={blockchainUtil?.network.uniqueName} onClick={() => handleNetworkSelect(network)}>
+                                    <NetworkIcon src={network.logo} alt={`${network.uniqueName} icon`} />
+                                    {network.uniqueName}
+                                </SelectNetworkButton>
+                            );
+                        })}
+                    </StyledHoverMenu>
+                )}
             </RelativePositionContainer>
         );
     };
@@ -214,14 +221,14 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             <StyledTabButton isActive={activeTab === 'createSwapOffer'} onClick={() => handleSwapOfferNavigationButtonClick('createSwapOffer')}>
                 Create Swap Offer
             </StyledTabButton>
-            <SwapOffersListsButtonWithMenu isActive={activeTab === 'swapOffersList'} onClick={() => setActiveTab('swapOffersList')} onMouseEnter={() => setShowSwapOfferOffersHoverMenu(true)} />
+            <SwapOffersListsButtonWithMenu isActive={activeTab === 'swapOffersList'} onClick={() => setActiveTab('swapOffersList')} />
             <StyledTabButton isActive={activeTab === 'completedSwapsList'} onClick={() => handleSwapOfferNavigationButtonClick('completedSwapsList')}>
                 Completed swaps
             </StyledTabButton>
             <Box flexGrow={1} />
             {isMobile && <Box sx={{ borderTop: 1, color: 'white' }} />}
             <SelectNetworkButtonWithMenu />
-            <w3m-button />
+            {isAccountConnected ? <w3m-button /> : <PrimaryButton onClick={() => open()} buttonText='Connect wallet' />}
         </>
     );
 
@@ -236,14 +243,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                                 boxShadow: 'none',
                             }}
                         >
-                            <CardMedia
-                                sx={{
-                                    width: '100px',
-                                    height: '100px',
-                                    backgroundColor: 'transparent',
-                                }}
-                                image='/images/swappy_logo.png'
-                            />
+                            <SwappyHome image='/images/swappy_logo.png' />
                         </Card>
                     </Link>
                     {isMobile ? (
