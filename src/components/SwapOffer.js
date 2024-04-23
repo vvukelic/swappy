@@ -376,7 +376,14 @@ function SwapOffer({
     return (
         <>
             <MainContentContainer>
-                <SelectToken selectedToken={selectedSrcToken} selectedTokenDecimals={selectedSrcTokenDecimals} amount={srcAmount} setAmount={setSrcAmount} selectedTokenImg={selectedSrcTokenImg} labelText='You send' openModal={() => openModal('src')} selectedTokenAccountBalance={defaultAccountSrcTokenBalance} />
+                <SelectToken
+                    selectedToken={selectedSrcToken}
+                    selectedTokenDecimals={selectedSrcTokenDecimals}
+                    amount={srcAmount} setAmount={setSrcAmount}
+                    selectedTokenImg={selectedSrcTokenImg}
+                    labelText='You send' openModal={() => openModal('src')}
+                    selectedTokenAccountBalance={defaultAccountSrcTokenBalance}
+                />
 
                 <Grid item xs={12} container justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton
@@ -396,28 +403,69 @@ function SwapOffer({
                     </IconButton>
                 </Grid>
 
-                <SelectToken selectedToken={selectedDstToken} selectedTokenDecimals={selectedDstTokenDecimals} amount={dstAmount} setAmount={setDstAmount} selectedTokenImg={selectedDstTokenImg} labelText='You receive' openModal={() => openModal('dst')} />
+                <SelectToken
+                    selectedToken={selectedDstToken}
+                    selectedTokenDecimals={selectedDstTokenDecimals}
+                    amount={dstAmount} setAmount={setDstAmount}
+                    selectedTokenImg={selectedDstTokenImg}
+                    labelText='You receive'
+                    openModal={() => openModal('dst')}
+                />
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px', marginTop: '20px' }}>
                     <Grid item xs={6} sm={4}>
-                        <FormControlLabel control={<StyledSwitch onChange={() => setExpirationEnabled(!expirationEnabled)} checked={expirationEnabled} />} label='Expires In:' sx={{ color: 'white' }} />
+                        <FormControlLabel
+                            control={<StyledSwitch onChange={() => setExpirationEnabled(!expirationEnabled)} checked={expirationEnabled} />}
+                            label='Expires In:'
+                            sx={{ color: 'white' }}
+                        />
                     </Grid>
                     <Grid item xs={3} sm={4}>
-                        <TextField label='Hours' variant='outlined' type='number' value={expiresInHours} onChange={(e) => setExpiresInHours(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                        <TextField
+                            label='Hours'
+                            variant='outlined'
+                            type='number'
+                            value={expiresInHours}
+                            onChange={(e) => setExpiresInHours(e.target.value)}
+                            fullWidth
+                            disabled={!expirationEnabled}
+                            InputLabelProps={{ style: { color: 'white' } }}
+                            inputProps={{ style: { color: 'white' } }}
+                        />
                     </Grid>
                     <Grid item xs={3} sm={4}>
-                        <TextField label='Minutes' variant='outlined' type='number' value={expiresInMinutes} onChange={(e) => setExpiresInMinutes(e.target.value)} fullWidth disabled={!expirationEnabled} InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                        <TextField 
+                            abel='Minutes'
+                            variant='outlined'
+                            type='number'
+                            value={expiresInMinutes}
+                            onChange={(e) => setExpiresInMinutes(e.target.value)}
+                            fullWidth
+                            disabled={!expirationEnabled}
+                            InputLabelProps={{ style: { color: 'white' } }}
+                            inputProps={{ style: { color: 'white' } }}
+                        />
                     </Grid>
                 </Grid>
 
                 <Grid item xs={12} sx={{ color: 'white', padding: '0 16px' }}>
-                    <TextField label='Destination Address (Optional)' variant='outlined' onChange={(e) => setDstAddress(e.target.value)} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                    <TextField
+                        label='Destination Address (Optional)'
+                        variant='outlined'
+                        onChange={(e) => setDstAddress(e.target.value)}
+                        fullWidth InputLabelProps={{ style: { color: 'white' } }}
+                        inputProps={{ style: { color: 'white' } }}
+                    />
                 </Grid>
 
                 <Grid item xs={12} container alignItems='center' sx={{ color: 'white', padding: '0 16px' }}>
                     <Grid item xs={12}>
                         <Tooltip title='Enable this option to allow others to partially fulfill your swap offer. This increases the chances of your offer being used, but you may receive multiple smaller transactions instead of a single one.'>
-                            <FormControlLabel control={<StyledSwitch onChange={() => setPartialFillEnabled(!partialFillEnabled)} checked={partialFillEnabled} />} label='Allow swap offer to be partially filled' sx={{ color: 'white' }} />
+                            <FormControlLabel
+                                control={<StyledSwitch onChange={() => setPartialFillEnabled(!partialFillEnabled)} checked={partialFillEnabled} />}
+                                label='Allow swap offer to be partially filled'
+                                sx={{ color: 'white' }}
+                            />
                         </Tooltip>
                     </Grid>
                 </Grid>
@@ -427,7 +475,13 @@ function SwapOffer({
                 </Grid>
             </MainContentContainer>
 
-            <SelectTokenModal open={modalOpen} onClose={closeModal} handleTokenSelection={(token) => handleTokenSelection(token, modalType)} title={modalType === 'src' ? 'Select a token to send' : 'Select a token to receive'} />
+            <SelectTokenModal
+                open={modalOpen}
+                onClose={closeModal}
+                handleTokenSelection={(token) => handleTokenSelection(token, modalType)}
+                title={modalType === 'src' ? 'Select a token to send' : 'Select a token to receive'}
+                excludeToken={modalType === 'src' ? selectedDstToken : selectedSrcToken}
+            />
             <InfoModal open={showWrappedTokenModal} title='Info' msgText={wrappedTokenModalMsg} onOkClose={handleProceedWithSwap} onCancelClose={handleAbortSwap} />
             <InfoModal open={showInvalidAmountsModal} title='Error' msgText='Please insert valid token amounts.' onOkClose={() => setShowInvalidAmountsModal(false)} />
             <TransactionStatusModal open={txModalOpen} status={txStatus} statusTxt={txStatusTxt} errorTxt={txErrorTxt} onClose={() => setTxModalOpen(false)} />

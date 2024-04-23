@@ -57,7 +57,7 @@ const isValidEthereumAddress = (address) => {
     return /^(0x)?[0-9a-fA-F]{40}$/.test(address);
 };
 
-function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
+function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeToken }) {
     const { blockchainUtil } = useWalletConnect();
     const [searchInput, setSearchInput] = useState('');
     const [customToken, setCustomToken] = useState(null);
@@ -89,10 +89,11 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title }) {
         setfilteredTokens(
                 getAllTokens().filter(token =>
                     token.networkSpecificAddress[selectedNetwork.uniqueName] &&
+                    token !== excludeToken &&
                     (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
                 )
             );
-    }, [blockchainUtil, searchInput]);
+    }, [blockchainUtil, searchInput, excludeToken]);
 
     const handleSearchChange = (event) => {
         setSearchInput(event.target.value);
