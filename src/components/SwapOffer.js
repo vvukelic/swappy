@@ -67,8 +67,9 @@ function SwapOffer({
     const [selectedDstTokenDecimals, setSelectedDstTokenDecimals] = useState(0);
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const { addNotification, updateNotification } = useNotification();
-    const [infoModalMsg, setInfoModalMsg] = useState('');
-    const [showInfoModal, setShowInfoModal] = useState(false);
+    const [wrappedTokenModalMsg, setWrappedTokenModalMsg] = useState('');
+    const [showWrappedTokenModal, setShowWrappedTokenModal] = useState(false);
+    const [showInvalidAmountsModal, setShowInvalidAmountsModal] = useState(false);
     const { open } = useWeb3Modal();
 
     const openModal = (type) => {
@@ -214,6 +215,11 @@ function SwapOffer({
          const srcAmountInt = await blockchainUtil.toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName]);
          const dstAmountInt = await blockchainUtil.toSmallestUnit(dstAmount, selectedDstToken.networkSpecificAddress[blockchainUtil.network.uniqueName]);
 
+         if (srcAmountInt.eq(0) || dstAmountInt.eq(0)) {
+            setShowInvalidAmountsModal(true);
+            return;
+         }
+
          let expiresIn = 0;
          if (expirationEnabled) {
              expiresIn = parseInt(expiresInHours) * 60 * 60 + parseInt(expiresInMinutes) * 60;
@@ -326,8 +332,8 @@ function SwapOffer({
         } else if (!insufficientSrcTokenAmount) {
             if (selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName] === ethers.constants.AddressZero) {
                 const nativeTokenName = selectedSrcToken.name.toUpperCase();
-                setInfoModalMsg(`For this swap offer, your ${nativeTokenName} will be converted to W${nativeTokenName}. Once the offer is accepted, the W${nativeTokenName} will be seamlessly reverted back to ${nativeTokenName} and sent to the swap taker.`);
-                setShowInfoModal(true);
+                setWrappedTokenModalMsg(`For this swap offer, your ${nativeTokenName} will be converted to W${nativeTokenName}. Once the offer is accepted, the W${nativeTokenName} will be seamlessly reverted back to ${nativeTokenName} and sent to the swap taker.`);
+                setShowWrappedTokenModal(true);
             } else {
                 openSwapOffer();
             }
@@ -359,12 +365,12 @@ function SwapOffer({
     };
 
     const handleProceedWithSwap = async () => {
-        setShowInfoModal(false);
+        setShowWrappedTokenModal(false);
         openSwapOffer();
     };
 
     const handleAbortSwap = () => {
-        setShowInfoModal(false);
+        setShowWrappedTokenModal(false);
     };
 
     return (
@@ -422,7 +428,8 @@ function SwapOffer({
             </MainContentContainer>
 
             <SelectTokenModal open={modalOpen} onClose={closeModal} handleTokenSelection={(token) => handleTokenSelection(token, modalType)} title={modalType === 'src' ? 'Select a token to send' : 'Select a token to receive'} />
-            <InfoModal open={showInfoModal} msgText={infoModalMsg} onOkClose={handleProceedWithSwap} onCancelClose={handleAbortSwap} />
+            <InfoModal open={showWrappedTokenModal} title='Info' msgText={wrappedTokenModalMsg} onOkClose={handleProceedWithSwap} onCancelClose={handleAbortSwap} />
+            <InfoModal open={showInvalidAmountsModal} title='Error' msgText='Please insert valid token amounts.' onOkClose={() => setShowInvalidAmountsModal(false)} />
             <TransactionStatusModal open={txModalOpen} status={txStatus} statusTxt={txStatusTxt} errorTxt={txErrorTxt} onClose={() => setTxModalOpen(false)} />
         </>
     );
