@@ -13,6 +13,12 @@ module.exports = {
                 // blockNumber: 55099794
             },
         },
+        ethereum: {
+            url: secret['ethereum_url'],
+            accounts: {
+                mnemonic: secret['wallet_mnemonic'],
+            },
+        },
         sepolia: {
             url: secret['sepolia_url'],
             accounts: {
@@ -25,5 +31,20 @@ module.exports = {
                 mnemonic: secret['wallet_mnemonic'],
             },
         },
+        bsc: {
+            url: secret['bsc_url'],
+            accounts: {
+                mnemonic: secret['wallet_mnemonic'],
+            },
+        },
+    },
+    gasReporter: {
+        enabled: true,
+        L1: 'ethereum',
+        currency: 'USD',
+        noColors: true,
+        outputFile: 'gasReportEther.txt',
+        coinmarketcap: secret['coinmarketcap_api_key'],
+        token: 'ETH',
     },
 };

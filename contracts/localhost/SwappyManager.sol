@@ -34,7 +34,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
             require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
 
             _weth.deposit{value: srcAmount}();
-            assert(_weth.transfer(msg.sender, srcAmount));
+            require(_weth.transfer(msg.sender, srcAmount), "WETH transfer failed");
             srcTokenAddress = _wethAddress;
             newSwapOffer.convertSrcTokenToNative = true;
         } else {

@@ -172,12 +172,20 @@ function SwapOffer({
     }, [blockchainUtil, defaultAccount, selectedSrcToken, tokenApproved, srcAmount, isAccountConnected]);
 
     useEffect(() => {
-        async function srcTokenHoldingsAmount() {
-            const tokenContract = selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName];
+        let active = true;
 
-            if (tokenContract) {
-                const tokenBalance = await blockchainUtil.getTokenBalance(defaultAccount, tokenContract);
-                setDefaultAccountSrcTokenBalance(await blockchainUtil.toBaseUnit(tokenBalance, tokenContract));
+        async function srcTokenHoldingsAmount() {
+            const tokenAddress = selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName];
+
+            if (tokenAddress) {
+                const tokenBalance = await blockchainUtil.getTokenBalance(defaultAccount, tokenAddress);
+                const tokenBalanceBaseUnit = await blockchainUtil.toBaseUnit(tokenBalance, tokenAddress);
+
+                if (!active) {
+                    return;
+                }
+
+                setDefaultAccountSrcTokenBalance(tokenBalanceBaseUnit);
             }
         };
 
@@ -186,6 +194,11 @@ function SwapOffer({
 
             if (tokenAddress) {
                 const srcTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await blockchainUtil.getTokenDecimals(tokenAddress);
+
+                if (!active) {
+                    return;
+                }
+
                 setSelectedSrcTokenDecimals(srcTokenDecimals);
             }
         };
@@ -194,6 +207,10 @@ function SwapOffer({
             srcTokenHoldingsAmount();
             getSrcTokenDecimals();
         }
+
+        return () => {
+            active = false;
+        };
     }, [defaultAccount, selectedSrcToken, blockchainUtil]);
 
     useEffect(() => {
@@ -435,7 +452,7 @@ function SwapOffer({
                     </Grid>
                     <Grid item xs={3} sm={4}>
                         <TextField 
-                            abel='Minutes'
+                            label='Minutes'
                             variant='outlined'
                             type='number'
                             value={expiresInMinutes}
