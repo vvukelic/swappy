@@ -108,7 +108,7 @@ class SwapOffer {
         }
 
         if (!dstToken) {
-            srcToken = await this.createCustomTokenFromAddress(this.srcTokenAddress);
+            dstToken = await this.createCustomTokenFromAddress(this.dstTokenAddress);
         }
 
         this.srcToken = srcToken;

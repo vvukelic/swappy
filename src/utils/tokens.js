@@ -84,6 +84,10 @@ export function updateCustomTokensList() {
         networks.forEach((network) => {
             const commonTokenAddress = commonToken.networkSpecificAddress[network];
 
+            if (!commonTokenAddress) {
+                return;
+            }
+
             // Filter out custom tokens that match the current commonToken's address on any network
             customTokensList = customTokensList.filter((customToken) => {
                 const customTokenAddress = customToken.networkSpecificAddress[network];
