@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Avatar, Grid, Typography, Box, TextField, Slider } from '@mui/material';
+import { Avatar, Grid, Link, Box, TextField, Slider } from '@mui/material';
 import styled from '@emotion/styled';
 import BorderSection from './BorderSection';
 import { getTokenImageUrl } from '../utils/tokens';
+import { StyledTokenLinkName } from '../sharedStyles/general';
 
 const StyledContainerGrid = styled(Grid)`
     align-items: center;
@@ -46,7 +47,7 @@ const StyledSlider = styled(Slider)`
     width: 12em;
 `;
 
-function SwapOfferDetailsPartialFillTokenForm({ token, amount, maxAmount, setAmount, tokenDecimals, labelText }) {
+function SwapOfferDetailsPartialFillTokenForm({ token, tokenUrl, amount, maxAmount, setAmount, tokenDecimals, labelText }) {
     const [displayAmount, setDisplayAmount] = useState('');
     const [sliderValue, setSliderValue] = useState(0);
 
@@ -127,19 +128,19 @@ function SwapOfferDetailsPartialFillTokenForm({ token, amount, maxAmount, setAmo
             <StyledContainerGrid container>
                 <Grid item xs={3}>
                     <StyledAvatarBox>
-                        <Avatar src={imageUrl} sx={{ width: '64px', height: '64px' }} />
+                        <Link href={tokenUrl} target='_blank' rel='noopener noreferrer'>
+                            <Avatar src={imageUrl} sx={{ width: '64px', height: '64px' }} />
+                        </Link>
                     </StyledAvatarBox>
                 </Grid>
                 <StyledAmountGrid item xs={9}>
                     <StyledTextField value={displayAmount} onChange={handleAmountOnChange} onBlur={handleAmountOnBlur} />
-                    {token && <Typography>{token.name.toUpperCase()}</Typography>}
-                    <StyledSlider
-                        value={parseFloat(sliderValue)}
-                        onChange={handleSliderChange}
-                        min={0}
-                        max={parseFloat(ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals))}
-                        step={stepValue}
-                    />
+                    {token && (
+                        <Link href={tokenUrl} target='_blank' rel='noopener noreferrer' style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <StyledTokenLinkName>{token.name.toUpperCase()}</StyledTokenLinkName>
+                        </Link>
+                    )}
+                    <StyledSlider value={parseFloat(sliderValue)} onChange={handleSliderChange} min={0} max={parseFloat(ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals))} step={stepValue} />
                 </StyledAmountGrid>
             </StyledContainerGrid>
         </BorderSection>

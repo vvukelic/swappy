@@ -116,6 +116,9 @@ class SwapOffer {
 
         this.srcTokenName = this.srcToken.name.toUpperCase();
         this.dstTokenName = this.dstToken.name.toUpperCase();
+        this.srcTokenUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/token/${this.srcTokenAddress}`;
+        this.dstTokenUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/token/${this.dstTokenAddress}`;
+
         this.swaps = await this.getSwaps();
         this.srcAmountInBaseUnit = await this.blockchainUtil.toBaseUnit(this.srcAmount, this.srcTokenAddress);
         this.dstAmountInBaseUnit = await this.blockchainUtil.toBaseUnit(this.dstAmount, this.dstTokenAddress);
