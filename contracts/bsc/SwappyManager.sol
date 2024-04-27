@@ -11,17 +11,17 @@ import "../SwappyData.sol";
 contract SwappyManager is AccessControl, ReentrancyGuard {
     SwappyData private _dataContract;
     uint256 private _nonce;
-    address constant private _wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    IWETH constant private _weth = IWETH(_wethAddress);
+    address constant private _wbnbAddress = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
+    IWBNB constant private _wbnb = IWBNB(_wbnbAddress);
     address payable public _feeAddress;
     AggregatorV3Interface private _priceFeed;
-    uint256 private _feeAmountInCents = 200;
+    uint256 private _feeAmountInCents = 100;
 
     constructor(address dataContractAddress, address payable feeAddress) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _dataContract = SwappyData(dataContractAddress);
         _feeAddress = feeAddress;
-        _priceFeed = AggregatorV3Interface(0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419);
+        _priceFeed = AggregatorV3Interface(0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE);
     }
 
     event SwapOfferCreated(address indexed creator, bytes32 swapHash);
@@ -31,11 +31,11 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         SwappyData.SwapOffer memory newSwapOffer;
 
         if (srcTokenAddress == address(0)) {
-            require(msg.value >= srcAmount, "Not enough ETH to create a swap!");
+            require(msg.value >= srcAmount, "Not enough BNB to create a swap!");
 
-            _weth.deposit{value: srcAmount}();
-            require(_weth.transfer(msg.sender, srcAmount), "WETH transfer failed");
-            srcTokenAddress = _wethAddress;
+            _wbnb.deposit{value: srcAmount}();
+            require(_wbnb.transfer(msg.sender, srcAmount), "WBNB transfer failed");
+            srcTokenAddress = _wbnbAddress;
             newSwapOffer.convertSrcTokenToNative = true;
         } else {
             newSwapOffer.convertSrcTokenToNative = false;
@@ -50,7 +50,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         newSwapOffer.dstAddress = dstAddress;
         newSwapOffer.createdTime = block.timestamp;
         newSwapOffer.feeTokenAddress = address(0);
-        newSwapOffer.feeAmount = _calculateEthFee();
+        newSwapOffer.feeAmount = _calculateBnbFee();
         newSwapOffer.partialFillEnabled = partialFillEnabled;
 
         if (expiresIn > 0) {
@@ -128,10 +128,10 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         require(srcToken.allowance(swapOffer.srcAddress, swapManagerAddress) >= swap.srcAmount, "Not enough allowence for source token!");
 
         if (dstTokenAddress == address(0)) {
-            require(msg.value >= (swap.dstAmount + swapOffer.feeAmount), "Not enough ETH to create swap!");
+            require(msg.value >= (swap.dstAmount + swapOffer.feeAmount), "Not enough BNB to create swap!");
             swapOffer.srcAddress.transfer(swap.dstAmount);
         } else {
-            require(msg.value >= swapOffer.feeAmount, "Not enough ETH to take a swap!");
+            require(msg.value >= swapOffer.feeAmount, "Not enough BNB to take a swap!");
 
             ERC20 dstToken = ERC20(dstTokenAddress);
             require(dstToken.allowance(msg.sender, swapManagerAddress) >= swap.dstAmount, "Not enough allowence for destination token!");
@@ -141,9 +141,9 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
             }
         }
 
-        if (srcTokenAddress == _wethAddress && swapOffer.convertSrcTokenToNative) {
+        if (srcTokenAddress == _wbnbAddress && swapOffer.convertSrcTokenToNative) {
             require(srcToken.transferFrom(swapOffer.srcAddress, address(this), swap.srcAmount), "Source amount failed to transfer");
-            _weth.withdraw(swap.srcAmount);
+            _wbnb.withdraw(swap.srcAmount);
             dstAddress.transfer(swap.srcAmount);
         } else {
             require(srcToken.transferFrom(swapOffer.srcAddress, msg.sender, swap.srcAmount), "Source amount failed to transfer");
@@ -177,17 +177,17 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
         _feeAmountInCents = feeAmount;
     }
 
-    function _calculateEthFee() private view returns (uint256) {
-        (,int ethUsdPrice,,,) = _priceFeed.latestRoundData();
+    function _calculateBnbFee() private view returns (uint256) {
+        (,int bnbUsdPrice,,,) = _priceFeed.latestRoundData();
         uint8 decimals = _priceFeed.decimals();
-        return (_feeAmountInCents * 1e18) / (uint256(ethUsdPrice) / 10 ** (decimals - 2));
+        return (_feeAmountInCents * 1e18) / (uint256(bnbUsdPrice) / 10 ** (decimals - 2));
     }
 
     receive() external payable {}
     fallback() external payable {}
 }
 
-interface IWETH is IERC20 {
+interface IWBNB is IERC20 {
     function deposit() external payable;
     function withdraw(uint) external;
 }

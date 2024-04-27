@@ -1,8 +1,8 @@
-import { Avatar, Grid, Typography, Box } from '@mui/material';
+import { Avatar, Grid, Typography, Box, Link } from '@mui/material';
 import styled from '@emotion/styled';
 import BorderSection from './BorderSection';
 import { getTokenImageUrl } from '../utils/tokens';
-
+import { StyledTokenLinkName } from '../sharedStyles/general';
 
 const StyledContainerGrid = styled(Grid)`
     align-items: center;
@@ -14,7 +14,7 @@ const StyledAmountTypography = styled(Typography)`
     word-break: break-word;
 `;
 
-const StyledAvatarBox= styled(Box)`
+const StyledAvatarBox = styled(Box)`
     padding: 1em;
     justify-content: center;
     display: flex;
@@ -25,7 +25,7 @@ const StyledAmountGrid = styled(Grid)`
     min-width: 100px;
 `;
 
-function SwapOfferDetailsTokenInfo({ token, amount, labelText }) {
+function SwapOfferDetailsTokenInfo({ token, tokenUrl, amount, labelText }) {
     const imageUrl = getTokenImageUrl(token);
 
     return (
@@ -33,12 +33,18 @@ function SwapOfferDetailsTokenInfo({ token, amount, labelText }) {
             <StyledContainerGrid container>
                 <Grid item xs={3}>
                     <StyledAvatarBox>
-                        <Avatar src={imageUrl} sx={{ width: '64px', height: '64px' }} />
+                        <Link href={tokenUrl} target='_blank' rel='noopener noreferrer'>
+                            <Avatar src={imageUrl} sx={{ width: '64px', height: '64px' }} />
+                        </Link>
                     </StyledAvatarBox>
                 </Grid>
                 <StyledAmountGrid item xs={9}>
                     {token && <StyledAmountTypography>{amount}</StyledAmountTypography>}
-                    {token && <Typography>{token.name.toUpperCase()}</Typography>}
+                    {token && (
+                        <Link href={tokenUrl} target='_blank' rel='noopener noreferrer' style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <StyledTokenLinkName>{token.name.toUpperCase()}</StyledTokenLinkName>
+                        </Link>
+                    )}
                 </StyledAmountGrid>
             </StyledContainerGrid>
         </BorderSection>

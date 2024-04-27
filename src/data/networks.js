@@ -3,6 +3,7 @@ const networks = {
         chainId: 0x1,
         chainName: 'Ethereum Mainnet',
         uniqueName: 'ethereum',
+        rpcUrls: ['https://eth.llamarpc.com'],
         color: '#3d5dd7',
         logo: '/images/eth-logo.png',
         nativeCurrency: {

@@ -16,15 +16,21 @@ export async function waitForTxToBeMined(tx) {
     }
 }
 
-export const supportedNetworkNames = ['localhost', 'sepolia', 'polygon'];
+export const supportedNetworkNames = {
+    development: ['localhost', 'sepolia', 'ethereum', 'polygon', 'bsc'],
+    production: ['ethereum', 'polygon', 'bsc'],
+};
 let supportedNetworks = [];
 
 export function getSupportedNetworks() {
     if (supportedNetworks.length > 0) {
         return supportedNetworks;
     }
+
+    const environment = process.env.NODE_ENV || 'production';
+    const networkNames = supportedNetworkNames[environment] || supportedNetworkNames.production;
     
-    supportedNetworkNames.forEach((name) => {
+    networkNames.forEach((name) => {
         const network = networks[name];
 
         if (network) {

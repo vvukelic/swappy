@@ -64,6 +64,20 @@ class SwapOffer {
         return swaps;
     }
 
+    async createCustomTokenFromAddress(tokenAddress) {
+        try {
+            const tokenName = await this.blockchainUtil.getTokenSymbol(tokenAddress);
+            return {
+                name: tokenName,
+                networkSpecificAddress: {
+                    [this.blockchainUtil.network.uniqueName]: tokenAddress,
+                },
+            };
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     getSrcToken() {
         return this.convertSrcTokenToNative ? this.blockchainUtil.nativeToken : this.srcToken;
     }
@@ -85,10 +99,26 @@ class SwapOffer {
         this.status = swapOffer.status;
         this.srcTokenDecimals = this.srcTokenAddress === ethers.constants.AddressZero ? 18 : await this.blockchainUtil.getTokenDecimals(this.srcTokenAddress);
         this.dstTokenDecimals = this.dstTokenAddress === ethers.constants.AddressZero ? 18 : await this.blockchainUtil.getTokenDecimals(this.dstTokenAddress);
-        this.srcToken = await getTokenByAddress(this.srcTokenAddress, this.blockchainUtil.network.uniqueName);
-        this.dstToken = await getTokenByAddress(this.dstTokenAddress, this.blockchainUtil.network.uniqueName);
+        
+        let srcToken = getTokenByAddress(this.srcTokenAddress, this.blockchainUtil.network.uniqueName);
+        let dstToken = getTokenByAddress(this.dstTokenAddress, this.blockchainUtil.network.uniqueName);
+
+        if (!srcToken) {
+            srcToken = await this.createCustomTokenFromAddress(this.srcTokenAddress);
+        }
+
+        if (!dstToken) {
+            dstToken = await this.createCustomTokenFromAddress(this.dstTokenAddress);
+        }
+
+        this.srcToken = srcToken;
+        this.dstToken = dstToken;
+
         this.srcTokenName = this.srcToken.name.toUpperCase();
         this.dstTokenName = this.dstToken.name.toUpperCase();
+        this.srcTokenUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/token/${this.srcTokenAddress}`;
+        this.dstTokenUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/token/${this.dstTokenAddress}`;
+
         this.swaps = await this.getSwaps();
         this.srcAmountInBaseUnit = await this.blockchainUtil.toBaseUnit(this.srcAmount, this.srcTokenAddress);
         this.dstAmountInBaseUnit = await this.blockchainUtil.toBaseUnit(this.dstAmount, this.dstTokenAddress);

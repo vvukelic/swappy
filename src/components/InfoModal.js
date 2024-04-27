@@ -6,7 +6,7 @@ import { ModalContent, StyledModal, ModalTitle } from '../sharedStyles/general';
 import SecondaryButton from './SecondaryButton';
 
 
-function InfoModal({ open, msgText, onOkClose, onCancelClose }) {
+function InfoModal({ open, title, msgText, onOkClose, onCancelClose }) {
     return (
         <StyledModal
             open={open}
@@ -18,7 +18,7 @@ function InfoModal({ open, msgText, onOkClose, onCancelClose }) {
         >
             <ModalContent>
                 <ModalTitle id='transaction-status-modal' variant='h5' component='h2'>
-                    Info
+                    {title}
                 </ModalTitle>
                 <Box display='grid' justifyContent='center'>
                     <Typography id='transaction-status-description' textAlign='center'>
@@ -27,7 +27,7 @@ function InfoModal({ open, msgText, onOkClose, onCancelClose }) {
                 </Box>
                 <Box display='flex' justifyContent='center' mt={2} gap={1}>
                     <PrimaryButton onClick={onOkClose} buttonText='Ok' />
-                    <SecondaryButton onClick={onCancelClose} buttonText='Cancel' />
+                    {onCancelClose && <SecondaryButton onClick={onCancelClose} buttonText='Cancel' />}
                 </Box>
             </ModalContent>
         </StyledModal>

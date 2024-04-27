@@ -16,7 +16,7 @@ async function main() {
     await swappyData.deployed();
     console.log('SwappyData deployed to:', swappyData.address);
     deployedAddresses.SwappyData = swappyData.address;
-    // const swappyData = await ethers.getContractAt('contracts/SwappyData.sol:SwappyData', '0x73C014A6EBaBadad4b9cC84Bbe238102FccD1A66');
+    // const swappyData = await ethers.getContractAt('contracts/SwappyData.sol:SwappyData', '0x3EC0465705b4C0b5cB8E90072Bc586ADc2347123');
 
     console.log('Deploying SwappyManager...');
     const SwappyManagerFactory = await ethers.getContractFactory(`contracts/${network.name}/SwappyManager.sol:SwappyManager`);
@@ -28,10 +28,11 @@ async function main() {
 
     console.log('Adding SwappyManager as a manager in SwappyData...');
     await swappyData.addManager(swappyManager.address);
+    // await swappyData.addManager('0x469e5912a4472d49B43C1b34B0685693acc1CA29', { gasPrice: ethers.utils.parseUnits('8', 'gwei') });
     // await swappyData.removeManager('0x94FB120e084eBa847c94C7bb9f81c161053cc279');
     console.log('SwappyManager added as manager.');
 
-    saveFrontendFiles(deployedAddresses);
+    // saveFrontendFiles(deployedAddresses);
 }
 
 function saveFrontendFiles(deployedAddresses) {

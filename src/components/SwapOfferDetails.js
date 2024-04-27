@@ -20,7 +20,7 @@ import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import SwapStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
-import { getNativeToken } from '../utils/tokens';
+import InfoModal from './InfoModal';
 import { useNotification } from './NotificationProvider';
 import { Truncate } from '../sharedStyles/general';
 import { supportedNetworkNames } from '../utils/general';
@@ -82,6 +82,7 @@ function SwapOfferDetails({ hash }) {
     const [swapDstAmount, setSwapDstAmount] = useState(null);
     const [tokenApproved, setTokenApproved] = useState(false);
     const [swapButtonText, setSwapButtonText] = useState('Connect wallet');
+    const [showInvalidAmountsModal, setShowInvalidAmountsModal] = useState(false);
     const { addNotification, updateNotification } = useNotification();
     const isMobile = useMediaQuery('(max-width:600px)');
     const router = useRouter();
@@ -168,8 +169,13 @@ function SwapOfferDetails({ hash }) {
 
     const handleCreateSwapForOffer = async () => {
         if (tokenApproved) {
+            if (swapDstAmount.eq(0)) {
+                setShowInvalidAmountsModal(true);
+                return;
+            }
+
             startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
-            
+
             try {
                 const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.networkSpecificAddress[blockchainUtil.network.uniqueName], swapDstAmount, swapOffer.feeAmount);
 
@@ -291,9 +297,9 @@ function SwapOfferDetails({ hash }) {
     return (
         <>
             <MainContentContainer sx={{ width: '100%' }}>
-                {swapOffer.partialFillEnabled && swapOffer.readableStatus === 'OPENED' ?
-                    <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} /> :
-                    <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
+                {swapOffer.partialFillEnabled && swapOffer.readableStatus === 'OPENED' ? 
+                    <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} /> : 
+                    <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
 
                 <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton variant='outlined' disabled>
@@ -301,7 +307,7 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                <SwapOfferDetailsTokenInfo token={swapOffer.getSrcToken()} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' />
+                <SwapOfferDetailsTokenInfo token={swapOffer.getSrcToken()} tokenUrl={swapOffer.srcTokenUrl} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' />
 
                 <Grid item sx={{ height: '42px' }} />
 
@@ -464,6 +470,8 @@ function SwapOfferDetails({ hash }) {
                     </Grid>
                 )}
             </MainContentContainer>
+
+            <InfoModal open={showInvalidAmountsModal} title='Error' msgText='Please insert valid token amount.' onOkClose={() => setShowInvalidAmountsModal(false)} />
             <TransactionStatusModal open={txModalOpen} status={txStatus} statusTxt={txStatusTxt} errorTxt={txErrorTxt} onClose={() => setTxModalOpen(false)} />
         </>
     );

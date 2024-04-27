@@ -60,3 +60,12 @@ export const FooterContainer = styled(Box)`
     font-size: 0.9em;
     margin-top: auto;
 `;
+
+export const StyledTokenLinkName = styled(Typography)`
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        text-decoration: underline;
+    }
+`;
