@@ -90,7 +90,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
                 getAllTokens().filter(token =>
                     token.networkSpecificAddress[selectedNetwork.uniqueName] &&
                     token !== excludeToken &&
-                    (token.symbol.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
+                    (token.symbol?.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
                 )
             );
     }, [blockchainUtil, searchInput, excludeToken]);

@@ -6,7 +6,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { waitForTxToBeMined } from '../utils/general';
+import { networkNames, waitForTxToBeMined } from '../utils/general';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
