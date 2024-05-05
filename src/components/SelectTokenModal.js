@@ -66,9 +66,9 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
     useEffect(() => {
         async function processSearchInput() {
             try {
-                const tokenName = await blockchainUtil.getTokenSymbol(searchInput);
+                const tokenSymbol = await blockchainUtil.getTokenSymbol(searchInput);
                 setCustomToken({
-                    'symbol': tokenName,
+                    'symbol': tokenSymbol,
                     'networkSpecificAddress': {
                         [blockchainUtil.network.uniqueName]: searchInput
                     }
