@@ -137,7 +137,7 @@ function SwapOfferDetailsPartialFillTokenForm({ token, tokenUrl, amount, maxAmou
                     <StyledTextField value={displayAmount} onChange={handleAmountOnChange} onBlur={handleAmountOnBlur} />
                     {token && (
                         <Link href={tokenUrl} target='_blank' rel='noopener noreferrer' style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <StyledTokenLinkName>{token.name.toUpperCase()}</StyledTokenLinkName>
+                            <StyledTokenLinkName>{token.symbol}</StyledTokenLinkName>
                         </Link>
                     )}
                     <StyledSlider value={parseFloat(sliderValue)} onChange={handleSliderChange} min={0} max={parseFloat(ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals))} step={stepValue} />

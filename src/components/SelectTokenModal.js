@@ -68,7 +68,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
             try {
                 const tokenName = await blockchainUtil.getTokenSymbol(searchInput);
                 setCustomToken({
-                    'name': tokenName,
+                    'symbol': tokenName,
                     'networkSpecificAddress': {
                         [blockchainUtil.network.uniqueName]: searchInput
                     }
@@ -90,7 +90,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
                 getAllTokens().filter(token =>
                     token.networkSpecificAddress[selectedNetwork.uniqueName] &&
                     token !== excludeToken &&
-                    (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
+                    (token.symbol.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
                 )
             );
     }, [blockchainUtil, searchInput, excludeToken]);
@@ -117,9 +117,9 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
                 <List>
                     {filteredTokens.length > 0 ? (
                         filteredTokens.map((token) => (
-                            <StyledListItem onClick={() => selectToken(token)} key={token.name}>
+                            <StyledListItem onClick={() => selectToken(token)} key={token.symbol}>
                                 <StyledAvatar src={getTokenImageUrl(token)} />
-                                <ListItemText primary={token.name} />
+                                <ListItemText primary={token.symbol} />
                             </StyledListItem>
                         ))
                     ) : customToken ? (

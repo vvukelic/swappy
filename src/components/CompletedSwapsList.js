@@ -45,8 +45,8 @@ function CompletedSwapsList() {
                         displayUserAddress: sliceAddress(swapOffer.srcAddress),
                         displayYouSentAmount: swap.dstAmountInBaseUnit,
                         displayYouReceivedAmount: swap.srcAmountInBaseUnit,
-                        displayYouSentTokenName: swapOffer.dstTokenName,
-                        displayYouReceivedTokenName: swapOffer.getSrcToken().name,
+                        displayYouSentTokenName: swapOffer.dstTokenSymbol,
+                        displayYouReceivedTokenName: swapOffer.getSrcToken().symbol,
                     });
                 });
             };
@@ -66,8 +66,8 @@ function CompletedSwapsList() {
                             displayUserAddress: sliceAddress(swap.dstAddress),
                             displayYouSentAmount: swap.srcAmountInBaseUnit,
                             displayYouReceivedAmount: swap.dstAmountInBaseUnit,
-                            displayYouSentTokenName: swapOffer.getSrcToken().name,
-                            displayYouReceivedTokenName: swapOffer.dstTokenName,
+                            displayYouSentTokenName: swapOffer.getSrcToken().symbol,
+                            displayYouReceivedTokenName: swapOffer.dstTokenSymbol,
                         });
                     });
                 })

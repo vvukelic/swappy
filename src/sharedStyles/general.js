@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Link } from '@mui/material';
 import Modal from '@mui/material/Modal';
 
 
@@ -67,5 +67,16 @@ export const StyledTokenLinkName = styled(Typography)`
 
     &:hover {
         text-decoration: underline;
+        cursor: pointer;
+    }
+`;
+
+export const StyledLink = styled(Link)`
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        text-decoration: underline;
+        cursor: pointer;
     }
 `;

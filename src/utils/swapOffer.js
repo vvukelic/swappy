@@ -97,8 +97,12 @@ class SwapOffer {
         this.expirationTime = swapOffer.expirationTime;
         this.partialFillEnabled = swapOffer.partialFillEnabled;
         this.status = swapOffer.status;
+
         this.srcTokenDecimals = this.srcTokenAddress === ethers.constants.AddressZero ? 18 : await this.blockchainUtil.getTokenDecimals(this.srcTokenAddress);
         this.dstTokenDecimals = this.dstTokenAddress === ethers.constants.AddressZero ? 18 : await this.blockchainUtil.getTokenDecimals(this.dstTokenAddress);
+
+        this.srcAddressUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/address/${this.srcAddress}`;
+        this.dstAddressUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/address/${this.dstAddress}`;
         
         let srcToken = getTokenByAddress(this.srcTokenAddress, this.blockchainUtil.network.uniqueName);
         let dstToken = getTokenByAddress(this.dstTokenAddress, this.blockchainUtil.network.uniqueName);
@@ -114,8 +118,8 @@ class SwapOffer {
         this.srcToken = srcToken;
         this.dstToken = dstToken;
 
-        this.srcTokenName = this.srcToken.name.toUpperCase();
-        this.dstTokenName = this.dstToken.name.toUpperCase();
+        this.srcTokenSymbol = this.srcToken.symbol;
+        this.dstTokenSymbol = this.dstToken.symbol;
         this.srcTokenUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/token/${this.srcTokenAddress}`;
         this.dstTokenUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/token/${this.dstTokenAddress}`;
 

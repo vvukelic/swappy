@@ -1,6 +1,6 @@
 [
     {
-        "name": "ETH",
+        "symbol": "ETH",
         "networkSpecificAddress": {
             "localhost": "0x0000000000000000000000000000000000000000",
             "ethereum": "0x0000000000000000000000000000000000000000",
@@ -12,7 +12,7 @@
         "logo": "/images/eth-logo.png"
     },
     {
-        "name": "USDC",
+        "symbol": "USDC",
         "networkSpecificAddress": {
             "localhost": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
             "ethereum": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -24,7 +24,17 @@
         }
     },
     {
-        "name": "LEO",
+        "symbol": "stETH",
+        "networkSpecificAddress": {
+            "localhost": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+            "ethereum": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+            "sepolia": "",
+            "polygon": "",
+            "bsc": ""
+        }
+    },
+    {
+        "symbol": "LEO",
         "networkSpecificAddress": {
             "localhost": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
             "ethereum": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
@@ -33,7 +43,7 @@
         }
     },
     {
-        "name": "LINK",
+        "symbol": "LINK",
         "networkSpecificAddress": {
             "localhost": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
             "ethereum": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
@@ -43,7 +53,7 @@
         }
     },
     {
-        "name": "WETH",
+        "symbol": "WETH",
         "networkSpecificAddress": {
             "localhost": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
             "ethereum": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
@@ -54,7 +64,7 @@
         }
     },
     {
-        "name": "MATIC",
+        "symbol": "MATIC",
         "networkSpecificAddress": {
             "localhost": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
             "ethereum": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
@@ -66,7 +76,7 @@
         "logo": "/images/matic-logo.png"
     },
     {
-        "name": "WMATIC",
+        "symbol": "WMATIC",
         "networkSpecificAddress": {
             "localhost": "",
             "ethereum": "",
@@ -77,7 +87,7 @@
         "logo": "/images/matic-logo.png"
     },
     {
-        "name": "BNB",
+        "symbol": "BNB",
         "networkSpecificAddress": {
             "localhost": "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
             "ethereum": "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
@@ -89,7 +99,7 @@
         "logo": "/images/bnb-logo.png"
     },
     {
-        "name": "WBNB",
+        "symbol": "WBNB",
         "networkSpecificAddress": {
             "localhost": "0x418D75f65a02b3D53B2418FB8E1fe493759c7605",
             "ethereum": "0x418D75f65a02b3D53B2418FB8E1fe493759c7605",
@@ -101,7 +111,7 @@
         "logo": "/images/bnb-logo.png"
     },
     {
-        "name": "OKB",
+        "symbol": "OKB",
         "networkSpecificAddress": {
             "localhost": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
             "ethereum": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
@@ -110,7 +120,7 @@
         }
     },
     {
-        "name": "SHIB",
+        "symbol": "SHIB",
         "networkSpecificAddress": {
             "localhost": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
             "ethereum": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
@@ -119,7 +129,7 @@
         }
     },
     {
-        "name": "TON",
+        "symbol": "TON",
         "networkSpecificAddress": {
             "localhost": "0x6a6c2adA3Ce053561C2FbC3eE211F23d9b8C520a",
             "ethereum": "0x6a6c2adA3Ce053561C2FbC3eE211F23d9b8C520a",
@@ -129,7 +139,7 @@
         "logo": "/images/ton-logo.svg"
     },
     {
-        "name": "UNI",
+        "symbol": "UNI",
         "networkSpecificAddress": {
             "localhost": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
             "ethereum": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
@@ -138,16 +148,23 @@
         }
     },
     {
-        "name": "WBTC",
+        "symbol": "WBTC",
         "networkSpecificAddress": {
             "localhost": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
             "ethereum": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
             "goerli": "0xC04B0d3107736C32e19F1c62b2aF67BE61d63a05",
-            "polygon": ""
+            "polygon": "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"
         }
     },
     {
-        "name": "DAI",
+        "symbol": "BTCB",
+        "networkSpecificAddress": {
+            "bsc": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c"
+        },
+        "logo": "/images/btc-logo.svg"
+    },
+    {
+        "symbol": "DAI",
         "networkSpecificAddress": {
             "localhost": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
             "ethereum": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
@@ -156,7 +173,7 @@
         }
     },
     {
-        "name": "USDT",
+        "symbol": "USDT",
         "networkSpecificAddress": {
             "localhost": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
             "ethereum": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
@@ -166,7 +183,7 @@
         }
     },
     {
-        "name": "AAVE",
+        "symbol": "AAVE",
         "networkSpecificAddress": {
             "localhost": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
             "ethereum": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
@@ -175,7 +192,55 @@
         }
     },
     {
-        "name": "SNX",
+        "symbol": "ARB",
+        "networkSpecificAddress": {
+            "localhost": "0xB50721BCf8d664c30412Cfbc6cf7a15145234ad1",
+            "ethereum": "0xB50721BCf8d664c30412Cfbc6cf7a15145234ad1"
+        }
+    },
+    {
+        "symbol": "RNDR",
+        "networkSpecificAddress": {
+            "localhost": "0x6De037ef9aD2725EB40118Bb1702EBb27e4Aeb24",
+            "ethereum": "0x6De037ef9aD2725EB40118Bb1702EBb27e4Aeb24",
+            "polygon": "0x61299774020dA444Af134c82fa83E3810b309991"
+        }
+    },
+    {
+        "symbol": "AXS",
+        "networkSpecificAddress": {
+            "localhost": "0xBB0E17EF65F82Ab018d8EDd776e8DD940327B28b",
+            "ethereum": "0xBB0E17EF65F82Ab018d8EDd776e8DD940327B28b",
+            "polygon": "0x61BDD9C7d4dF4Bf47A4508c0c8245505F2Af5b7b",
+            "bsc": "0x715D400F88C167884bbCc41C5FeA407ed4D2f8A0"
+        }
+    },
+    {
+        "symbol": "IMX",
+        "networkSpecificAddress": {
+            "localhost": "0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF",
+            "ethereum": "0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF"
+        }
+    },
+    {
+        "symbol": "CAKE",
+        "networkSpecificAddress": {
+            "localhost": "0x152649eA73beAb28c5b49B26eb48f7EAD6d4c898",
+            "ethereum": "0x152649eA73beAb28c5b49B26eb48f7EAD6d4c898",
+            "bsc": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82"
+        },
+        "logo": "/images/cake-logo.svg"
+    },
+    {
+        "symbol": "AST",
+        "networkSpecificAddress": {
+            "localhost": "0x27054b13b1B798B345b591a4d22e6562d47eA75a",
+            "ethereum": "0x27054b13b1B798B345b591a4d22e6562d47eA75a"
+        },
+        "logo": "https://tokens.1inch.io/0x27054b13b1b798b345b591a4d22e6562d47ea75a.png"
+    },
+    {
+        "symbol": "SNX",
         "networkSpecificAddress": {
             "localhost": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
             "ethereum": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
@@ -184,7 +249,7 @@
         }
     },
     {
-        "name": "COMP",
+        "symbol": "COMP",
         "networkSpecificAddress": {
             "localhost": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
             "ethereum": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
@@ -193,7 +258,7 @@
         }
     },
     {
-        "name": "MKR",
+        "symbol": "MKR",
         "networkSpecificAddress": {
             "localhost": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
             "ethereum": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
@@ -202,7 +267,7 @@
         }
     },
     {
-        "name": "YFI",
+        "symbol": "YFI",
         "networkSpecificAddress": {
             "localhost": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
             "ethereum": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
@@ -211,7 +276,7 @@
         }
     },
     {
-        "name": "SUSHI",
+        "symbol": "SUSHI",
         "networkSpecificAddress": {
             "localhost": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
             "ethereum": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
@@ -220,7 +285,7 @@
         }
     },
     {
-        "name": "ZRX",
+        "symbol": "ZRX",
         "networkSpecificAddress": {
             "localhost": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
             "ethereum": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
@@ -229,7 +294,7 @@
         }
     },
     {
-        "name": "BAT",
+        "symbol": "BAT",
         "networkSpecificAddress": {
             "localhost": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
             "ethereum": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
@@ -238,7 +303,7 @@
         }
     },
     {
-        "name": "UMA",
+        "symbol": "UMA",
         "networkSpecificAddress": {
             "localhost": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
             "ethereum": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
@@ -247,7 +312,7 @@
         }
     },
     {
-        "name": "GRT",
+        "symbol": "GRT",
         "networkSpecificAddress": {
             "localhost": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
             "ethereum": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
@@ -256,7 +321,7 @@
         }
     },
     {
-        "name": "1INCH",
+        "symbol": "1INCH",
         "networkSpecificAddress": {
             "localhost": "0x111111111117dC0aa78b770fA6A738034120C302",
             "ethereum": "0x111111111117dC0aa78b770fA6A738034120C302",
@@ -265,7 +330,7 @@
         }
     },
     {
-        "name": "ENJ",
+        "symbol": "ENJ",
         "networkSpecificAddress": {
             "localhost": "0xF629cBd94d3791C9250152BD8dfBDF380E2a3B9c",
             "ethereum": "0xF629cBd94d3791C9250152BD8dfBDF380E2a3B9c",
@@ -274,7 +339,7 @@
         }
     },
     {
-        "name": "MANA",
+        "symbol": "MANA",
         "networkSpecificAddress": {
             "localhost": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
             "ethereum": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
@@ -283,7 +348,7 @@
         }
     },
     {
-        "name": "CRV",
+        "symbol": "CRV",
         "networkSpecificAddress": {
             "localhost": "0xD533a949740bb3306d119CC777fa900bA034cd52",
             "ethereum": "0xD533a949740bb3306d119CC777fa900bA034cd52",
