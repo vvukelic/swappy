@@ -67,11 +67,13 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
         async function processSearchInput() {
             try {
                 const tokenSymbol = await blockchainUtil.getTokenSymbol(searchInput);
+                const tokenName = await blockchainUtil.getTokenName(searchInput);
+
                 setCustomToken({
-                    'symbol': tokenSymbol,
-                    'networkSpecificAddress': {
-                        [blockchainUtil.network.uniqueName]: searchInput
-                    }
+                    symbol: tokenSymbol,
+                    name: tokenName,
+                    address: searchInput,
+                    logoURI: '',
                 });
             } catch (err) {
                 console.error(err);
@@ -87,10 +89,10 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
         const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
 
         setfilteredTokens(
-                getAllTokens().filter(token =>
-                    token.networkSpecificAddress[selectedNetwork.uniqueName] &&
+                getAllTokens(selectedNetwork.uniqueName).filter(token =>
+                    // token.networkSpecificAddress[selectedNetwork.uniqueName] &&
                     token !== excludeToken &&
-                    (token.symbol?.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
+                    (token.symbol?.includes(searchInput.toUpperCase()) || token.address.includes(searchInput))
                 )
             );
     }, [blockchainUtil, searchInput, excludeToken]);

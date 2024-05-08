@@ -66,12 +66,13 @@ class SwapOffer {
 
     async createCustomTokenFromAddress(tokenAddress) {
         try {
-            const tokenName = await this.blockchainUtil.getTokenSymbol(tokenAddress);
+            const tokenSymbol = await this.blockchainUtil.getTokenSymbol(tokenAddress);
+            const tokenName = await this.blockchainUtil.getTokenName(tokenAddress);
             return {
+                symbol: tokenSymbol,
                 name: tokenName,
-                networkSpecificAddress: {
-                    [this.blockchainUtil.network.uniqueName]: tokenAddress,
-                },
+                address: tokenAddress,
+                logoURI: '',
             };
         } catch (err) {
             console.error(err);

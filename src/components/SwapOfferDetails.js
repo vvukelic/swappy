@@ -177,7 +177,7 @@ function SwapOfferDetails({ hash }) {
             startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
 
             try {
-                const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.networkSpecificAddress[blockchainUtil.network.uniqueName], swapDstAmount, swapOffer.feeAmount);
+                const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.address, swapDstAmount, swapOffer.feeAmount);
 
                 addNotification(tx.hash, {
                     message: 'Taking a swap...',

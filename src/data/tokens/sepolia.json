@@ -1,0 +1,18 @@
+{
+    "tokens": [
+        {
+            "symbol": "ETH",
+            "name": "Ether",
+            "address": "0x0000000000000000000000000000000000000000",
+            "decimals": 18,
+            "logoURI": "/images/eth-logo.png"
+        },
+        {
+            "symbol": "USDC",
+            "name": "USDC",
+            "address": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+            "decimals": 18,
+            "logoURI": "https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389"
+        }
+    ]
+}

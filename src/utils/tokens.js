@@ -1,6 +1,10 @@
 import { ethers } from 'ethers';
 
 import commonTokens from '../data/commonTokens.json';
+import ethereumTokens from '../data/tokens/ethereum.json';
+import polygonTokens from '../data/tokens/polygon.json';
+import bscTokens from '../data/tokens/bsc.json';
+import sepoliaTokens from '../data/tokens/sepolia.json';
 
 let tokensByAddressCache = {};
 
@@ -11,8 +15,8 @@ const indexTokensByAddress = (network) => {
 
     const tokenIndex = {};
 
-    getAllTokens().forEach((token) => {
-        tokenIndex[token.networkSpecificAddress[network]] = token;
+    getAllTokens(network).forEach((token) => {
+        tokenIndex[token.address] = token;
     });
 
     tokensByAddressCache[network] = tokenIndex;
@@ -31,11 +35,10 @@ export function getNativeToken(network) {
 }
 
 export function getTokenImageUrl(token) {
-    if (token && token.logo) {
-        return token.logo;
-    } else if (token && token.networkSpecificAddress['ethereum']) {
-        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${token.networkSpecificAddress['ethereum']}/logo.png`;
+    if (token && token.logoURI) {
+        return token.logoURI;
     }
+
     return '';
 };
 
@@ -72,8 +75,22 @@ export function addCustomToken(customToken) {
     tokensByAddressCache = {};
 };
 
-export function getAllTokens() {
-    return [...commonTokens, ...getCustomTokensList()];
+// export function getAllTokens() {
+//     return [...commonTokens, ...getCustomTokensList()];
+// };
+
+export function getAllTokens(networkName) {
+    if (networkName === 'ethereum') {
+        return ethereumTokens.tokens;
+    } else if (networkName === 'polygon') {
+        return polygonTokens.tokens;
+    } else if (networkName === 'bsc') {
+        return bscTokens.tokens;
+    } else if (networkName === 'localhost') {
+        return ethereumTokens.tokens;
+    } else if (networkName === 'sepolia') {
+        return sepoliaTokens.tokens;
+    }
 };
 
 export function updateCustomTokensList() {
