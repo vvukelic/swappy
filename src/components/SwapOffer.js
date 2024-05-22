@@ -227,7 +227,7 @@ function SwapOffer({
         if (defaultAccount && selectedDstToken && blockchainUtil) {
             getDstTokenDecimals();
         }
-    }, [defaultAccount, selectedDstToken, blockchainUtil]);
+    }, [defaultAccount, selectedDstToken]);
 
     async function openSwapOffer() {
          const srcAmountInt = await blockchainUtil.toSmallestUnit(srcAmount, selectedSrcToken.address);

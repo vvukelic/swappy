@@ -89,11 +89,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
         const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
 
         setfilteredTokens(
-                getAllTokens(selectedNetwork.uniqueName).filter(token =>
-                    // token.networkSpecificAddress[selectedNetwork.uniqueName] &&
-                    token !== excludeToken &&
-                    (token.symbol?.includes(searchInput.toUpperCase()) || token.address.includes(searchInput))
-                )
+                getAllTokens(selectedNetwork.uniqueName)
             );
     }, [blockchainUtil, searchInput, excludeToken]);
 
@@ -120,8 +116,8 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
                     {filteredTokens.length > 0 ? (
                         filteredTokens.map((token) => (
                             <StyledListItem onClick={() => selectToken(token)} key={token.symbol}>
-                                <StyledAvatar src={getTokenImageUrl(token)} />
-                                <ListItemText primary={token.symbol} />
+                                <StyledAvatar src={getTokenImageUrl(token)}/>
+                                <ListItemText primary={token.symbol} secondary={token.name} />
                             </StyledListItem>
                         ))
                     ) : customToken ? (

@@ -39,7 +39,7 @@ export function getTokenImageUrl(token) {
         return token.logoURI;
     }
 
-    return '';
+    return '/images/no-image-logo.svg';
 };
 
 const saveCustomTokensList = (list) => {
