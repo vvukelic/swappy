@@ -52,6 +52,13 @@ const ScrollableListContainer = styled.div`
     overflow-y: auto;
 `;
 
+const CustomAddTokenItem = styled(ListItem)`
+    &:hover {
+        background-color: #224e5d;
+        cursor: pointer;
+    }
+`;
+
 const isValidEthereumAddress = (address) => {
     return /^(0x)?[0-9a-fA-F]{40}$/.test(address);
 };
@@ -82,19 +89,22 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
             } else {
                 async function processSearchInput() {
                     try {
-                        const tokenSymbol = await blockchainUtil.getTokenSymbol(searchInput);
-                        const tokenName = await blockchainUtil.getTokenName(searchInput);
+                        const tokenSymbol = await blockchainUtil.getTokenSymbol(searchInputLowerCase);
+                        const tokenName = await blockchainUtil.getTokenName(searchInputLowerCase);
+                        const decimals = await blockchainUtil.getTokenDecimals(searchInputLowerCase);
 
                         setCustomToken({
-                            chainId: blockchainUtil.chainId,
-                            address: searchInput.toLowerCase(),
+                            chainId: blockchainUtil.network.chainId,
+                            address: searchInputLowerCase,
                             name: tokenName,
                             symbol: tokenSymbol.toUpperCase(),
                             logoURI: '',
+                            decimals: decimals
                         });
                     } catch (err) {
                         console.error(err);
                     }
+                    setFilteredTokens([]);
                 }
                 processSearchInput();
             }
@@ -102,9 +112,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
             setCustomToken(null);
 
             const filtered = allTokens
-                .filter((token) => token.name.toLowerCase().includes(searchInputLowerCase)
-                    || token.symbol.toLowerCase().includes(searchInputLowerCase)
-                    || token.address.includes(searchInputLowerCase))
+                .filter((token) => token.name.toLowerCase().includes(searchInputLowerCase) || token.symbol.toLowerCase().includes(searchInputLowerCase))
                 .filter((token) => token !== excludeToken);
             setFilteredTokens(filtered);
         }
@@ -121,7 +129,8 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
 
     const handleAddTokenClick = () => {
         if (customToken) {
-            addCustomToken(customToken);
+            addCustomToken(customToken, blockchainUtil.network.uniqueName);
+            setAllTokens(getAllTokens(blockchainUtil.network.uniqueName));
             selectToken(customToken);
         }
     };
@@ -140,12 +149,12 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
                             </StyledListItem>
                         ))
                     ) : customToken ? (
-                        <ListItem>
-                            <IconButton onClick={handleAddTokenClick}>
+                        <CustomAddTokenItem onClick={handleAddTokenClick}>
+                            <IconButton>
                                 <AddIcon />
                             </IconButton>
-                            <ListItemText primary='Add token' />
-                        </ListItem>
+                            <ListItemText primary='Add token' secondary={`${customToken.symbol} - ${customToken.name}`} />
+                        </CustomAddTokenItem>
                     ) : null}
                 </List>
             </ScrollableListContainer>

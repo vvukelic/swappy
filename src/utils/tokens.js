@@ -42,18 +42,18 @@ export function getTokenImageUrl(token) {
     return '/images/no-image-logo.svg';
 };
 
-const saveCustomTokensList = (list) => {
+const saveCustomTokensList = (list, networkName) => {
     try {
         const serializedList = JSON.stringify(list);
-        localStorage.setItem('customTokens', serializedList);
+        localStorage.setItem(networkName + 'SwappyCustomTokens', serializedList);
     } catch (error) {
         console.error('Error saving custom tokens to local storage', error);
     }
 };
 
-const getCustomTokensList = () => {
+const getCustomTokensList = (networkName) => {
     try {
-        const serializedList = localStorage.getItem('customTokens');
+        const serializedList = localStorage.getItem(networkName + 'SwappyCustomTokens');
 
         if (!serializedList) {
             return [];
@@ -66,11 +66,11 @@ const getCustomTokensList = () => {
     }
 };
 
-export function addCustomToken(customToken) {
-    let customTokensList = getCustomTokensList();
+export function addCustomToken(customToken, networkName) {
+    let customTokensList = getCustomTokensList(networkName);
 
     customTokensList.push(customToken);
-    saveCustomTokensList(customTokensList);
+    saveCustomTokensList(customTokensList, networkName);
 
     tokensByAddressCache = {};
 };
@@ -81,11 +81,11 @@ export function addCustomToken(customToken) {
 
 export function getAllTokens(networkName) {
     if (networkName === 'ethereum') {
-        return ethereumTokens.tokens;
+        return [...getCustomTokensList(networkName), ...ethereumTokens.tokens];
     } else if (networkName === 'polygon') {
         return polygonTokens.tokens;
     } else if (networkName === 'bsc') {
-        return bscTokens.tokens;
+        return [...getCustomTokensList(networkName), ...bscTokens.tokens];
     } else if (networkName === 'localhost') {
         return ethereumTokens.tokens;
     } else if (networkName === 'sepolia') {

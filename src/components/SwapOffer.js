@@ -16,7 +16,6 @@ import InfoModal from './InfoModal';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import { useNotification } from './NotificationProvider';
-// import commonTokens from '../data/commonTokens.json';
 import networks from '../data/networks';
 
 
