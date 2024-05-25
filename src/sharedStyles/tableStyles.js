@@ -24,6 +24,9 @@ export const StyledTableRow = styled(TableRow)`
     &:nth-of-type(even) {
         background-color: #358a9e;
     }
+`;
+
+export const ClicableTableRow = styled(StyledTableRow)`
     &:hover {
         background-color: #235666;
         cursor: pointer;

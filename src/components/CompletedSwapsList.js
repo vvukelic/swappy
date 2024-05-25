@@ -8,7 +8,7 @@ import { Truncate } from '../sharedStyles/general';
 import SwapOffer from '../utils/swapOffer';
 import { sliceAddress } from '../utils/general';
 import BorderSection from './BorderSection';
-import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, StyledTableCell, StyledHeaderTableCell, StyledMessage } from '../sharedStyles/tableStyles';
+import { StyledTableContainer, StyledTable, StyledTableHead, ClicableTableRow, StyledTableCell, StyledHeaderTableCell, StyledMessage } from '../sharedStyles/tableStyles';
 
 
 const contractAddresses = require('../contracts/contract-address.json');
@@ -113,7 +113,7 @@ function CompletedSwapsList() {
                                     </TableRow>
                                 ) : (swapsTakenByUser.map((swap, index) => {
                                     return (
-                                        <StyledTableRow key={index} onClick={() => handleRowClick(swap.swapOfferHash)}>
+                                        <ClicableTableRow key={index} onClick={() => handleRowClick(swap.swapOfferHash)}>
                                             {!isMobile && <StyledTableCell align='right'>{swap.displayClosedTime}</StyledTableCell>}
                                             <StyledTableCell align='right'>
                                                 <Tooltip title={swap.userAddress}>
@@ -132,7 +132,7 @@ function CompletedSwapsList() {
                                                 </Tooltip>
                                                 {swap.displayYouReceivedTokenName}
                                             </StyledTableCell>
-                                        </StyledTableRow>
+                                        </ClicableTableRow>
                                     );
                                 })
                             )}

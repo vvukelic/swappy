@@ -18,8 +18,6 @@ describe('SwapManager contract', function () {
         await impersonateAccount(srcAddress);
         const srcAddressSigner = await ethers.getSigner(srcAddress);
         await tokenContract.connect(srcAddressSigner).transfer(dstAddress, amount);
-        const decimals = await tokenContract.decimals();
-        const balance = await tokenContract.balanceOf(dstAddress);
         await stopImpersonatingAccount(srcAddress);
     }
 

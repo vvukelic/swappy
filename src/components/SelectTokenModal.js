@@ -9,10 +9,9 @@ import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import styled from '@emotion/styled';
-import { getTokenImageUrl, addCustomToken, getAllTokens } from '../utils/tokens';
+import { getTokenImageUrl, addCustomToken, getAllTokens, getTokenByAddress } from '../utils/tokens';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import networks from '../data/networks';
-
 
 const StyledDialog = styled(Dialog)`
     & .MuiPaper-root {
@@ -61,37 +60,55 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
     const { blockchainUtil } = useWalletConnect();
     const [searchInput, setSearchInput] = useState('');
     const [customToken, setCustomToken] = useState(null);
-    const [filteredTokens, setfilteredTokens] = useState([]);
-
-    useEffect(() => {
-        async function processSearchInput() {
-            try {
-                const tokenSymbol = await blockchainUtil.getTokenSymbol(searchInput);
-                const tokenName = await blockchainUtil.getTokenName(searchInput);
-
-                setCustomToken({
-                    symbol: tokenSymbol,
-                    name: tokenName,
-                    address: searchInput,
-                    logoURI: '',
-                });
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        if (isValidEthereumAddress(searchInput)) {
-            processSearchInput();
-        }
-    }, [searchInput]);
+    const [filteredTokens, setFilteredTokens] = useState([]);
+    const [allTokens, setAllTokens] = useState([]);
 
     useEffect(() => {
         const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
+        const tokens = getAllTokens(selectedNetwork.uniqueName);
+        setAllTokens(tokens);
+        setFilteredTokens(tokens);
+    }, [blockchainUtil]);
 
-        setfilteredTokens(
-                getAllTokens(selectedNetwork.uniqueName)
-            );
-    }, [blockchainUtil, searchInput, excludeToken]);
+    useEffect(() => {
+        const searchInputLowerCase = searchInput.toLowerCase();
+
+        if (isValidEthereumAddress(searchInputLowerCase)) {
+            const knownToken = getTokenByAddress(searchInputLowerCase, blockchainUtil.network.uniqueName);
+
+            if (knownToken) {
+                setFilteredTokens([knownToken]);
+                setCustomToken(null);
+            } else {
+                async function processSearchInput() {
+                    try {
+                        const tokenSymbol = await blockchainUtil.getTokenSymbol(searchInput);
+                        const tokenName = await blockchainUtil.getTokenName(searchInput);
+
+                        setCustomToken({
+                            chainId: blockchainUtil.chainId,
+                            address: searchInput.toLowerCase(),
+                            name: tokenName,
+                            symbol: tokenSymbol.toUpperCase(),
+                            logoURI: '',
+                        });
+                    } catch (err) {
+                        console.error(err);
+                    }
+                }
+                processSearchInput();
+            }
+        } else {
+            setCustomToken(null);
+
+            const filtered = allTokens
+                .filter((token) => token.name.toLowerCase().includes(searchInputLowerCase)
+                    || token.symbol.toLowerCase().includes(searchInputLowerCase)
+                    || token.address.includes(searchInputLowerCase))
+                .filter((token) => token !== excludeToken);
+            setFilteredTokens(filtered);
+        }
+    }, [searchInput, allTokens, excludeToken, blockchainUtil]);
 
     const handleSearchChange = (event) => {
         setSearchInput(event.target.value);
@@ -103,20 +120,22 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
     };
 
     const handleAddTokenClick = () => {
-        addCustomToken(customToken);
-        selectToken(customToken);
+        if (customToken) {
+            addCustomToken(customToken);
+            selectToken(customToken);
+        }
     };
 
     return (
         <StyledDialog onClose={onClose} open={open}>
             <StyledDialogTitle>{title}</StyledDialogTitle>
-            <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+            <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} value={searchInput} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
             <ScrollableListContainer>
                 <List>
                     {filteredTokens.length > 0 ? (
                         filteredTokens.map((token) => (
-                            <StyledListItem onClick={() => selectToken(token)} key={token.symbol}>
-                                <StyledAvatar src={getTokenImageUrl(token)}/>
+                            <StyledListItem onClick={() => selectToken(token)} key={token.address}>
+                                <StyledAvatar src={getTokenImageUrl(token)} />
                                 <ListItemText primary={token.symbol} secondary={token.name} />
                             </StyledListItem>
                         ))

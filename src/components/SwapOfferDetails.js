@@ -297,7 +297,7 @@ function SwapOfferDetails({ hash }) {
     return (
         <>
             <MainContentContainer sx={{ width: '100%' }}>
-                {swapOffer.partialFillEnabled && swapOffer.readableStatus === 'OPENED' ? <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} /> : <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
+                {swapOffer.partialFillEnabled && swapOffer.readableStatus === 'OPENED' ? <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} labelText='You send' sx={{ width: '100%' }} /> : <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
 
                 <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton variant='outlined' disabled>
@@ -305,7 +305,7 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                <SwapOfferDetailsTokenInfo token={swapOffer.getSrcToken()} tokenUrl={swapOffer.srcTokenUrl} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' />
+                <SwapOfferDetailsTokenInfo token={swapOffer.getSrcToken()} tokenUrl={swapOffer.srcTokenUrl} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcToken.decimals)} labelText='You receive' />
 
                 <Grid item sx={{ height: '42px' }} />
 
@@ -460,13 +460,13 @@ function SwapOfferDetails({ hash }) {
                     </BorderSection>
                 )}
 
-                {swapOffer.readableStatus === 'OPENED' && (swapOffer.dstAddress === ethers.constants.AddressZero || swapOffer.dstAddress === defaultAccount) && swapOffer.srcAddress !== defaultAccount && (
+                {swapOffer.readableStatus === 'OPENED' && (swapOffer.dstAddress === ethers.constants.AddressZero || swapOffer.dstAddress.toLowerCase() === defaultAccount.toLowerCase()) && swapOffer.srcAddress.toLowerCase() !== defaultAccount.toLowerCase() && (
                     <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
                         <PrimaryButton onClick={handleCreateSwapForOffer} buttonText={swapButtonText} />
                     </Grid>
                 )}
 
-                {swapOffer.readableStatus === 'OPENED' && swapOffer.srcAddress === defaultAccount && (
+                {swapOffer.readableStatus === 'OPENED' && swapOffer.srcAddress.toLowerCase() === defaultAccount.toLowerCase() && (
                     <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
                         <PrimaryButton onClick={handleCancelSwapOffer} buttonText='Cancel' />
                     </Grid>

@@ -47,17 +47,17 @@ const StyledSlider = styled(Slider)`
     width: 12em;
 `;
 
-function SwapOfferDetailsPartialFillTokenForm({ token, tokenUrl, amount, maxAmount, setAmount, tokenDecimals, labelText }) {
+function SwapOfferDetailsPartialFillTokenForm({ token, tokenUrl, amount, maxAmount, setAmount, labelText }) {
     const [displayAmount, setDisplayAmount] = useState('');
     const [sliderValue, setSliderValue] = useState(0);
 
     useEffect(() => {
         if (!displayAmount) {
-            const displayAmount = ethers.utils.formatUnits(amount.toString(), tokenDecimals);
+            const displayAmount = ethers.utils.formatUnits(amount.toString(), token.decimals);
             setDisplayAmount(displayAmount);
             setSliderValue(displayAmount);
         }
-    }, [amount, tokenDecimals]);
+    }, [amount, token]);
 
     const imageUrl = getTokenImageUrl(token);
 
@@ -71,7 +71,7 @@ function SwapOfferDetailsPartialFillTokenForm({ token, tokenUrl, amount, maxAmou
             value = '0.';
         }
 
-        const regex = new RegExp(`(\\.\\d{0,${tokenDecimals}}).*`);
+        const regex = new RegExp(`(\\.\\d{0,${token.decimals}}).*`);
         const formattedValue = value.replace(regex, '$1');
         
         return formattedValue;
@@ -84,7 +84,7 @@ function SwapOfferDetailsPartialFillTokenForm({ token, tokenUrl, amount, maxAmou
         setSliderValue(formattedValue);
 
         if (formattedValue) {
-            const parsedValue = ethers.utils.parseUnits(formattedValue || '0', tokenDecimals);
+            const parsedValue = ethers.utils.parseUnits(formattedValue || '0', token.decimals);
             setAmount(parsedValue);
         }
     }
@@ -93,26 +93,26 @@ function SwapOfferDetailsPartialFillTokenForm({ token, tokenUrl, amount, maxAmou
         const formattedValue = formatValue(e.target.value);
 
         if (formattedValue) {
-            const parsedValue = ethers.utils.parseUnits(formattedValue || '0', tokenDecimals);
+            const parsedValue = ethers.utils.parseUnits(formattedValue || '0', token.decimals);
 
             if (parsedValue.gt(maxAmount)) {
-                setDisplayAmount(ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals));
+                setDisplayAmount(ethers.utils.formatUnits(maxAmount.toString(), token.decimals));
             } else {
-                setDisplayAmount(ethers.utils.formatUnits(parsedValue.toString(), tokenDecimals));
+                setDisplayAmount(ethers.utils.formatUnits(parsedValue.toString(), token.decimals));
             }
         }
     }
 
     const handleSliderChange = (event, newValue) => {
-        let newValueBN = ethers.utils.parseUnits(newValue.toFixed(tokenDecimals).toString(), tokenDecimals);
-        const maxAmountBN = ethers.utils.parseUnits(ethers.utils.formatUnits(maxAmount, tokenDecimals), tokenDecimals);
+        let newValueBN = ethers.utils.parseUnits(newValue.toFixed(token.decimals).toString(), token.decimals);
+        const maxAmountBN = ethers.utils.parseUnits(ethers.utils.formatUnits(maxAmount, token.decimals), token.decimals);
         const marginBN = maxAmountBN.div(ethers.utils.parseUnits('100', 0));
 
         if (maxAmountBN.sub(newValueBN).lte(marginBN)) {
             newValueBN = maxAmountBN;
         }
 
-        const formattedValue = ethers.utils.formatUnits(newValueBN, tokenDecimals);
+        const formattedValue = ethers.utils.formatUnits(newValueBN, token.decimals);
         setSliderValue(parseFloat(formattedValue));
         setDisplayAmount(formattedValue);
         setAmount(newValueBN);
@@ -120,7 +120,7 @@ function SwapOfferDetailsPartialFillTokenForm({ token, tokenUrl, amount, maxAmou
 
 
     const stepPercentage = 0.0001; // 0.01%
-    const maxAmountInUnits = ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals);
+    const maxAmountInUnits = ethers.utils.formatUnits(maxAmount.toString(), token.decimals);
     const stepValue = maxAmountInUnits * stepPercentage;
 
     return (

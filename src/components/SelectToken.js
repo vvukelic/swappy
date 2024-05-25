@@ -68,7 +68,7 @@ const BalanceInfo = styled.span`
     }
 `;
 
-function SelectToken({ selectedToken, selectedTokenDecimals, amount, setAmount, selectedTokenImg, labelText, openModal, selectedTokenAccountBalance }) {
+function SelectToken({ selectedToken, amount, setAmount, selectedTokenImg, labelText, openModal, selectedTokenAccountBalance }) {
     const [displayAmount, setDisplayAmount] = useState('');
 
     useEffect(() => {
@@ -85,9 +85,7 @@ function SelectToken({ selectedToken, selectedTokenDecimals, amount, setAmount, 
             value = '0.';
         }
 
-        const _selectedTokenDecimals = selectedTokenDecimals ? selectedTokenDecimals : 18;
-
-        const regex = new RegExp(`(\\.\\d{0,${_selectedTokenDecimals}}).*`);
+        const regex = new RegExp(`(\\.\\d{0,${selectedToken.decimals}}).*`);
         const formattedValue = value.replace(regex, '$1');
 
         setDisplayAmount(formattedValue);

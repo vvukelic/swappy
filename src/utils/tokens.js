@@ -117,3 +117,11 @@ export function updateCustomTokensList() {
 
     tokensByAddressCache = {};
 };
+
+export function toSmallestUnit(amount, token) {
+    return ethers.utils.parseUnits(amount, token.decimals);
+}
+
+export function toBaseUnit(amount, token) {
+    return ethers.utils.formatUnits(amount, token.decimals);
+}

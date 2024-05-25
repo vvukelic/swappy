@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { getTokenByAddress } from './tokens';
+import { getTokenByAddress, toBaseUnit } from './tokens';
 import { sliceAddress } from './general';
 
 
@@ -45,8 +45,8 @@ class SwapOffer {
         const swaps = [];
 
         for (let i = 0; i < rawSwaps.length; i++) {
-            const srcAmountInBaseUnit = ethers.utils.formatUnits(rawSwaps[i].srcAmount.toString(), this.srcTokenDecimals);
-            const dstAmountInBaseUnit = ethers.utils.formatUnits(rawSwaps[i].dstAmount.toString(), this.dstTokenDecimals);
+            const srcAmountInBaseUnit = ethers.utils.formatUnits(rawSwaps[i].srcAmount.toString(), this.srcToken.decimals);
+            const dstAmountInBaseUnit = ethers.utils.formatUnits(rawSwaps[i].dstAmount.toString(), this.dstToken.decimals);
             const displayClosedTime = new Date(rawSwaps[i].closedTime * 1000).toLocaleString();
             const displayDstAddress = sliceAddress(rawSwaps[i].dstAddress);
 
@@ -88,8 +88,8 @@ class SwapOffer {
         this.hash = swapOfferHash;
         this.srcAddress = swapOffer.srcAddress;
         this.dstAddress = swapOffer.dstAddress;
-        this.srcTokenAddress = swapOffer.srcTokenAddress;
-        this.dstTokenAddress = swapOffer.dstTokenAddress;
+        this.srcTokenAddress = swapOffer.srcTokenAddress.toLowerCase();
+        this.dstTokenAddress = swapOffer.dstTokenAddress.toLowerCase();
         this.srcAmount = swapOffer.srcAmount;
         this.dstAmount = swapOffer.dstAmount;
         this.feeAmount = swapOffer.feeAmount;
@@ -98,9 +98,6 @@ class SwapOffer {
         this.expirationTime = swapOffer.expirationTime;
         this.partialFillEnabled = swapOffer.partialFillEnabled;
         this.status = swapOffer.status;
-
-        this.srcTokenDecimals = this.srcTokenAddress === ethers.constants.AddressZero ? 18 : await this.blockchainUtil.getTokenDecimals(this.srcTokenAddress);
-        this.dstTokenDecimals = this.dstTokenAddress === ethers.constants.AddressZero ? 18 : await this.blockchainUtil.getTokenDecimals(this.dstTokenAddress);
 
         this.srcAddressUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/address/${this.srcAddress}`;
         this.dstAddressUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/address/${this.dstAddress}`;
@@ -125,8 +122,8 @@ class SwapOffer {
         this.dstTokenUrl = `${this.blockchainUtil.network.blockExplorerUrls[0]}/token/${this.dstTokenAddress}`;
 
         this.swaps = await this.getSwaps();
-        this.srcAmountInBaseUnit = await this.blockchainUtil.toBaseUnit(this.srcAmount, this.srcTokenAddress);
-        this.dstAmountInBaseUnit = await this.blockchainUtil.toBaseUnit(this.dstAmount, this.dstTokenAddress);
+        this.srcAmountInBaseUnit = toBaseUnit(this.srcAmount, this.srcToken);
+        this.dstAmountInBaseUnit = toBaseUnit(this.dstAmount, this.dstToken);
         this.feeAmountInBaseUnit = ethers.utils.formatUnits(this.feeAmount, 'ether');
         this.displayCreatedTime = new Date(this.createdTime * 1000).toLocaleString();
         this.displayExpirationTime = this.expirationTime.toString() !== '0' ? new Date(this.expirationTime * 1000).toLocaleString() : null;
