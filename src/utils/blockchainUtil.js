@@ -54,6 +54,25 @@ export class BlockchainUtil {
         }
     }
 
+    async getErc20Token(tokenContractAddress) {
+        try {
+            const tokenSymbol = await this.getTokenSymbol(tokenContractAddress);
+            const tokenName = await this.getTokenName(tokenContractAddress);
+            const decimals = await this.getTokenDecimals(tokenContractAddress);
+
+            return {
+                chainId: this.network.chainId,
+                address: tokenContractAddress.toLowerCase(),
+                name: tokenName,
+                symbol: tokenSymbol.toUpperCase(),
+                logoURI: '',
+                decimals: decimals,
+            };
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     async getErc20TokenBalance(accountAddress, tokenContractAddress) {
         const tokenContract = new ethers.Contract(tokenContractAddress, erc20Abi, this.provider);
 

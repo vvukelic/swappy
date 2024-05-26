@@ -1,32 +1,54 @@
 import { ethers } from 'ethers';
 
-import commonTokens from '../data/commonTokens.json';
 import ethereumTokens from '../data/tokens/ethereum.json';
 import polygonTokens from '../data/tokens/polygon.json';
 import bscTokens from '../data/tokens/bsc.json';
 import sepoliaTokens from '../data/tokens/sepolia.json';
+import localhostTokens from '../data/tokens/localhost.json';
 
 let tokensByAddressCache = {};
+let commonTokensByAddressCache = {};
 
-const indexTokensByAddress = (network) => {
-    if (tokensByAddressCache[network]) {
-        return tokensByAddressCache[network];
+const indexTokensByAddress = (networkName) => {
+    if (tokensByAddressCache[networkName]) {
+        return tokensByAddressCache[networkName];
     }
 
     const tokenIndex = {};
 
-    getAllTokens(network).forEach((token) => {
+    getAllTokens(networkName).forEach((token) => {
         tokenIndex[token.address] = token;
     });
 
-    tokensByAddressCache[network] = tokenIndex;
+    tokensByAddressCache[networkName] = tokenIndex;
 
     return tokenIndex;
 };
 
-export function getTokenByAddress(address, network) {
-    const tokensByAddress = indexTokensByAddress(network);
+const indexCommonTokensByAddress = (networkName) => {
+    if (commonTokensByAddressCache[networkName]) {
+        return commonTokensByAddressCache[networkName];
+    }
+
+    const commonTokenIndex = {};
+
+    getCommonTokensList(networkName).forEach((token) => {
+        commonTokenIndex[token.address] = token;
+    });
+
+    commonTokensByAddressCache[networkName] = commonTokenIndex;
+
+    return commonTokenIndex;
+};
+
+export function getTokenByAddress(address, networkName) {
+    const tokensByAddress = indexTokensByAddress(networkName);
     return tokensByAddress[address] || null;
+};
+
+export function getCommonTokenByAddress(address, networkName) {
+    const commonTokensByAddress = indexCommonTokensByAddress(networkName);
+    return commonTokensByAddress[address] || null;
 };
 
 export function getNativeToken(network) {
@@ -51,7 +73,21 @@ const saveCustomTokensList = (list, networkName) => {
     }
 };
 
-const getCustomTokensList = (networkName) => {
+function getCommonTokensList(networkName) {
+    if (networkName === 'ethereum') {
+        return ethereumTokens.tokens;
+    } else if (networkName === 'polygon') {
+        return polygonTokens.tokens;
+    } else if (networkName === 'bsc') {
+        return bscTokens.tokens;
+    } else if (networkName === 'localhost') {
+        return localhostTokens.tokens;
+    } else if (networkName === 'sepolia') {
+        return sepoliaTokens.tokens;
+    }
+}
+
+function getCustomTokensList(networkName) {
     try {
         const serializedList = localStorage.getItem(networkName + 'SwappyCustomTokens');
 
@@ -75,47 +111,21 @@ export function addCustomToken(customToken, networkName) {
     tokensByAddressCache = {};
 };
 
-// export function getAllTokens() {
-//     return [...commonTokens, ...getCustomTokensList()];
-// };
-
 export function getAllTokens(networkName) {
-    if (networkName === 'ethereum') {
-        return [...getCustomTokensList(networkName), ...ethereumTokens.tokens];
-    } else if (networkName === 'polygon') {
-        return polygonTokens.tokens;
-    } else if (networkName === 'bsc') {
-        return [...getCustomTokensList(networkName), ...bscTokens.tokens];
-    } else if (networkName === 'localhost') {
-        return ethereumTokens.tokens;
-    } else if (networkName === 'sepolia') {
-        return sepoliaTokens.tokens;
-    }
+    return [...getCustomTokensList(networkName), ...getCommonTokensList(networkName)];
 };
 
-export function updateCustomTokensList() {
-    let customTokensList = getCustomTokensList();
-    const networks = Object.keys(commonTokens[0].networkSpecificAddress);
+export function updateCustomTokensList(networkName) {
+    const customTokensList = getCustomTokensList(networkName);
 
-    commonTokens.forEach((commonToken) => {
-        networks.forEach((network) => {
-            const commonTokenAddress = commonToken.networkSpecificAddress[network];
-
-            if (!commonTokenAddress) {
-                return;
-            }
-
-            // Filter out custom tokens that match the current commonToken's address on any network
-            customTokensList = customTokensList.filter((customToken) => {
-                const customTokenAddress = customToken.networkSpecificAddress[network];
-                return customTokenAddress !== commonTokenAddress;
-            });
-        });
+    const filteredCustomTokensList = customTokensList.filter((customToken) => {
+        return !getCommonTokenByAddress(customToken.address, networkName);
     });
 
-    saveCustomTokensList(customTokensList);
+    saveCustomTokensList(filteredCustomTokensList, networkName);
 
     tokensByAddressCache = {};
+    commonTokensByAddressCache = {};
 };
 
 export function toSmallestUnit(amount, token) {

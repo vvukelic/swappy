@@ -912,6 +912,14 @@
         },
         {
             "chainId": 31337,
+            "address": "0x08389495d7456e1951ddf7c3a1314a4bfb646d8b",
+            "name": "CRPT",
+            "symbol": "CRPT",
+            "logoURI": "https://assets.coingecko.com/coins/images/1901/standard/crypt.png?1696502894",
+            "decimals": 18
+        },
+        {
+            "chainId": 31337,
             "address": "0xd533a949740bb3306d119cc777fa900ba034cd52",
             "name": "Curve DAO",
             "symbol": "CRV",
@@ -1029,6 +1037,14 @@
             "symbol": "DATA",
             "logoURI": "https://assets.coingecko.com/coins/images/17869/large/DATA_new_symbol_3x.png?1696517392",
             "decimals": 18
+        },
+        {
+            "chainId": 31337,
+            "address": "0xb7b1570e26315baad369b8ea0a943b7f140db9eb",
+            "name": "DEEPSPACE",
+            "symbol": "DPS",
+            "logoURI": "https://assets.coingecko.com/coins/images/17953/standard/f1LFu897_400x400.jpg?1696517473",
+            "decimals": 9
         },
         {
             "chainId": 31337,
@@ -2996,6 +3012,14 @@
             "name": "SmarDex",
             "symbol": "SDEX",
             "logoURI": "https://assets.coingecko.com/coins/images/29470/large/SDEX_logo_transparent_outside_240x240.png?1696930070",
+            "decimals": 18
+        },
+        {
+            "chainId": 31337,
+            "address": "0x34be5b8c30ee4fde069dc878989686abe9884470",
+            "name": "SENATE",
+            "symbol": "SENATE",
+            "logoURI": "https://assets.coingecko.com/coins/images/21272/standard/siIBOmcs.png?1696520643",
             "decimals": 18
         },
         {

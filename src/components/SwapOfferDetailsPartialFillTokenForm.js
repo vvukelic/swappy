@@ -140,7 +140,7 @@ function SwapOfferDetailsPartialFillTokenForm({ token, tokenUrl, amount, maxAmou
                             <StyledTokenLinkName>{token.symbol}</StyledTokenLinkName>
                         </Link>
                     )}
-                    <StyledSlider value={parseFloat(sliderValue)} onChange={handleSliderChange} min={0} max={parseFloat(ethers.utils.formatUnits(maxAmount.toString(), tokenDecimals))} step={stepValue} />
+                    <StyledSlider value={parseFloat(sliderValue)} onChange={handleSliderChange} min={0} max={parseFloat(ethers.utils.formatUnits(maxAmount.toString(), token.decimals))} step={stepValue} />
                 </StyledAmountGrid>
             </StyledContainerGrid>
         </BorderSection>

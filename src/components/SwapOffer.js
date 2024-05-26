@@ -7,7 +7,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
-import { toSmallestUnit, toBaseUnit, getAllTokens } from '../utils/tokens';
+import { toSmallestUnit, toBaseUnit, getAllTokens, updateCustomTokensList } from '../utils/tokens';
 import { waitForTxToBeMined } from '../utils/general';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
@@ -102,15 +102,10 @@ function SwapOffer({
     };
 
     useEffect(() => {
-        // updateCustomTokensList();
-    }, []);
-
-    useEffect(() => {
-        if (!isAccountConnected) {
-            setSwapOfferButtonText('Connect wallet');
-            setDefaultAccountSrcTokenBalance(null);
+        if (blockchainUtil) {
+            updateCustomTokensList(blockchainUtil.network.uniqueName);
         }
-    }, [isAccountConnected]);
+    }, [blockchainUtil]);
 
     useEffect(() => {
         if (blockchainUtil?.network) {
@@ -125,37 +120,39 @@ function SwapOffer({
     useEffect(() => {
         let active = true;
 
-        function swapOfferButtonText() {
-            if (selectedSrcToken.address) {
-                let srcAmountInt = toSmallestUnit(srcAmount, selectedSrcToken);
+        if (isAccountConnected) {
+            if (defaultAccount && selectedSrcToken && defaultAccountSrcTokenBalance) {
+                
+                if (selectedSrcToken.address) {
+                    let srcAmountInt = toSmallestUnit(srcAmount, selectedSrcToken);
 
-                if (!active) {
-                    return;
-                }
-
-                if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
-                    setInsufficientSrcTokenAmount(false);
-
-                    if (tokenApproved) {
-                        setSwapOfferButtonText('Create Swap Offer');
-                    } else {
-                        setSwapOfferButtonText(`Approve ${selectedSrcToken.symbol} Token`);
+                    if (!active) {
+                        return;
                     }
-                } else {
-                    setInsufficientSrcTokenAmount(true);
-                    setSwapOfferButtonText(`Insufficient ${selectedSrcToken.symbol} balance`);
+
+                    if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
+                        setInsufficientSrcTokenAmount(false);
+
+                        if (tokenApproved) {
+                            setSwapOfferButtonText('Create Swap Offer');
+                        } else {
+                            setSwapOfferButtonText(`Approve ${selectedSrcToken.symbol} Token`);
+                        }
+                    } else {
+                        setInsufficientSrcTokenAmount(true);
+                        setSwapOfferButtonText(`Insufficient ${selectedSrcToken.symbol} balance`);
+                    }
                 }
             }
-        }
-
-        if (defaultAccount && selectedSrcToken && blockchainUtil && defaultAccountSrcTokenBalance) {
-            swapOfferButtonText();
+        } else {
+            setSwapOfferButtonText('Connect wallet');
+            setDefaultAccountSrcTokenBalance(null);
         }
 
         return () => {
             active = false;
         };
-    }, [defaultAccount, selectedSrcToken, tokenApproved, srcAmount, defaultAccountSrcTokenBalance]);
+    }, [defaultAccount, selectedSrcToken, tokenApproved, srcAmount, defaultAccountSrcTokenBalance, isAccountConnected]);
 
     useEffect(() => {
         let active = true;

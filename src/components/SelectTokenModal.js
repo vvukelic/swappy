@@ -88,22 +88,8 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
                 setCustomToken(null);
             } else {
                 async function processSearchInput() {
-                    try {
-                        const tokenSymbol = await blockchainUtil.getTokenSymbol(searchInputLowerCase);
-                        const tokenName = await blockchainUtil.getTokenName(searchInputLowerCase);
-                        const decimals = await blockchainUtil.getTokenDecimals(searchInputLowerCase);
-
-                        setCustomToken({
-                            chainId: blockchainUtil.network.chainId,
-                            address: searchInputLowerCase,
-                            name: tokenName,
-                            symbol: tokenSymbol.toUpperCase(),
-                            logoURI: '',
-                            decimals: decimals
-                        });
-                    } catch (err) {
-                        console.error(err);
-                    }
+                    const customToken = await blockchainUtil.getErc20Token(searchInputLowerCase);
+                    setCustomToken(customToken);
                     setFilteredTokens([]);
                 }
                 processSearchInput();

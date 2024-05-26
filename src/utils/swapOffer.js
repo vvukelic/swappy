@@ -64,21 +64,6 @@ class SwapOffer {
         return swaps;
     }
 
-    async createCustomTokenFromAddress(tokenAddress) {
-        try {
-            const tokenSymbol = await this.blockchainUtil.getTokenSymbol(tokenAddress);
-            const tokenName = await this.blockchainUtil.getTokenName(tokenAddress);
-            return {
-                symbol: tokenSymbol,
-                name: tokenName,
-                address: tokenAddress,
-                logoURI: '',
-            };
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
     getSrcToken() {
         return this.convertSrcTokenToNative ? this.blockchainUtil.nativeToken : this.srcToken;
     }
@@ -106,11 +91,11 @@ class SwapOffer {
         let dstToken = getTokenByAddress(this.dstTokenAddress, this.blockchainUtil.network.uniqueName);
 
         if (!srcToken) {
-            srcToken = await this.createCustomTokenFromAddress(this.srcTokenAddress);
+            srcToken = await this.blockchainUtil.getErc20Token(this.srcTokenAddress);
         }
 
         if (!dstToken) {
-            dstToken = await this.createCustomTokenFromAddress(this.dstTokenAddress);
+            dstToken = await this.blockchainUtil.getErc20Token(this.dstTokenAddress);
         }
 
         this.srcToken = srcToken;
