@@ -16,10 +16,13 @@ export async function waitForTxToBeMined(tx) {
     }
 }
 
-export const supportedNetworkNames = {
+export const networkNames = {
     development: ['localhost', 'sepolia', 'ethereum', 'polygon', 'bsc'],
     production: ['ethereum', 'polygon', 'bsc'],
 };
+
+const environment = process.env.NODE_ENV || 'production';
+export const supportedNetworkNames = networkNames[environment] || networkNames.production;
 let supportedNetworks = [];
 
 export function getSupportedNetworks() {
@@ -27,10 +30,7 @@ export function getSupportedNetworks() {
         return supportedNetworks;
     }
 
-    const environment = process.env.NODE_ENV || 'production';
-    const networkNames = supportedNetworkNames[environment] || supportedNetworkNames.production;
-    
-    networkNames.forEach((name) => {
+    supportedNetworkNames.forEach((name) => {
         const network = networks[name];
 
         if (network) {

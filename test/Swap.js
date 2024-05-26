@@ -18,8 +18,6 @@ describe('SwapManager contract', function () {
         await impersonateAccount(srcAddress);
         const srcAddressSigner = await ethers.getSigner(srcAddress);
         await tokenContract.connect(srcAddressSigner).transfer(dstAddress, amount);
-        const decimals = await tokenContract.decimals();
-        const balance = await tokenContract.balanceOf(dstAddress);
         await stopImpersonatingAccount(srcAddress);
     }
 
@@ -47,10 +45,35 @@ describe('SwapManager contract', function () {
         // transfer matic to addr2
         await transferErc20Token(maticTokenAddr, '0x50d669F43b484166680Ecc3670E4766cdb0945CE', addr2.address, 100000000);
 
-        return { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2, addr3 };
+        const defaultAdminRole = await hardhatSwappyData.DEFAULT_ADMIN_ROLE();
+        const managerRole = await hardhatSwappyData.MANAGER_ROLE();
+
+        return { hardhatSwappyData, hardhatSwappyManager, owner, feeAddr, addr1, addr2, addr3, defaultAdminRole, managerRole };
     }
 
-    describe('Deployment', function () {
+    function getSampleSwapOffer() {
+        return {
+            srcAddress: ethers.Wallet.createRandom().address,
+            dstAddress: ethers.Wallet.createRandom().address,
+            srcTokenAddress: ethers.Wallet.createRandom().address,
+            srcAmount: ethers.utils.parseEther('10'),
+            dstTokenAddress: ethers.Wallet.createRandom().address,
+            dstAmount: ethers.utils.parseEther('10'),
+            feeTokenAddress: ethers.Wallet.createRandom().address,
+            feeAmount: ethers.utils.parseEther('0.01'),
+            convertSrcTokenToNative: false,
+            createdTime: Math.floor(Date.now() / 1000),
+            expirationTime: Math.floor(Date.now() / 1000) + 86400,
+            partialFillEnabled: false,
+            status: 0,
+        };
+    }
+
+    function getSampleSwapOfferHash() {
+        return ethers.utils.keccak256(ethers.utils.toUtf8Bytes('example'));
+    }
+
+    describe('Deployment/access', function () {
         it('Deployer has the default admin role (SwappyData)', async function () {
             const { hardhatSwappyData, owner } = await loadFixture(deploySwappyContractsFixture);
             expect(await hardhatSwappyData.hasRole(defaultAdminRole, owner.address)).to.equal(true);
@@ -59,6 +82,78 @@ describe('SwapManager contract', function () {
         it('Deployer has the default admin role (SwappyManager)', async function () {
             const { hardhatSwappyManager, owner } = await loadFixture(deploySwappyContractsFixture);
             expect(await hardhatSwappyManager.hasRole(defaultAdminRole, owner.address)).to.equal(true);
+        });
+
+        it('Should allow adding a new manager', async function () {
+            const { hardhatSwappyData, owner, addr1, managerRole } = await loadFixture(deploySwappyContractsFixture);
+            await expect(hardhatSwappyData.connect(owner).addManager(addr1.address)).to.emit(hardhatSwappyData, 'RoleGranted').withArgs(managerRole, addr1.address, owner.address);
+            expect(await hardhatSwappyData.hasRole(managerRole, addr1.address)).to.equal(true);
+        });
+
+        it('Should not allow non-admin to add a new manager', async function () {
+            const { hardhatSwappyData, addr1, addr2, defaultAdminRole } = await loadFixture(deploySwappyContractsFixture);
+            await expect(hardhatSwappyData.connect(addr1).addManager(addr2.address)).to.be.revertedWith(`AccessControl: account ${addr1.address.toLowerCase()} is missing role ${defaultAdminRole}`);
+        });
+
+        it('Should allow admin to remove a manager', async function () {
+            const { hardhatSwappyData, owner, addr1, managerRole } = await loadFixture(deploySwappyContractsFixture);
+
+            await hardhatSwappyData.connect(owner).addManager(addr1.address);
+
+            await expect(hardhatSwappyData.connect(owner).removeManager(addr1.address)).to.emit(hardhatSwappyData, 'RoleRevoked').withArgs(managerRole, addr1.address, owner.address);
+            expect(await hardhatSwappyData.hasRole(managerRole, addr1.address)).to.equal(false);
+        });
+
+        it('Should prevent non-admin from removing a manager', async function () {
+            const { hardhatSwappyData, owner, addr1, defaultAdminRole } = await loadFixture(deploySwappyContractsFixture);
+
+            await hardhatSwappyData.connect(owner).addManager(addr1.address);
+
+            await expect(hardhatSwappyData.connect(addr1).removeManager(addr1.address)).to.be.revertedWith(`AccessControl: account ${addr1.address.toLowerCase()} is missing role ${defaultAdminRole}`);
+        });
+
+        it('Should not allow non-manager to add a swap offer', async function () {
+            const { hardhatSwappyData, addr1, managerRole } = await loadFixture(deploySwappyContractsFixture);
+
+            const swapOffer = getSampleSwapOffer();
+            const swapOfferHash = getSampleSwapOfferHash();
+
+            await expect(hardhatSwappyData.connect(addr1).addSwapOffer(swapOfferHash, swapOffer)).to.be.revertedWith(`AccessControl: account ${addr1.address.toLowerCase()} is missing role ${managerRole}`);
+        });
+
+        it('Should not allow non-manager to add a swap', async function () {
+            const { hardhatSwappyData, addr1, managerRole } = await loadFixture(deploySwappyContractsFixture);
+
+            const swap = {
+                dstAddress: ethers.Wallet.createRandom().address,
+                srcAmount: ethers.utils.parseEther('10'),
+                dstAmount: ethers.utils.parseEther('10'),
+                feeAmount: ethers.utils.parseEther('0.01'),
+                closedTime: Math.floor(Date.now() / 1000),
+            };
+            const swapOfferHash = getSampleSwapOfferHash();
+
+            await expect(hardhatSwappyData.connect(addr1).addSwap(swapOfferHash, swap)).to.be.revertedWith(`AccessControl: account ${addr1.address.toLowerCase()} is missing role ${managerRole}`);
+        });
+
+        it('Should not allow non-manager to add user swap offer', async function () {
+            const { hardhatSwappyData, addr1, addr2, managerRole } = await loadFixture(deploySwappyContractsFixture);
+            await expect(hardhatSwappyData.connect(addr1).addUserSwapOffer(addr2.address, getSampleSwapOfferHash())).to.be.revertedWith(`AccessControl: account ${addr1.address.toLowerCase()} is missing role ${managerRole}`);
+        });
+
+        it('Should not allow non-manager to add swap offer for user', async function () {
+            const { hardhatSwappyData, addr1, addr2, managerRole } = await loadFixture(deploySwappyContractsFixture);
+            await expect(hardhatSwappyData.connect(addr1).addSwapOfferForUser(addr2.address, getSampleSwapOfferHash())).to.be.revertedWith(`AccessControl: account ${addr1.address.toLowerCase()} is missing role ${managerRole}`);
+        });
+
+        it('Should not allow non-manager to add swap offer taken by user', async function () {
+            const { hardhatSwappyData, addr1, addr2, managerRole } = await loadFixture(deploySwappyContractsFixture);
+            await expect(hardhatSwappyData.connect(addr1).addSwapOfferTakenByUser(addr2.address, getSampleSwapOfferHash())).to.be.revertedWith(`AccessControl: account ${addr1.address.toLowerCase()} is missing role ${managerRole}`);
+        });
+
+        it('Should not allow non-manager to update swap offer status', async function () {
+            const { hardhatSwappyData, addr1, addr2, managerRole } = await loadFixture(deploySwappyContractsFixture);
+            await expect(hardhatSwappyData.connect(addr1).updateSwapOfferStatus(getSampleSwapOfferHash(), 1)).to.be.revertedWith(`AccessControl: account ${addr1.address.toLowerCase()} is missing role ${managerRole}`);
         });
     });
 

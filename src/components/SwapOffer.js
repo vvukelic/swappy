@@ -7,7 +7,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import SelectTokenModal from './SelectTokenModal';
 import SelectToken from './SelectToken';
 import MainContentContainer from './MainContentContainer';
-import { getTokenByAddress, updateCustomTokensList, getNativeToken } from '../utils/tokens';
+import { toSmallestUnit, toBaseUnit, getAllTokens, updateCustomTokensList } from '../utils/tokens';
 import { waitForTxToBeMined } from '../utils/general';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import styled from '@emotion/styled';
@@ -16,7 +16,6 @@ import InfoModal from './InfoModal';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import { useNotification } from './NotificationProvider';
-import commonTokens from '../data/commonTokens.json';
 import networks from '../data/networks';
 
 
@@ -63,8 +62,6 @@ function SwapOffer({
     const [modalType, setModalType] = useState(null);
     const [insufficientSrcTokenAmount, setInsufficientSrcTokenAmount] = useState(false);
     const [defaultAccountSrcTokenBalance, setDefaultAccountSrcTokenBalance] = useState(null);
-    const [selectedSrcTokenDecimals, setSelectedSrcTokenDecimals] = useState(0);
-    const [selectedDstTokenDecimals, setSelectedDstTokenDecimals] = useState(0);
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const { addNotification, updateNotification } = useNotification();
     const [wrappedTokenModalMsg, setWrappedTokenModalMsg] = useState('');
@@ -86,13 +83,14 @@ function SwapOffer({
         const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
 
         if (type === 'src') {
-            let tokenAddress = token.networkSpecificAddress[selectedNetwork.uniqueName];
+            // let tokenAddress = token.networkSpecificAddress[selectedNetwork.uniqueName];
+            let tokenAddress = token.address;
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByAddress(selectedNetwork.wrappedNativeCurrencyAddress, selectedNetwork.uniqueName).networkSpecificAddress[selectedNetwork.uniqueName];
+                tokenAddress = selectedNetwork.wrappedNativeCurrencyAddress;
             }
 
-            if (blockchainUtil) {
+            if (blockchainUtil && blockchainUtil.network.chainId === token.chainId) {
                 const swappyAllowence = await blockchainUtil.getSwappyAllowance(tokenAddress, defaultAccount);
                 setTokenApproved(swappyAllowence > 0);
             }
@@ -104,108 +102,75 @@ function SwapOffer({
     };
 
     useEffect(() => {
-        updateCustomTokensList();
-    }, []);
-
-    useEffect(() => {
-        if (!isAccountConnected) {
-            setSwapOfferButtonText('Connect wallet');
-            setDefaultAccountSrcTokenBalance(null);
+        if (blockchainUtil) {
+            updateCustomTokensList(blockchainUtil.network.uniqueName);
         }
-    }, [isAccountConnected]);
+    }, [blockchainUtil]);
 
     useEffect(() => {
         if (blockchainUtil?.network) {
-            handleTokenSelection(getNativeToken(blockchainUtil.network.uniqueName), 'src');
+            handleTokenSelection(getAllTokens(blockchainUtil.network.uniqueName)[0], 'src');
+            handleTokenSelection(getAllTokens(blockchainUtil.network.uniqueName)[1], 'dst');
         } else {
-            handleTokenSelection(commonTokens[0], 'src'); // ETH
+            handleTokenSelection(getAllTokens('ethereum')[0], 'src');
+            handleTokenSelection(getAllTokens('ethereum')[1], 'dst');
         }
-
-        handleTokenSelection(commonTokens[1], 'dst');  // USDC
     }, [blockchainUtil, defaultAccount]);
 
     useEffect(() => {
         let active = true;
 
-        async function swapOfferButtonText() {
-            const tokenAddress = selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName];
+        if (isAccountConnected) {
+            if (defaultAccount && selectedSrcToken && defaultAccountSrcTokenBalance) {
+                
+                if (selectedSrcToken.address) {
+                    let srcAmountInt = toSmallestUnit(srcAmount, selectedSrcToken);
 
-            if (tokenAddress) {
-                const defaultAccountSrcTokenBalance = await blockchainUtil.getTokenBalance(defaultAccount, tokenAddress);
-                let srcAmountInt = null;
-
-                try {
-                    srcAmountInt = await blockchainUtil.toSmallestUnit(srcAmount, tokenAddress);
-                } catch (error) {
-                    if (active) {
-                        setSrcAmount('0.0');
+                    if (!active) {
                         return;
                     }
-                }
 
-                if (!active) {
-                    return;
-                }
+                    if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
+                        setInsufficientSrcTokenAmount(false);
 
-                if (srcAmountInt.lte(defaultAccountSrcTokenBalance)) {
-                    setInsufficientSrcTokenAmount(false);
-
-                    if (tokenApproved) {
-                        setSwapOfferButtonText('Create Swap Offer');
+                        if (tokenApproved) {
+                            setSwapOfferButtonText('Create Swap Offer');
+                        } else {
+                            setSwapOfferButtonText(`Approve ${selectedSrcToken.symbol} Token`);
+                        }
                     } else {
-                        setSwapOfferButtonText(`Approve ${selectedSrcToken.name} Token`);
+                        setInsufficientSrcTokenAmount(true);
+                        setSwapOfferButtonText(`Insufficient ${selectedSrcToken.symbol} balance`);
                     }
-                } else {
-                    setInsufficientSrcTokenAmount(true);
-                    setSwapOfferButtonText(`Insufficient ${selectedSrcToken.name} balance`);
                 }
             }
-        }
-
-        if (defaultAccount && selectedSrcToken && blockchainUtil) {
-            swapOfferButtonText();
+        } else {
+            setSwapOfferButtonText('Connect wallet');
+            setDefaultAccountSrcTokenBalance(null);
         }
 
         return () => {
             active = false;
         };
-    }, [blockchainUtil, defaultAccount, selectedSrcToken, tokenApproved, srcAmount, isAccountConnected]);
+    }, [defaultAccount, selectedSrcToken, tokenApproved, srcAmount, defaultAccountSrcTokenBalance, isAccountConnected]);
 
     useEffect(() => {
         let active = true;
 
         async function srcTokenHoldingsAmount() {
-            const tokenAddress = selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName];
-
-            if (tokenAddress) {
-                const tokenBalance = await blockchainUtil.getTokenBalance(defaultAccount, tokenAddress);
-                const tokenBalanceBaseUnit = await blockchainUtil.toBaseUnit(tokenBalance, tokenAddress);
+            if (selectedSrcToken.address && blockchainUtil.network.chainId === selectedSrcToken.chainId) {
+                const tokenBalance = await blockchainUtil.getTokenBalance(defaultAccount, selectedSrcToken.address);
 
                 if (!active) {
                     return;
                 }
 
-                setDefaultAccountSrcTokenBalance(tokenBalanceBaseUnit);
-            }
-        };
-
-        async function getSrcTokenDecimals() {
-            const tokenAddress = selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName];
-
-            if (tokenAddress) {
-                const srcTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await blockchainUtil.getTokenDecimals(tokenAddress);
-
-                if (!active) {
-                    return;
-                }
-
-                setSelectedSrcTokenDecimals(srcTokenDecimals);
+                setDefaultAccountSrcTokenBalance(tokenBalance);
             }
         };
 
         if (defaultAccount && selectedSrcToken && blockchainUtil) {
             srcTokenHoldingsAmount();
-            getSrcTokenDecimals();
         }
 
         return () => {
@@ -213,24 +178,9 @@ function SwapOffer({
         };
     }, [defaultAccount, selectedSrcToken, blockchainUtil]);
 
-    useEffect(() => {
-        async function getDstTokenDecimals() {
-            const tokenAddress = selectedDstToken.networkSpecificAddress[blockchainUtil.network.uniqueName];
-
-            if (tokenAddress) {
-                const dstTokenDecimals = tokenAddress === ethers.constants.AddressZero ? 18 : await blockchainUtil.getTokenDecimals(tokenAddress);
-                setSelectedDstTokenDecimals(dstTokenDecimals);
-            }
-        }
-
-        if (defaultAccount && selectedDstToken && blockchainUtil) {
-            getDstTokenDecimals();
-        }
-    }, [defaultAccount, selectedDstToken, blockchainUtil]);
-
     async function openSwapOffer() {
-         const srcAmountInt = await blockchainUtil.toSmallestUnit(srcAmount, selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName]);
-         const dstAmountInt = await blockchainUtil.toSmallestUnit(dstAmount, selectedDstToken.networkSpecificAddress[blockchainUtil.network.uniqueName]);
+         const srcAmountInt = toSmallestUnit(srcAmount, selectedSrcToken);
+         const dstAmountInt = toSmallestUnit(dstAmount, selectedDstToken);
 
          if (srcAmountInt.eq(0) || dstAmountInt.eq(0)) {
             setShowInvalidAmountsModal(true);
@@ -251,9 +201,9 @@ function SwapOffer({
 
          try {
              const tx = await blockchainUtil.createSwapOffer(
-                selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName],
+                selectedSrcToken.address,
                 srcAmountInt,
-                selectedDstToken.networkSpecificAddress[blockchainUtil.network.uniqueName],
+                selectedDstToken.address,
                 dstAmountInt,
                 dstAddress,
                 expiresIn,
@@ -261,7 +211,7 @@ function SwapOffer({
             );
 
              addNotification(tx.hash, {
-                 message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()}...`,
+                 message: `Creating a swap offer ${selectedSrcToken.symbol} -> ${selectedDstToken.symbol}...`,
                  sevirity: 'info',
                  duration: null,
              });
@@ -282,7 +232,7 @@ function SwapOffer({
                      endTransaction(true, `You successfuly created a swap offer!`);
                  } else {
                      updateNotification(receipt.transactionHash, {
-                         message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
+                         message: `Creating a swap offer ${selectedSrcToken.symbol} -> ${selectedDstToken.symbol} failed!`,
                          severity: 'error',
                          duration: 5000,
                      });
@@ -291,7 +241,7 @@ function SwapOffer({
                  }
              } else {
                  updateNotification(receipt.transactionHash, {
-                     message: `Creating a swap offer ${selectedSrcToken.name.toUpperCase()} -> ${selectedDstToken.name.toUpperCase()} failed!`,
+                     message: `Creating a swap offer ${selectedSrcToken.symbol} -> ${selectedDstToken.symbol} failed!`,
                      severity: 'error',
                      duration: 5000,
                  });
@@ -307,19 +257,20 @@ function SwapOffer({
         if (!isAccountConnected) {
             open();
         } else if (!tokenApproved && !insufficientSrcTokenAmount) {
-            let tokenAddress = selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName];
+            let tokenAddress = selectedSrcToken.address;
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                tokenAddress = getTokenByAddress(blockchainUtil.network.wrappedNativeCurrencyAddress, blockchainUtil.network.uniqueName).networkSpecificAddress[blockchainUtil.network.uniqueName];
+                // tokenAddress = getTokenByAddress(blockchainUtil.network.wrappedNativeCurrencyAddress, blockchainUtil.network.uniqueName).networkSpecificAddress[blockchainUtil.network.uniqueName];
+                tokenAddress = blockchainUtil.network.wrappedNativeCurrencyAddress;
             }
 
-            startTransaction(`Please go to your wallet and approve ${selectedSrcToken.name.toUpperCase()}.`);
+            startTransaction(`Please go to your wallet and approve ${selectedSrcToken.symbol}.`);
 
             try {
                 const tx = await blockchainUtil.approveTokenForSwappy(tokenAddress);
 
                 addNotification(tx.hash, {
-                    message: `Approving ${selectedSrcToken.name.toUpperCase()}...`,
+                    message: `Approving ${selectedSrcToken.symbol}...`,
                     sevirity: 'info',
                     duration: null,
                 });
@@ -328,28 +279,28 @@ function SwapOffer({
 
                 if (receipt.status === 1) {
                     updateNotification(receipt.transactionHash, {
-                        message: `${selectedSrcToken.name.toUpperCase()} approved!`,
+                        message: `${selectedSrcToken.symbol} approved!`,
                         severity: 'success',
                         duration: 5000,
                     });
-                    endTransaction(true, `You successfuly approved ${selectedSrcToken.name.toUpperCase()}!`);
+                    endTransaction(true, `You successfuly approved ${selectedSrcToken.symbol}!`);
                     setTokenApproved(true);
                 } else {
                     updateNotification(receipt.transactionHash, {
-                        message: `There was an error approving ${selectedSrcToken.name.toUpperCase()}!`,
+                        message: `There was an error approving ${selectedSrcToken.symbol}!`,
                         severity: 'error',
                         duration: 5000,
                     });
-                    endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`);
+                    endTransaction(false, `There was an error approving ${selectedSrcToken.symbol}.`);
                 }
             } catch (error) {
-                endTransaction(false, `There was an error approving ${selectedSrcToken.name.toUpperCase()}.`, error.toString());
+                endTransaction(false, `There was an error approving ${selectedSrcToken.symbol}.`, error.toString());
                 return;
             }
         } else if (!insufficientSrcTokenAmount) {
-            if (selectedSrcToken.networkSpecificAddress[blockchainUtil.network.uniqueName] === ethers.constants.AddressZero) {
-                const nativeTokenName = selectedSrcToken.name.toUpperCase();
-                setWrappedTokenModalMsg(`For this swap offer, your ${nativeTokenName} will be converted to W${nativeTokenName}. Once the offer is accepted, the W${nativeTokenName} will be seamlessly reverted back to ${nativeTokenName} and sent to the swap taker.`);
+            if (selectedSrcToken.address === ethers.constants.AddressZero) {
+                const nativeTokenSymbol = selectedSrcToken.symbol;
+                setWrappedTokenModalMsg(`For this swap offer, your ${nativeTokenSymbol} will be converted to W${nativeTokenSymbol}. Once the offer is accepted, the W${nativeTokenSymbol} will be seamlessly reverted back to ${nativeTokenSymbol} and sent to the swap taker.`);
                 setShowWrappedTokenModal(true);
             } else {
                 openSwapOffer();
@@ -372,9 +323,9 @@ function SwapOffer({
             return;
         }
 
-        let newSrcTokenAddress = selectedDstToken.networkSpecificAddress[blockchainUtil.network.uniqueName];
+        let newSrcTokenAddress = selectedDstToken.address;
         if (newSrcTokenAddress === ethers.constants.AddressZero) {
-            newSrcTokenAddress = getTokenByAddress(blockchainUtil.network.wrappedNativeCurrencyAddress, blockchainUtil.network.uniqueName).networkSpecificAddress[blockchainUtil.network.uniqueName];
+            newSrcTokenAddress = blockchainUtil.network.wrappedNativeCurrencyAddress;
         }
 
         const availableTokenBalance = await blockchainUtil.getSwappyAllowance(newSrcTokenAddress, defaultAccount);
@@ -395,11 +346,10 @@ function SwapOffer({
             <MainContentContainer>
                 <SelectToken
                     selectedToken={selectedSrcToken}
-                    selectedTokenDecimals={selectedSrcTokenDecimals}
                     amount={srcAmount} setAmount={setSrcAmount}
                     selectedTokenImg={selectedSrcTokenImg}
                     labelText='You send' openModal={() => openModal('src')}
-                    selectedTokenAccountBalance={defaultAccountSrcTokenBalance}
+                    selectedTokenAccountBalance={defaultAccountSrcTokenBalance && selectedSrcToken ? toBaseUnit(defaultAccountSrcTokenBalance, selectedSrcToken) : null}
                 />
 
                 <Grid item xs={12} container justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
@@ -422,7 +372,6 @@ function SwapOffer({
 
                 <SelectToken
                     selectedToken={selectedDstToken}
-                    selectedTokenDecimals={selectedDstTokenDecimals}
                     amount={dstAmount} setAmount={setDstAmount}
                     selectedTokenImg={selectedDstTokenImg}
                     labelText='You receive'

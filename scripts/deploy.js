@@ -32,7 +32,7 @@ async function main() {
     // await swappyData.removeManager('0x94FB120e084eBa847c94C7bb9f81c161053cc279');
     console.log('SwappyManager added as manager.');
 
-    // saveFrontendFiles(deployedAddresses);
+    saveFrontendFiles(deployedAddresses);
 }
 
 function saveFrontendFiles(deployedAddresses) {

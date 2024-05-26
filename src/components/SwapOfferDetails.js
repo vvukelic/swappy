@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { useRouter } from 'next/router';
-import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip, CircularProgress } from '@mui/material';
+import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip, CircularProgress, Link } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { waitForTxToBeMined } from '../utils/general';
+import { networkNames, waitForTxToBeMined } from '../utils/general';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
@@ -22,7 +22,7 @@ import SwapStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
 import InfoModal from './InfoModal';
 import { useNotification } from './NotificationProvider';
-import { Truncate } from '../sharedStyles/general';
+import { Truncate, StyledLink } from '../sharedStyles/general';
 import { supportedNetworkNames } from '../utils/general';
 import networks from '../data/networks';
 
@@ -129,7 +129,7 @@ function SwapOfferDetails({ hash }) {
                 if (swapOffer.dstTokenAddress === ethers.constants.AddressZero) {
                     setSwapButtonText(`${blockchainUtil.network.wrappedNativeCurrencySymbol} balance too low`);
                 } else {
-                    setSwapButtonText(`Approve ${swapOffer.dstTokenName} Token`);
+                    setSwapButtonText(`Approve ${swapOffer.dstTokenSymbol} Token`);
                 }
             }
         }
@@ -177,7 +177,7 @@ function SwapOfferDetails({ hash }) {
             startTransaction(`Please go to your wallet and confirm the transaction for taking the swap.`);
 
             try {
-                const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.networkSpecificAddress[blockchainUtil.network.uniqueName], swapDstAmount, swapOffer.feeAmount);
+                const tx = await blockchainUtil.createSwapForOffer(hash, swapOffer.dstToken.address, swapDstAmount, swapOffer.feeAmount);
 
                 addNotification(tx.hash, {
                     message: 'Taking a swap...',
@@ -211,13 +211,13 @@ function SwapOfferDetails({ hash }) {
 
             window.location.reload();
         } else {
-            startTransaction(`Please go to your wallet and approve ${swapOffer.dstTokenName}`);
+            startTransaction(`Please go to your wallet and approve ${swapOffer.dstTokenSymbol}`);
 
             try {
                 const tx = await blockchainUtil.approveTokenForSwappy(swapOffer.dstTokenAddress);
 
                 addNotification(tx.hash, {
-                    message: `Approving ${swapOffer.dstTokenName}...`,
+                    message: `Approving ${swapOffer.dstTokenSymbol}...`,
                     sevirity: 'info',
                     duration: null,
                 });
@@ -226,22 +226,22 @@ function SwapOfferDetails({ hash }) {
 
                 if (receipt.status === 1) {
                     updateNotification(tx.transactionHash, {
-                        message: `${swapOffer.dstTokenName} approved!`,
+                        message: `${swapOffer.dstTokenSymbol} approved!`,
                         severity: 'success',
                         duration: 5000,
                     });
-                    endTransaction(true, `You successfuly approved ${swapOffer.dstTokenName}!`);
+                    endTransaction(true, `You successfuly approved ${swapOffer.dstTokenSymbol}!`);
                     setTokenApproved(true);
                 } else {
                     updateNotification(tx.transactionHash, {
-                        message: `There was an error approving ${swapOffer.dstTokenName}!`,
+                        message: `There was an error approving ${swapOffer.dstTokenSymbol}!`,
                         severity: 'error',
                         duration: 5000,
                     });
-                    endTransaction(false, `There was an error approving ${swapOffer.dstTokenName}.`);
+                    endTransaction(false, `There was an error approving ${swapOffer.dstTokenSymbol}.`);
                 }
             } catch (error) {
-                endTransaction(false, `There was an error approving ${swapOffer.dstTokenName}.`, error.toString());
+                endTransaction(false, `There was an error approving ${swapOffer.dstTokenSymbol}.`, error.toString());
                 return;
             }
         }
@@ -297,9 +297,7 @@ function SwapOfferDetails({ hash }) {
     return (
         <>
             <MainContentContainer sx={{ width: '100%' }}>
-                {swapOffer.partialFillEnabled && swapOffer.readableStatus === 'OPENED' ? 
-                    <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} tokenDecimals={swapOffer.dstTokenDecimals} labelText='You send' sx={{ width: '100%' }} /> : 
-                    <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
+                {swapOffer.partialFillEnabled && swapOffer.readableStatus === 'OPENED' ? <SwapOfferDetailsPartialFillTokenForm token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapDstAmount} maxAmount={swapOffer.remainingDstAmountSum} setAmount={setSwapDstAmount} labelText='You send' sx={{ width: '100%' }} /> : <SwapOfferDetailsTokenInfo token={swapOffer.dstToken} tokenUrl={swapOffer.dstTokenUrl} amount={swapOffer.dstAmountInBaseUnit} labelText='You send' />}
 
                 <Grid item xs={12} justifyContent='center' alignItems='center' sx={{ padding: '0 !important' }}>
                     <IconButton variant='outlined' disabled>
@@ -307,7 +305,7 @@ function SwapOfferDetails({ hash }) {
                     </IconButton>
                 </Grid>
 
-                <SwapOfferDetailsTokenInfo token={swapOffer.getSrcToken()} tokenUrl={swapOffer.srcTokenUrl} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcTokenDecimals)} labelText='You receive' />
+                <SwapOfferDetailsTokenInfo token={swapOffer.getSrcToken()} tokenUrl={swapOffer.srcTokenUrl} amount={ethers.utils.formatUnits(swapSrcAmount.toString(), swapOffer.srcToken.decimals)} labelText='You receive' />
 
                 <Grid item sx={{ height: '42px' }} />
 
@@ -361,7 +359,9 @@ function SwapOfferDetails({ hash }) {
                             </StyledBox>
                             <StyledBox>
                                 <Tooltip title={swapOffer.srcAddress}>
-                                    <Typography>{sliceAddress(swapOffer.srcAddress)}</Typography>
+                                    <StyledLink href={swapOffer.srcAddressUrl} target='_blank' rel='noopener noreferrer'>
+                                        {sliceAddress(swapOffer.srcAddress)}
+                                    </StyledLink>
                                 </Tooltip>
                             </StyledBox>
                             <StyledBox>
@@ -369,7 +369,7 @@ function SwapOfferDetails({ hash }) {
                                     <Tooltip title={swapOffer.srcAmountInBaseUnit}>
                                         <Truncate>{swapOffer.srcAmountInBaseUnit}</Truncate>
                                     </Tooltip>
-                                    {swapOffer.getSrcToken().name}
+                                    {swapOffer.getSrcToken().symbol}
                                 </StyledTypography>
                             </StyledBox>
                             <StyledBox>
@@ -377,7 +377,7 @@ function SwapOfferDetails({ hash }) {
                                     <Tooltip title={swapOffer.dstAmountInBaseUnit}>
                                         <Truncate>{swapOffer.dstAmountInBaseUnit}</Truncate>
                                     </Tooltip>
-                                    {swapOffer.dstTokenName}
+                                    {swapOffer.dstTokenSymbol}
                                 </StyledTypography>
                             </StyledBox>
                             <StyledBox>
@@ -395,17 +395,19 @@ function SwapOfferDetails({ hash }) {
                             )}
                             {swapOffer.dstAddress !== ethers.constants.AddressZero && (
                                 <StyledBox>
-                                    <Typography>{sliceAddress(swapOffer.dstAddress)}</Typography>
+                                    <StyledLink href={swapOffer.dstAddressUrl} target='_blank' rel='noopener noreferrer'>
+                                        {sliceAddress(swapOffer.dstAddress)}
+                                    </StyledLink>
                                 </StyledBox>
                             )}
                             <StyledBox>
                                 <StyledExchangeRate>
-                                    <StyledTypography>1 {swapOffer.dstTokenName} =</StyledTypography>
+                                    <StyledTypography>1 {swapOffer.dstTokenSymbol} =</StyledTypography>
                                     <StyledAmountAndToken>
                                         <Tooltip title={swapOffer.displayExchangeRateSrcDst}>
                                             <Truncate>{swapOffer.displayExchangeRateSrcDst}</Truncate>
                                         </Tooltip>
-                                        {swapOffer.getSrcToken().name}
+                                        {swapOffer.getSrcToken().symbol}
                                     </StyledAmountAndToken>
                                 </StyledExchangeRate>
                             </StyledBox>
@@ -441,13 +443,13 @@ function SwapOfferDetails({ hash }) {
                                                     <Tooltip title={swap.dstAmountInBaseUnit}>
                                                         <Truncate>{swap.dstAmountInBaseUnit}</Truncate>
                                                     </Tooltip>
-                                                    {swapOffer.dstTokenName}
+                                                    {swapOffer.dstTokenSymbol}
                                                 </StyledTableCell>
                                                 <StyledTableCell>
                                                     <Tooltip title={swap.srcAmountInBaseUnit}>
                                                         <Truncate>{swap.srcAmountInBaseUnit}</Truncate>
                                                     </Tooltip>
-                                                    {swapOffer.getSrcToken().name}
+                                                    {swapOffer.getSrcToken().symbol}
                                                 </StyledTableCell>
                                             </StyledTableRow>
                                         );
@@ -458,13 +460,13 @@ function SwapOfferDetails({ hash }) {
                     </BorderSection>
                 )}
 
-                {swapOffer.readableStatus === 'OPENED' && (swapOffer.dstAddress === ethers.constants.AddressZero || swapOffer.dstAddress === defaultAccount) && swapOffer.srcAddress !== defaultAccount && (
+                {swapOffer.readableStatus === 'OPENED' && (swapOffer.dstAddress === ethers.constants.AddressZero || swapOffer.dstAddress.toLowerCase() === defaultAccount.toLowerCase()) && swapOffer.srcAddress.toLowerCase() !== defaultAccount.toLowerCase() && (
                     <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
                         <PrimaryButton onClick={handleCreateSwapForOffer} buttonText={swapButtonText} />
                     </Grid>
                 )}
 
-                {swapOffer.readableStatus === 'OPENED' && swapOffer.srcAddress === defaultAccount && (
+                {swapOffer.readableStatus === 'OPENED' && swapOffer.srcAddress.toLowerCase() === defaultAccount.toLowerCase() && (
                     <Grid item xs={12} sx={{ padding: '0 16px', marginTop: '20px' }}>
                         <PrimaryButton onClick={handleCancelSwapOffer} buttonText='Cancel' />
                     </Grid>

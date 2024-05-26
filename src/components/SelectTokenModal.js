@@ -9,10 +9,9 @@ import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import styled from '@emotion/styled';
-import { getTokenImageUrl, addCustomToken, getAllTokens } from '../utils/tokens';
+import { getTokenImageUrl, addCustomToken, getAllTokens, getTokenByAddress } from '../utils/tokens';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import networks from '../data/networks';
-
 
 const StyledDialog = styled(Dialog)`
     & .MuiPaper-root {
@@ -53,6 +52,13 @@ const ScrollableListContainer = styled.div`
     overflow-y: auto;
 `;
 
+const CustomAddTokenItem = styled(ListItem)`
+    &:hover {
+        background-color: #224e5d;
+        cursor: pointer;
+    }
+`;
+
 const isValidEthereumAddress = (address) => {
     return /^(0x)?[0-9a-fA-F]{40}$/.test(address);
 };
@@ -61,39 +67,42 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
     const { blockchainUtil } = useWalletConnect();
     const [searchInput, setSearchInput] = useState('');
     const [customToken, setCustomToken] = useState(null);
-    const [filteredTokens, setfilteredTokens] = useState([]);
-
-    useEffect(() => {
-        async function processSearchInput() {
-            try {
-                const tokenName = await blockchainUtil.getTokenSymbol(searchInput);
-                setCustomToken({
-                    'name': tokenName,
-                    'networkSpecificAddress': {
-                        [blockchainUtil.network.uniqueName]: searchInput
-                    }
-                });
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        if (isValidEthereumAddress(searchInput)) {
-            processSearchInput();
-        }
-    }, [searchInput]);
+    const [filteredTokens, setFilteredTokens] = useState([]);
+    const [allTokens, setAllTokens] = useState([]);
 
     useEffect(() => {
         const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
+        const tokens = getAllTokens(selectedNetwork.uniqueName);
+        setAllTokens(tokens);
+        setFilteredTokens(tokens);
+    }, [blockchainUtil]);
 
-        setfilteredTokens(
-                getAllTokens().filter(token =>
-                    token.networkSpecificAddress[selectedNetwork.uniqueName] &&
-                    token !== excludeToken &&
-                    (token.name.includes(searchInput.toUpperCase()) || token.networkSpecificAddress[selectedNetwork.uniqueName].includes(searchInput))
-                )
-            );
-    }, [blockchainUtil, searchInput, excludeToken]);
+    useEffect(() => {
+        const searchInputLowerCase = searchInput.toLowerCase();
+
+        if (isValidEthereumAddress(searchInputLowerCase)) {
+            const knownToken = getTokenByAddress(searchInputLowerCase, blockchainUtil.network.uniqueName);
+
+            if (knownToken) {
+                setFilteredTokens([knownToken]);
+                setCustomToken(null);
+            } else {
+                async function processSearchInput() {
+                    const customToken = await blockchainUtil.getErc20Token(searchInputLowerCase);
+                    setCustomToken(customToken);
+                    setFilteredTokens([]);
+                }
+                processSearchInput();
+            }
+        } else {
+            setCustomToken(null);
+
+            const filtered = allTokens
+                .filter((token) => token.name.toLowerCase().includes(searchInputLowerCase) || token.symbol.toLowerCase().includes(searchInputLowerCase))
+                .filter((token) => token !== excludeToken);
+            setFilteredTokens(filtered);
+        }
+    }, [searchInput, allTokens, excludeToken, blockchainUtil]);
 
     const handleSearchChange = (event) => {
         setSearchInput(event.target.value);
@@ -105,30 +114,33 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
     };
 
     const handleAddTokenClick = () => {
-        addCustomToken(customToken);
-        selectToken(customToken);
+        if (customToken) {
+            addCustomToken(customToken, blockchainUtil.network.uniqueName);
+            setAllTokens(getAllTokens(blockchainUtil.network.uniqueName));
+            selectToken(customToken);
+        }
     };
 
     return (
         <StyledDialog onClose={onClose} open={open}>
             <StyledDialogTitle>{title}</StyledDialogTitle>
-            <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+            <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} value={searchInput} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
             <ScrollableListContainer>
                 <List>
                     {filteredTokens.length > 0 ? (
                         filteredTokens.map((token) => (
-                            <StyledListItem onClick={() => selectToken(token)} key={token.name}>
+                            <StyledListItem onClick={() => selectToken(token)} key={token.address}>
                                 <StyledAvatar src={getTokenImageUrl(token)} />
-                                <ListItemText primary={token.name} />
+                                <ListItemText primary={token.symbol} secondary={token.name} />
                             </StyledListItem>
                         ))
                     ) : customToken ? (
-                        <ListItem>
-                            <IconButton onClick={handleAddTokenClick}>
+                        <CustomAddTokenItem onClick={handleAddTokenClick}>
+                            <IconButton>
                                 <AddIcon />
                             </IconButton>
-                            <ListItemText primary='Add token' />
-                        </ListItem>
+                            <ListItemText primary='Add token' secondary={`${customToken.symbol} - ${customToken.name}`} />
+                        </CustomAddTokenItem>
                     ) : null}
                 </List>
             </ScrollableListContainer>

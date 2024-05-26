@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { TableBody, TableRow, Paper, Tooltip, CircularProgress } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { StyledTableContainer, StyledTable, StyledTableHead, StyledTableRow, StyledTableCell, StyledHeaderTableCell, StyledMessage } from '../sharedStyles/tableStyles';
+import { StyledTableContainer, StyledTable, StyledTableHead, ClicableTableRow, StyledTableCell, StyledHeaderTableCell, StyledMessage } from '../sharedStyles/tableStyles';
 import BorderedSection from './BorderSection';
 import SwapOfferStatusChip from './SwapOfferStatusChip';
 import SwapOffer from '../utils/swapOffer';
@@ -102,11 +102,11 @@ const UserSwapOffersList = ({ activeSwapOffersListTab }) => {
                                         const isSwapOffersForYou = activeSwapOffersListTab === 'swapOffersForYou';
                                         const displaySrcAmount = isSwapOffersForYou ? dstAmount : srcAmount;
                                         const displayDstAmount = isSwapOffersForYou ? srcAmount : dstAmount;
-                                        const displaySrcTokenName = isSwapOffersForYou ? swapOffer.dstTokenName : swapOffer.getSrcToken().name;
-                                        const displayDstTokenName = isSwapOffersForYou ? swapOffer.getSrcToken().name : swapOffer.dstTokenName;
+                                        const displaySrcTokenName = isSwapOffersForYou ? swapOffer.dstTokenSymbol : swapOffer.getSrcToken().symbol;
+                                        const displayDstTokenName = isSwapOffersForYou ? swapOffer.getSrcToken().symbol : swapOffer.dstTokenSymbol;
 
                                         return (
-                                            <StyledTableRow key={index} onClick={() => handleRowClick(swapOffer.hash)}>
+                                            <ClicableTableRow key={index} onClick={() => handleRowClick(swapOffer.hash)}>
                                                 {!isMobile && <StyledTableCell align='right'>{swapOffer.displayCreatedTime}</StyledTableCell>}
                                                 <StyledTableCell align='right'>
                                                     <Tooltip title={displaySrcAmount}>
@@ -126,7 +126,7 @@ const UserSwapOffersList = ({ activeSwapOffersListTab }) => {
                                                 <StyledTableCell>
                                                     <SwapOfferPercentageFilledLabel percentage={swapOffer.filledPercentage} />
                                                 </StyledTableCell>
-                                            </StyledTableRow>
+                                            </ClicableTableRow>
                                         );
                                     })
                                 )}

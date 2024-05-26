@@ -41,8 +41,8 @@ function SwapOfferDetailsTokenInfo({ token, tokenUrl, amount, labelText }) {
                 <StyledAmountGrid item xs={9}>
                     {token && <StyledAmountTypography>{amount}</StyledAmountTypography>}
                     {token && (
-                        <Link href={tokenUrl} target='_blank' rel='noopener noreferrer' style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <StyledTokenLinkName>{token.name.toUpperCase()}</StyledTokenLinkName>
+                        <Link href={tokenUrl} target='_blank' rel='noopener noreferrer' style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}>
+                            <StyledTokenLinkName>{token.symbol}</StyledTokenLinkName>
                         </Link>
                     )}
                 </StyledAmountGrid>

@@ -204,7 +204,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                     <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
                         {Object.values(getSupportedNetworks()).map((network) => {
                             return (
-                                <SelectNetworkButton key={blockchainUtil?.network.uniqueName} onClick={() => handleNetworkSelect(network)}>
+                                <SelectNetworkButton key={network.uniqueName} onClick={() => handleNetworkSelect(network)}>
                                     <NetworkIcon src={network.logo} alt={`${network.uniqueName} icon`} />
                                     {network.uniqueName}
                                 </SelectNetworkButton>
