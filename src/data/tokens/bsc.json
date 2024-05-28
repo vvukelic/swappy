@@ -8,18 +8,26 @@
     "tokens": [
         {
             "chainId": 56,
-            "address": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
-            "name": "Binance Bridged USDC (BNB Smart Chain)",
-            "symbol": "USDC",
-            "logoURI": "https://assets.coingecko.com/coins/images/35220/large/USDC.jpg?1707919050",
-            "decimals": 18
-        },
-        {
-            "chainId": 56,
             "address": "0x55d398326f99059ff775485246999027b3197955",
             "name": "Tether USD",
             "symbol": "USDT",
             "logoURI": "https://assets.coingecko.com/coins/images/35021/large/USDT.png?1707233575",
+            "decimals": 18
+        },
+        {
+            "chainId": 56,
+            "address": "0x0000000000000000000000000000000000000000",
+            "name": "BNB",
+            "symbol": "BNB",
+            "logoURI": "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1644979850",
+            "decimals": 18
+        },
+        {
+            "chainId": 56,
+            "address": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+            "name": "Binance Bridged USDC (BNB Smart Chain)",
+            "symbol": "USDC",
+            "logoURI": "https://assets.coingecko.com/coins/images/35220/large/USDC.jpg?1707919050",
             "decimals": 18
         },
         {
@@ -35,14 +43,6 @@
             "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
             "name": "Wrapped BNB",
             "symbol": "WBNB",
-            "logoURI": "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1644979850",
-            "decimals": 18
-        },
-        {
-            "chainId": 56,
-            "address": "0x0000000000000000000000000000000000000000",
-            "name": "BNB",
-            "symbol": "BNB",
             "logoURI": "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1644979850",
             "decimals": 18
         },

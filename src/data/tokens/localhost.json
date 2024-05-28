@@ -2088,6 +2088,14 @@
         },
         {
             "chainId": 31337,
+            "address": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0",
+            "name": "Polygon Matic",
+            "symbol": "MATIC",
+            "decimals": 18,
+            "logoURI": "https://assets.polygon.technology/tokenAssets/matic.svg"
+        },
+        {
+            "chainId": 31337,
             "address": "0xe25bcec5d3801ce3a794079bf94adf1b8ccd802d",
             "name": "MATRIX AI Network",
             "symbol": "MAN",
