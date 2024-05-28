@@ -10,6 +10,14 @@
         },
         {
             "chainId": 137,
+            "name": "Matic",
+            "symbol": "MATIC",
+            "decimals": 18,
+            "address": "0x0000000000000000000000000000000000000000",
+            "logoURI": "https://assets.polygon.technology/tokenAssets/matic.svg"
+        },
+        {
+            "chainId": 137,
             "address": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
             "name": "Wrapped Matic",
             "symbol": "WMATIC",
@@ -31,14 +39,6 @@
             "symbol": "WBTC",
             "logoURI": "https://assets.coingecko.com/coins/images/7598/large/wrapped_bitcoin_wbtc.png?1696507857",
             "decimals": 8
-        },
-        {
-            "chainId": 137,
-            "name": "Matic",
-            "symbol": "MATIC",
-            "decimals": 18,
-            "address": "0x0000000000000000000000000000000000000000",
-            "logoURI": "https://assets.polygon.technology/tokenAssets/matic.svg"
         },
         {
             "chainId": 137,

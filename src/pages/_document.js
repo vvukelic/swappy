@@ -6,6 +6,7 @@ class MyDocument extends Document {
             <Html>
                 <Head>
                     <link rel='icon' href='../images/favicon/favicon.ico' sizes='48x48' />
+                    <title>Swappy</title>
                 </Head>
                 <body>
                     <Main />
