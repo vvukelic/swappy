@@ -75,7 +75,7 @@ const StyledInfoValues = styled(Grid)`
 `;
 
 function SwapOfferDetails({ hash }) {
-    const { defaultAccount, blockchainUtil } = useWalletConnect();
+    const { defaultAccount, blockchainUtil, isAccountConnected } = useWalletConnect();
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const [swapOffer, setSwapOffer] = useState(null);
     const [swapSrcAmount, setSwapSrcAmount] = useState(null);
@@ -289,7 +289,9 @@ function SwapOfferDetails({ hash }) {
     if (!swapOffer) {
         return (
             <MainContentContainer sx={{ width: '100%' }}>
-                <CircularProgress color='inherit' />
+                {isAccountConnected ?
+                    <CircularProgress color='inherit' /> :
+                    <PrimaryButton onClick={handleCreateSwapForOffer} buttonText={swapButtonText} />}
             </MainContentContainer>
         );
     }
