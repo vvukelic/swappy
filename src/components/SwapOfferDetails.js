@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import { useWeb3Modal } from '@web3modal/ethers5/react';
 import { useRouter } from 'next/router';
-import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip, CircularProgress, Link } from '@mui/material';
+import { Grid, Typography, Box, Paper, TableBody, TableRow, Tooltip, CircularProgress } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
-import { networkNames, waitForTxToBeMined } from '../utils/general';
+import { waitForTxToBeMined } from '../utils/general';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
 import BorderSection from './BorderSection';
@@ -86,7 +87,7 @@ function SwapOfferDetails({ hash }) {
     const { addNotification, updateNotification } = useNotification();
     const isMobile = useMediaQuery('(max-width:600px)');
     const router = useRouter();
-
+    const { open } = useWeb3Modal();
 
     useEffect(() => {
         async function alignNetworks() {
@@ -167,7 +168,7 @@ function SwapOfferDetails({ hash }) {
         }
     }, [swapDstAmount]);
 
-    const handleCreateSwapForOffer = async () => {
+    async function handleCreateSwapForOffer() {
         if (tokenApproved) {
             if (swapDstAmount.eq(0)) {
                 setShowInvalidAmountsModal(true);
@@ -247,7 +248,7 @@ function SwapOfferDetails({ hash }) {
         }
     };
 
-    const handleCancelSwapOffer = async () => {
+    async function handleCancelSwapOffer() {
         startTransaction(`Please go to your wallet and confirm the transaction for canceling the swap offer.`);
 
         try {
@@ -286,12 +287,19 @@ function SwapOfferDetails({ hash }) {
         window.location.reload();
     };
 
+    function handleConnectWallet() {
+        open();
+    }
+
     if (!swapOffer) {
         return (
             <MainContentContainer sx={{ width: '100%' }}>
                 {isAccountConnected ?
                     <CircularProgress color='inherit' /> :
-                    <PrimaryButton onClick={handleCreateSwapForOffer} buttonText={swapButtonText} />}
+                    <>
+                        <p>You need to connect your wallet in order to see the swap offer.</p>
+                        <PrimaryButton onClick={handleConnectWallet} buttonText='Connect wallet' />
+                    </>}
             </MainContentContainer>
         );
     }
@@ -406,9 +414,11 @@ function SwapOfferDetails({ hash }) {
                                 <StyledExchangeRate>
                                     <StyledTypography>1 {swapOffer.dstTokenSymbol} =</StyledTypography>
                                     <StyledAmountAndToken>
-                                        <Tooltip title={swapOffer.displayExchangeRateSrcDst}>
-                                            <Truncate>{swapOffer.displayExchangeRateSrcDst}</Truncate>
-                                        </Tooltip>
+                                        <StyledTypography>
+                                            <Tooltip title={swapOffer.displayExchangeRateSrcDst}>
+                                                <Truncate>{swapOffer.displayExchangeRateSrcDst}</Truncate>
+                                            </Tooltip>
+                                        </StyledTypography>
                                         {swapOffer.getSrcToken().symbol}
                                     </StyledAmountAndToken>
                                 </StyledExchangeRate>

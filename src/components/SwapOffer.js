@@ -83,7 +83,6 @@ function SwapOffer({
         const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
 
         if (type === 'src') {
-            // let tokenAddress = token.networkSpecificAddress[selectedNetwork.uniqueName];
             let tokenAddress = token.address;
 
             if (tokenAddress === ethers.constants.AddressZero) {
@@ -260,7 +259,6 @@ function SwapOffer({
             let tokenAddress = selectedSrcToken.address;
 
             if (tokenAddress === ethers.constants.AddressZero) {
-                // tokenAddress = getTokenByAddress(blockchainUtil.network.wrappedNativeCurrencyAddress, blockchainUtil.network.uniqueName).networkSpecificAddress[blockchainUtil.network.uniqueName];
                 tokenAddress = blockchainUtil.network.wrappedNativeCurrencyAddress;
             }
 
