@@ -294,7 +294,7 @@ function SwapOfferDetails({ hash }) {
     if (!swapOffer) {
         return (
             <MainContentContainer sx={{ width: '100%' }}>
-                {isAccountConnected ?
+                {isAccountConnected || !blockchainUtil ?
                     <CircularProgress color='inherit' /> :
                     <>
                         <p>You need to connect your wallet in order to see the swap offer.</p>
