@@ -48,6 +48,6 @@ module.exports = {
         token: 'ETH',
     },
     etherscan: {
-        apiKey: secret["polygonscan_api_key"]
+        apiKey: secret["bscscan_api_key"]
     }
 };
