@@ -127,12 +127,24 @@ export default () => {
                     <TextContainer>
                         <h1>How to use Swappy?</h1>
                         <ul>
-                            <li>Select the token you want to send</li>
-                            <li>Type in the amount you want to send</li>
-                            <li>Select the token you want to receive</li>
-                            <li>Type in the amount you want to receive</li>
-                            <li>Create a swap offer</li>
-                            <li>Send the url of the swap offer to your counterparty</li>
+                            <li>
+                                Select the <BoldText>token</BoldText> you want <BoldText>to send</BoldText>
+                            </li>
+                            <li>
+                                Type in the <BoldText>amount</BoldText> you want <BoldText>to send</BoldText>
+                            </li>
+                            <li>
+                                Select the <BoldText>token</BoldText> you want <BoldText>to receive</BoldText>
+                            </li>
+                            <li>
+                                Type in the <BoldText>amount</BoldText> you want <BoldText>to receive</BoldText>
+                            </li>
+                            <li>
+                                Create a <BoldText>swap offer</BoldText>
+                            </li>
+                            <li>
+                                <BoldText>Send the url of the swap offer</BoldText> to your counterparty
+                            </li>
                         </ul>
                         <PrimaryButton onClick={onDappBtnClick} buttonText='Create a swap offer' />
                     </TextContainer>
@@ -146,10 +158,18 @@ export default () => {
                     <TextContainer>
                         <h1>Why Swappy?</h1>
                         <ul>
-                            <li>Trustless transactions enabled by smart contract technology</li>
-                            <li>Direct P2P trading, cutting out the middleman</li>
-                            <li>Support for partial swap offers, enhancing flexibility</li>
-                            <li>Secure and transparent process with blockchain verification</li>
+                            <li>
+                                <BoldText>Trustless transactions</BoldText> enabled by smart contract technology
+                            </li>
+                            <li>
+                                Direct <BoldText>P2P trading</BoldText>, cutting out the middleman
+                            </li>
+                            <li>
+                                Support for <BoldText>partial swap offers</BoldText>, enhancing flexibility
+                            </li>
+                            <li>
+                                <BoldText>Secure and transparent</BoldText> process with blockchain verification
+                            </li>
                             <li>User-friendly interface for easy trading</li>
                         </ul>
                     </TextContainer>
