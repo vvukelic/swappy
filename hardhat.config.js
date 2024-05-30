@@ -47,4 +47,7 @@ module.exports = {
         coinmarketcap: secret['coinmarketcap_api_key'],
         token: 'ETH',
     },
+    etherscan: {
+        apiKey: secret["polygonscan_api_key"]
+    }
 };
