@@ -124,7 +124,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     const router = useRouter();
     const [showSwapOffersHoverMenu, setShowSwapOffersHoverMenu] = useState(false);
     const [showNetworksHoverMenu, setShowNetworksHoverMenu] = useState(false);
-    const { networkWithoutWallet, setNetworkWithoutWallet } = useNetworkWithoutWallet();
+    const { networkWithoutWallet, setNetworkWithoutWallet } = useNetworkWithoutWallet(getSupportedNetworks()[0]);
     const { open } = useWeb3Modal();
 
     useEffect(() => {
