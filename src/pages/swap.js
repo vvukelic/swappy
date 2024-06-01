@@ -6,6 +6,7 @@ import SwapOffer from '../components/SwapOffer';
 import UserSwapOffersList from '../components/UserSwapOffersList';
 import CompletedSwapsList from '../components/CompletedSwapsList';
 import { getTokenImageUrl } from '../utils/tokens';
+import { NetworkWithoutWalletProvider } from '../context/NetworkWithoutWallet';
 
 
 export default () => {
@@ -41,25 +42,27 @@ export default () => {
     }, [router.query.tab]);
 
     return (
-        <Layout activeTab={activeTab} setActiveTab={setActiveTab} activeSwapOffersListTab={activeSwapOffersListTab} setActiveSwapOffersListTab={setActiveSwapOffersListTab}>
-            {activeTab === 'createSwapOffer' && (
-            <SwapOffer
-                srcAmount={srcAmount} setSrcAmount={setSrcAmount}
-                dstAmount={dstAmount} setDstAmount={setDstAmount}
-                dstAddress={dstAddress} setDstAddress={setDstAddress}
-                selectedSrcToken={selectedSrcToken} setSelectedSrcToken={setSelectedSrcToken}
-                selectedDstToken={selectedDstToken} setSelectedDstToken={setSelectedDstToken}
-                swapOfferButtonText={swapOfferButtonText} setSwapOfferButtonText={setSwapOfferButtonText}
-                tokenApproved={tokenApproved} setTokenApproved={setTokenApproved}
-                expiresInHours={expiresInHours} setExpiresInHours={setExpiresInHours}
-                expiresInMinutes={expiresInMinutes} setExpiresInMinutes={setExpiresInMinutes}
-                expirationEnabled={expirationEnabled} setExpirationEnabled={setExpirationEnabled}
-                partialFillEnabled={partialFillEnabled} setPartialFillEnabled={setPartialFillEnabled}
-                selectedSrcTokenImg={selectedSrcTokenImg}
-                selectedDstTokenImg={selectedDstTokenImg}
-            />)}
-            {activeTab === 'swapOffersList' && <UserSwapOffersList activeSwapOffersListTab={activeSwapOffersListTab} />}
-            {activeTab === 'completedSwapsList' && <CompletedSwapsList />}
-        </Layout>
+        <NetworkWithoutWalletProvider>
+            <Layout activeTab={activeTab} setActiveTab={setActiveTab} activeSwapOffersListTab={activeSwapOffersListTab} setActiveSwapOffersListTab={setActiveSwapOffersListTab}>
+                {activeTab === 'createSwapOffer' && (
+                <SwapOffer
+                    srcAmount={srcAmount} setSrcAmount={setSrcAmount}
+                    dstAmount={dstAmount} setDstAmount={setDstAmount}
+                    dstAddress={dstAddress} setDstAddress={setDstAddress}
+                    selectedSrcToken={selectedSrcToken} setSelectedSrcToken={setSelectedSrcToken}
+                    selectedDstToken={selectedDstToken} setSelectedDstToken={setSelectedDstToken}
+                    swapOfferButtonText={swapOfferButtonText} setSwapOfferButtonText={setSwapOfferButtonText}
+                    tokenApproved={tokenApproved} setTokenApproved={setTokenApproved}
+                    expiresInHours={expiresInHours} setExpiresInHours={setExpiresInHours}
+                    expiresInMinutes={expiresInMinutes} setExpiresInMinutes={setExpiresInMinutes}
+                    expirationEnabled={expirationEnabled} setExpirationEnabled={setExpirationEnabled}
+                    partialFillEnabled={partialFillEnabled} setPartialFillEnabled={setPartialFillEnabled}
+                    selectedSrcTokenImg={selectedSrcTokenImg}
+                    selectedDstTokenImg={selectedDstTokenImg}
+                />)}
+                {activeTab === 'swapOffersList' && <UserSwapOffersList activeSwapOffersListTab={activeSwapOffersListTab} />}
+                {activeTab === 'completedSwapsList' && <CompletedSwapsList />}
+            </Layout>
+        </NetworkWithoutWalletProvider>
     );
 };

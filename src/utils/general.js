@@ -17,7 +17,7 @@ export async function waitForTxToBeMined(tx) {
 }
 
 export const networkNames = {
-    development: ['localhost', 'sepolia', 'ethereum', 'polygon', 'bsc'],
+    development: ['ethereum', 'polygon', 'bsc', 'localhost', 'sepolia'],
     production: ['ethereum', 'polygon', 'bsc'],
 };
 

@@ -11,7 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import styled from '@emotion/styled';
 import { getTokenImageUrl, addCustomToken, getAllTokens, getTokenByAddress } from '../utils/tokens';
 import { useWalletConnect } from '../hooks/useWalletConnect';
-import networks from '../data/networks';
+import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
 
 const StyledDialog = styled(Dialog)`
     & .MuiPaper-root {
@@ -69,13 +69,14 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
     const [customToken, setCustomToken] = useState(null);
     const [filteredTokens, setFilteredTokens] = useState([]);
     const [allTokens, setAllTokens] = useState([]);
+    const { networkWithoutWallet } = useNetworkWithoutWallet();
 
     useEffect(() => {
-        const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
+        const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networkWithoutWallet;
         const tokens = getAllTokens(selectedNetwork.uniqueName);
         setAllTokens(tokens);
         setFilteredTokens(tokens);
-    }, [blockchainUtil]);
+    }, [blockchainUtil, networkWithoutWallet]);
 
     useEffect(() => {
         const searchInputLowerCase = searchInput.toLowerCase();
