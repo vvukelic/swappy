@@ -16,7 +16,7 @@ import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getSupportedNetworks } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
-import networks from '../data/networks';
+import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
 
 
 const StyledToolbar = styled(Toolbar)`
@@ -124,6 +124,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     const router = useRouter();
     const [showSwapOffersHoverMenu, setShowSwapOffersHoverMenu] = useState(false);
     const [showNetworksHoverMenu, setShowNetworksHoverMenu] = useState(false);
+    const { networkWithoutWallet, setNetworkWithoutWallet } = useNetworkWithoutWallet();
     const { open } = useWeb3Modal();
 
     useEffect(() => {
@@ -191,27 +192,26 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     const SelectNetworkButtonWithMenu = () => {
         const handleNetworkSelect = async (network) => {
             await blockchainUtil?.switchNetwork(network);
+            setNetworkWithoutWallet(network);
             setShowNetworksHoverMenu(false);
         };
 
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
-                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={blockchainUtil?.network ? blockchainUtil.network.color : networks.ethereum.color}>
-                    <img src={blockchainUtil?.network ? blockchainUtil.network.logo : networks.ethereum.logo} alt='' className='network-icon' />
-                    {blockchainUtil?.network ? blockchainUtil.network.uniqueName : networks.ethereum.uniqueName}
+                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={blockchainUtil?.network ? blockchainUtil.network.color : networkWithoutWallet.color}>
+                    <img src={blockchainUtil?.network ? blockchainUtil.network.logo : networkWithoutWallet.logo} alt='' className='network-icon' />
+                    {blockchainUtil?.network ? blockchainUtil.network.uniqueName : networkWithoutWallet.uniqueName}
                 </NetworkButton>
-                {isAccountConnected && (
-                    <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
-                        {Object.values(getSupportedNetworks()).map((network) => {
-                            return (
-                                <SelectNetworkButton key={network.uniqueName} onClick={() => handleNetworkSelect(network)}>
-                                    <NetworkIcon src={network.logo} alt={`${network.uniqueName} icon`} />
-                                    {network.uniqueName}
-                                </SelectNetworkButton>
-                            );
-                        })}
-                    </StyledHoverMenu>
-                )}
+                <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
+                    {Object.values(getSupportedNetworks()).map((network) => {
+                        return (
+                            <SelectNetworkButton key={network.uniqueName} onClick={() => handleNetworkSelect(network)}>
+                                <NetworkIcon src={network.logo} alt={`${network.uniqueName} icon`} />
+                                {network.uniqueName}
+                            </SelectNetworkButton>
+                        );
+                    })}
+                </StyledHoverMenu>
             </RelativePositionContainer>
         );
     };

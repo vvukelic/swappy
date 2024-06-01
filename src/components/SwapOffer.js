@@ -16,7 +16,7 @@ import InfoModal from './InfoModal';
 import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import { useNotification } from './NotificationProvider';
-import networks from '../data/networks';
+import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
 
 
 const StyledSwitch = styled(Switch)`
@@ -67,6 +67,7 @@ function SwapOffer({
     const [wrappedTokenModalMsg, setWrappedTokenModalMsg] = useState('');
     const [showWrappedTokenModal, setShowWrappedTokenModal] = useState(false);
     const [showInvalidAmountsModal, setShowInvalidAmountsModal] = useState(false);
+    const { networkWithoutWallet } = useNetworkWithoutWallet();
     const { open } = useWeb3Modal();
 
     const openModal = (type) => {
@@ -80,7 +81,7 @@ function SwapOffer({
     };
 
     const handleTokenSelection = async (token, type) => {
-        const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networks.ethereum;
+        const selectedNetwork = blockchainUtil?.network ? blockchainUtil.network : networkWithoutWallet;
 
         if (type === 'src') {
             let tokenAddress = token.address;
@@ -111,10 +112,10 @@ function SwapOffer({
             handleTokenSelection(getAllTokens(blockchainUtil.network.uniqueName)[0], 'src');
             handleTokenSelection(getAllTokens(blockchainUtil.network.uniqueName)[1], 'dst');
         } else {
-            handleTokenSelection(getAllTokens('ethereum')[0], 'src');
-            handleTokenSelection(getAllTokens('ethereum')[1], 'dst');
+            handleTokenSelection(getAllTokens(networkWithoutWallet.uniqueName)[0], 'src');
+            handleTokenSelection(getAllTokens(networkWithoutWallet.uniqueName)[1], 'dst');
         }
-    }, [blockchainUtil, defaultAccount]);
+    }, [blockchainUtil, defaultAccount, networkWithoutWallet]);
 
     useEffect(() => {
         let active = true;
