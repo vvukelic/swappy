@@ -22,10 +22,6 @@ function CompletedSwapsList() {
 
     useEffect(() => {
         const fetchUserCompletedSwapsList = async () => {
-            if (!blockchainUtil || !contractAddresses[blockchainUtil.network.uniqueName]) {
-                return;
-            }
-
             const swapOffersTakenByUserHashes = new Set(await blockchainUtil.getSwapOffersTakenByUser(defaultAccount));
             const swaps = [];
 
@@ -79,8 +75,10 @@ function CompletedSwapsList() {
             setLoadingSwaps(false);
         };
 
-        setLoadingSwaps(true);
-        fetchUserCompletedSwapsList();
+        if (blockchainUtil) {
+            setLoadingSwaps(true);
+            fetchUserCompletedSwapsList();
+        }
     }, [defaultAccount, blockchainUtil]);
 
     const handleRowClick = (swapOfferHash) => {
