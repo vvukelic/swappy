@@ -10,7 +10,7 @@
         },
         {
             "chainId": 137,
-            "name": "Matic",
+            "name": "Polygon",
             "symbol": "MATIC",
             "decimals": 18,
             "address": "0x0000000000000000000000000000000000000000",
@@ -2158,14 +2158,6 @@
             "name": "MASQ",
             "symbol": "MASQ",
             "logoURI": "https://assets.coingecko.com/coins/images/13699/large/masq.png?1696513446",
-            "decimals": 18
-        },
-        {
-            "chainId": 137,
-            "address": "0x0000000000000000000000000000000000001010",
-            "name": "Polygon",
-            "symbol": "MATIC",
-            "logoURI": "https://assets.coingecko.com/coins/images/4713/large/polygon.png?1698233745",
             "decimals": 18
         },
         {
