@@ -17,7 +17,6 @@ import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getSupportedNetworks } from '../utils/general';
 import PrimaryButton from './PrimaryButton';
 import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
-import networks from '../data/networks';
 
 
 const StyledToolbar = styled(Toolbar)`
@@ -125,7 +124,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     const router = useRouter();
     const [showSwapOffersHoverMenu, setShowSwapOffersHoverMenu] = useState(false);
     const [showNetworksHoverMenu, setShowNetworksHoverMenu] = useState(false);
-    const { networkWithoutWallet, setNetworkWithoutWallet } = useNetworkWithoutWallet(networks['ethereum']);
+    const { networkWithoutWallet, setNetworkWithoutWallet } = useNetworkWithoutWallet();
     const { open } = useWeb3Modal();
 
     useEffect(() => {
@@ -197,11 +196,13 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             setShowNetworksHoverMenu(false);
         };
 
+        const currentNetwork = blockchainUtil?.network ? blockchainUtil.network : networkWithoutWallet;
+
         return (
             <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
-                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={blockchainUtil?.network ? blockchainUtil.network.color : networkWithoutWallet.color}>
-                    <img src={blockchainUtil?.network ? blockchainUtil.network.logo : networkWithoutWallet.logo} alt='' className='network-icon' />
-                    {blockchainUtil?.network ? blockchainUtil.network.uniqueName : networkWithoutWallet.uniqueName}
+                <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={currentNetwork?.color || 'black'}>
+                    <img src={currentNetwork?.logo} alt='' className='network-icon' />
+                    {currentNetwork?.uniqueName}
                 </NetworkButton>
                 <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
                     {Object.values(getSupportedNetworks()).map((network) => {
