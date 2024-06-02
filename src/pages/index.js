@@ -5,7 +5,6 @@ import { Card, CardMedia, Box, AppBar, Toolbar } from '@mui/material';
 import PrimaryButton from '../components/PrimaryButton';
 import { BackgroundBox, FooterContainer } from '../sharedStyles/general';
 
-
 const ContentContainer = styled.div`
     display: flex;
     align-items: center;
@@ -73,7 +72,7 @@ const BoldText = styled.span`
     font-weight: bold;
 `;
 
-export default () => {
+export default function HomePage() {
     const isMobile = useMediaQuery('(max-width:600px)');
 
     function onDappBtnClick() {
@@ -183,4 +182,10 @@ export default () => {
             <FooterContainer>© 2024 Swappy</FooterContainer>
         </>
     );
-};
+}
+
+export async function getStaticProps() {
+    return {
+        props: {},
+    };
+}
