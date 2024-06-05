@@ -109,8 +109,13 @@ function SwapOffer({
 
     useEffect(() => {
         if (blockchainUtil?.network) {
-            handleTokenSelection(getAllTokens(blockchainUtil.network.uniqueName)[0], 'src');
-            handleTokenSelection(getAllTokens(blockchainUtil.network.uniqueName)[1], 'dst');
+            if (selectedSrcToken?.chainId !== blockchainUtil.network.chainId) {
+                handleTokenSelection(getAllTokens(blockchainUtil.network.uniqueName)[0], 'src');
+            }
+
+            if (selectedDstToken?.chainId !== blockchainUtil.network.chainId) {
+                handleTokenSelection(getAllTokens(blockchainUtil.network.uniqueName)[1], 'dst');
+            }
         } else {
             handleTokenSelection(getAllTokens(networkWithoutWallet.uniqueName)[0], 'src');
             handleTokenSelection(getAllTokens(networkWithoutWallet.uniqueName)[1], 'dst');
