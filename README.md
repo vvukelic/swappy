@@ -1,14 +1,14 @@
 # Swappy - Decentralized Swap Protocol
 
-Swappy is a decentralized swap protocol built on Ethereum, Polygon, and Binance Smart Chain. It allows users to create and manage token swap offers with flexible parameters and automatic fee calculations. The project is open source and is built around two main smart contracts: `SwappyData` and `SwappyManager`.
+https://swappy-fi.com
+
+Swappy is a decentralized swap protocol built on Ethereum, Polygon, and Binance Smart Chain. It allows users to create and manage token swap offers with flexible parameters. The project is open source and is built around two main smart contracts: `SwappyData` and `SwappyManager`.
 
 ## Features
 
 - **Decentralized Token Swaps**: Swap tokens on EVM blockchains with customizable offers ideal for OTC peer-2-peer trading.
 - **Flexible Swap Offers**: Create swap offers with specific parameters including partial fills, expiration times, and destination addresses (for private swaps).
 - **Fee Management**: Automatic fee calculation based on real-time prices using Chainlink price feeds. Fee is as low as $1 depending on the chain paid by the swap taker. Fee is represented and paid in the native token.
-
-https://swappy-fi.com
 
 ## Usage
 
