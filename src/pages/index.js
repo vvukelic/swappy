@@ -127,13 +127,13 @@ export default function HomePage() {
                         <h1>How to use Swappy?</h1>
                         <ul>
                             <li>
-                                Select the <BoldText>token</BoldText> you want <BoldText>to send</BoldText>
+                                Select a <BoldText>token</BoldText> you want <BoldText>to send</BoldText>
                             </li>
                             <li>
                                 Type in the <BoldText>amount</BoldText> you want <BoldText>to send</BoldText>
                             </li>
                             <li>
-                                Select the <BoldText>token</BoldText> you want <BoldText>to receive</BoldText>
+                                Select a <BoldText>token</BoldText> you want <BoldText>to receive</BoldText>
                             </li>
                             <li>
                                 Type in the <BoldText>amount</BoldText> you want <BoldText>to receive</BoldText>
