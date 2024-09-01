@@ -109,7 +109,7 @@ export default function HomePage() {
                     <TextContainer>
                         <h1>What is Swappy?</h1>
                         <p>
-                            Swappy is a platform facilitating decentralized, <BoldText>peer-to-peer (P2P)</BoldText> swaps, offering users a trustless environment for <BoldText>over-the-counter (OTC)</BoldText> trading.
+                            Swappy is a platform for decentralized, <BoldText>peer-to-peer (P2P)</BoldText> swaps, offering users a trustless environment for <BoldText>over-the-counter (OTC)</BoldText> trading.
                         </p>
                         <PrimaryButton onClick={onDappBtnClick} buttonText='Try it out' />
                     </TextContainer>

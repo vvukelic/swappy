@@ -14,6 +14,21 @@ const networks = {
         wrappedNativeCurrencyAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
         blockExplorerUrls: ['https://etherscan.io'],
     },
+    optimism: {
+        chainId: 10,
+        chainName: 'OP Mainnet',
+        uniqueName: 'optimism',
+        rpcUrls: ['https://mainnet.optimism.io'],
+        nativeCurrency: {
+            name: 'Ether',
+            symbol: 'ETH',
+            decimals: 18,
+        },
+        wrappedNativeCurrencyAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
+        color: '#d1031b',
+        logo: '/images/optimism-logo.svg',
+        blockExplorerUrls: ['https://optimistic.etherscan.io'],
+    },
     polygon: {
         chainId: 0x89,
         chainName: 'Polygon Mainnet',
