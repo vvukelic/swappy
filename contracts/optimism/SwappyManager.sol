@@ -14,7 +14,7 @@ contract SwappyManager is AccessControl, ReentrancyGuard {
     IWETH constant private _weth = IWETH(_wethAddress);
     address payable public _feeAddress;
     AggregatorV3Interface private _priceFeed;
-    uint256 private _feeAmountInCents = 200;
+    uint256 private _feeAmountInCents = 100;
 
     constructor(address dataContractAddress, address payable feeAddress) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
