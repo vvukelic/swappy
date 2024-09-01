@@ -25,6 +25,12 @@ module.exports = {
                 mnemonic: secret['wallet_mnemonic'],
             },
         },
+        optimism: {
+            url: secret['optimism_url'],
+            accounts: {
+                mnemonic: secret['wallet_mnemonic'],
+            },
+        },
         polygon: {
             url: secret['polygon_url'],
             accounts: {
@@ -48,6 +54,6 @@ module.exports = {
         token: 'ETH',
     },
     etherscan: {
-        apiKey: secret["bscscan_api_key"]
-    }
+        apiKey: secret['optimistic_etherscan_api_key'],
+    },
 };

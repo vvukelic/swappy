@@ -17,8 +17,8 @@ export async function waitForTxToBeMined(tx) {
 }
 
 export const networkNames = {
-    development: ['ethereum', 'polygon', 'bsc', 'localhost', 'sepolia'],
-    production: ['ethereum', 'polygon', 'bsc'],
+    development: ['ethereum', 'optimism', 'polygon', 'bsc', 'localhost', 'sepolia'],
+    production: ['ethereum', 'optimism', 'polygon', 'bsc'],
 };
 
 const environment = process.env.NODE_ENV || 'production';

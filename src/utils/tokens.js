@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 
 import ethereumTokens from '../data/tokens/ethereum.json';
+import optimismTokens from '../data/tokens/optimism.json';
 import polygonTokens from '../data/tokens/polygon.json';
 import bscTokens from '../data/tokens/bsc.json';
 import sepoliaTokens from '../data/tokens/sepolia.json';
@@ -76,6 +77,8 @@ const saveCustomTokensList = (list, networkName) => {
 function getCommonTokensList(networkName) {
     if (networkName === 'ethereum') {
         return ethereumTokens.tokens;
+    } else if (networkName === 'optimism') {
+        return optimismTokens.tokens;
     } else if (networkName === 'polygon') {
         return polygonTokens.tokens;
     } else if (networkName === 'bsc') {
