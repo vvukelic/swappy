@@ -2,7 +2,7 @@
 
 https://swappy-fi.com
 
-Swappy is a decentralized swap protocol built on Ethereum, Optimism, Polygon, and Binance Smart Chain. It allows users to create and manage token swap offers with flexible parameters. The project is open source and is built around two main smart contracts: `SwappyData` and `SwappyManager`.
+Swappy is a decentralized swap protocol built on Ethereum, Optimism, Arbitrum One, Polygon, and Binance Smart Chain. It allows users to create and manage token swap offers with flexible parameters. The project is open source and is built around two main smart contracts: `SwappyData` and `SwappyManager`.
 
 ## Features
 

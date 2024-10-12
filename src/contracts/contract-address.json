@@ -22,5 +22,9 @@
   "optimism": {
     "SwappyData": "0x3EC0465705b4C0b5cB8E90072Bc586ADc2347123",
     "SwappyManager": "0x469e5912a4472d49B43C1b34B0685693acc1CA29"
+  },
+  "arbitrum": {
+    "SwappyData": "0x3EC0465705b4C0b5cB8E90072Bc586ADc2347123",
+    "SwappyManager": "0x469e5912a4472d49B43C1b34B0685693acc1CA29"
   }
 }

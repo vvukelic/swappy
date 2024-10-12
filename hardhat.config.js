@@ -31,6 +31,12 @@ module.exports = {
                 mnemonic: secret['wallet_mnemonic'],
             },
         },
+        arbitrum: {
+            url: secret['arbitrum_url'],
+            accounts: {
+                mnemonic: secret['wallet_mnemonic'],
+            },
+        },
         polygon: {
             url: secret['polygon_url'],
             accounts: {
@@ -54,6 +60,6 @@ module.exports = {
         token: 'ETH',
     },
     etherscan: {
-        apiKey: secret['optimistic_etherscan_api_key'],
+        apiKey: secret['arbiscan_api_key'],
     },
 };

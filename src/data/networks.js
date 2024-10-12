@@ -29,6 +29,21 @@ const networks = {
         logo: '/images/optimism-logo.svg',
         blockExplorerUrls: ['https://optimistic.etherscan.io'],
     },
+    arbitrum: {
+        chainId: 42161,
+        chainName: 'Arbitrum One',
+        uniqueName: 'arbitrum',
+        rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+        nativeCurrency: {
+            name: 'Ether',
+            symbol: 'ETH',
+            decimals: 18,
+        },
+        wrappedNativeCurrencyAddress: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
+        color: '#007bdd',
+        logo: '/images/arbitrum-logo.svg',
+        blockExplorerUrls: ['https://explorer.arbitrum.io'],
+    },
     polygon: {
         chainId: 0x89,
         chainName: 'Polygon Mainnet',
