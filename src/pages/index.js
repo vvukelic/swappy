@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Card, CardMedia, Box, AppBar, Toolbar } from '@mui/material';
+import Button from '@mui/material/Button';
 import PrimaryButton from '../components/PrimaryButton';
+import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
 import { BackgroundBox, FooterContainer } from '../sharedStyles/general';
 
 const ContentContainer = styled.div`
@@ -72,12 +76,36 @@ const BoldText = styled.span`
     font-weight: bold;
 `;
 
+const StyledNavButton = styled(Button)`
+    margin-left: 10px;
+    color: white;
+    background-color: transparent;
+    border: 1px solid transparent;
+
+    &:hover {
+        background-color: #396777;
+        border-color: #ffffff;
+    }
+`;
+
 export default function HomePage() {
     const isMobile = useMediaQuery('(max-width:600px)');
+    const [drawerOpen, setDrawerOpen] = useState(false);
 
     function onDappBtnClick() {
         window.location.href = '/swap';
     }
+
+    const HeaderItems = () => (
+        <>
+            <a href='/Swappy whitepaper.pdf' target="_blank" rel="noopener noreferrer">
+                <StyledNavButton>Whitepaper</StyledNavButton>
+            </a>
+            {/* <StyledNavButton>Community</StyledNavButton> */}
+            <Box sx={{ flexGrow: 1 }} />
+            <PrimaryButton onClick={onDappBtnClick} buttonText='Launch app' />
+        </>
+    );
 
     return (
         <>
@@ -99,8 +127,21 @@ export default function HomePage() {
                                 image='/images/swappy_logo.png'
                             />
                         </Card>
-                        <Box sx={{ flexGrow: 1 }} />
-                        <PrimaryButton onClick={onDappBtnClick} buttonText='Launch app' />
+                        {isMobile ? (
+                            <>
+                                <Box flexGrow={1} />
+                                <IconButton edge='start' color='inherit' aria-label='menu' onClick={() => setDrawerOpen(true)}>
+                                    <MenuIcon />
+                                </IconButton>
+                                <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{ '& .MuiPaper-root': { backgroundColor: '#1B3A47' } }}>
+                                    <Box sx={{ width: 250, padding: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        <HeaderItems />
+                                    </Box>
+                                </Drawer>
+                            </>
+                        ) : (
+                            <HeaderItems />
+                        )}
                     </Toolbar>
                 </AppBar>
             </Box>
