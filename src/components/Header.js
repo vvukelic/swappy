@@ -15,6 +15,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getSupportedNetworks } from '../utils/general';
+import { RelativePositionContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
 import PrimaryButton from './PrimaryButton';
 import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
 
@@ -27,47 +28,6 @@ const StyledToolbar = styled(Toolbar)`
     }
 `;
 
-const RelativePositionContainer = styled.div`
-    position: relative;
-    display: grid;
-`;
-
-const StyledTabButton = styled(({ isActive, ...props }) => <Button {...props} />)`
-    margin-left: 10px;
-    color: white;
-    background-color: ${(props) => (props.isActive ? '#396777' : 'transparent')};
-    border: 1px solid transparent;
-
-    &:hover {
-        background-color: ${(props) => (props.isActive ? '#396777' : '#396777')};
-        border-color: #ffffff;
-    }
-`;
-
-const StyledTabMenuButton = styled(StyledTabButton)`
-    margin-left: 0;
-`;
-
-const StyledHoverMenu = styled(Box)`
-    position: absolute;
-    width: ${(props) => props.width};
-    background-color: #1b3a47;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    padding: 10px;
-    display: ${(props) => (props.show ? 'flex' : 'none')};
-    flex-direction: column;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-
-    @media (max-width: 900px) {
-        position: static;
-        transform: none;
-        left: 0;
-        width: auto;
-    }
-`;
 const NetworkButton = styled(({ bgColor, ...props }) => <Button {...props} />)`
     color: white;
     background-color: ${(props) => props.bgColor || 'transparent'};
@@ -90,7 +50,6 @@ const NetworkButton = styled(({ bgColor, ...props }) => <Button {...props} />)`
         margin-right: 10px;
     }
 `;
-
 
 const SelectNetworkButton = styled(StyledTabButton)`
     display: flex;
@@ -178,14 +137,14 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             <StyledTabButton isActive={activeTab === 'swapOffersList'} onClick={handleSwapOffersListClick}>
                 Swap Offers
             </StyledTabButton>
-            <StyledHoverMenu show={showSwapOffersHoverMenu} width='170px'>
-                <StyledTabMenuButton isActive={activeSwapOffersListTab === 'yourSwapOffers'} onClick={() => handleSwapOffersListTabClick('yourSwapOffers')}>
+            <DropdownHoverMenu show={showSwapOffersHoverMenu} width='170px'>
+                <DropdownHoverMenuButton isActive={activeSwapOffersListTab === 'yourSwapOffers'} onClick={() => handleSwapOffersListTabClick('yourSwapOffers')}>
                     Your Swap Offers
-                </StyledTabMenuButton>
-                <StyledTabMenuButton isActive={activeSwapOffersListTab === 'swapOffersForYou'} onClick={() => handleSwapOffersListTabClick('swapOffersForYou')}>
+                </DropdownHoverMenuButton>
+                <DropdownHoverMenuButton isActive={activeSwapOffersListTab === 'swapOffersForYou'} onClick={() => handleSwapOffersListTabClick('swapOffersForYou')}>
                     Swap Offers for You
-                </StyledTabMenuButton>
-            </StyledHoverMenu>
+                </DropdownHoverMenuButton>
+            </DropdownHoverMenu>
         </RelativePositionContainer>
     );
 
@@ -204,7 +163,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                     <img src={currentNetwork?.logo} alt='' className='network-icon' />
                     {currentNetwork?.uniqueName}
                 </NetworkButton>
-                <StyledHoverMenu show={showNetworksHoverMenu} width='240px'>
+                <DropdownHoverMenu show={showNetworksHoverMenu} width='240px'>
                     {Object.values(getSupportedNetworks()).map((network) => {
                         return (
                             <SelectNetworkButton key={network.uniqueName} onClick={() => handleNetworkSelect(network)}>
@@ -213,7 +172,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                             </SelectNetworkButton>
                         );
                     })}
-                </StyledHoverMenu>
+                </DropdownHoverMenu>
             </RelativePositionContainer>
         );
     };

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { Box, Typography, Link } from '@mui/material';
+import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 
 
@@ -78,5 +79,47 @@ export const StyledLink = styled(Link)`
     &:hover {
         text-decoration: underline;
         cursor: pointer;
+    }
+`;
+
+export const RelativePositionContainer = styled.div`
+    position: relative;
+    display: grid;
+`;
+
+export const StyledTabButton = styled(({ isActive, ...props }) => <Button {...props} />)`
+    margin-left: 10px;
+    color: white;
+    background-color: ${(props) => (props.isActive ? '#396777' : 'transparent')};
+    border: 1px solid transparent;
+
+    &:hover {
+        background-color: ${(props) => (props.isActive ? '#396777' : '#396777')};
+        border-color: #ffffff;
+    }
+`;
+
+export const DropdownHoverMenuButton = styled(StyledTabButton)`
+    margin-left: 0;
+`;
+
+export const DropdownHoverMenu = styled(Box)`
+    position: absolute;
+    width: ${(props) => props.width};
+    background-color: #1b3a47;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 10px;
+    display: ${(props) => (props.show ? 'flex' : 'none')};
+    flex-direction: column;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    @media (max-width: 900px) {
+        position: static;
+        transform: none;
+        left: 0;
+        width: auto;
     }
 `;

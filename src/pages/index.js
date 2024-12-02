@@ -7,7 +7,7 @@ import PrimaryButton from '../components/PrimaryButton';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import { BackgroundBox, FooterContainer } from '../sharedStyles/general';
+import { BackgroundBox, FooterContainer, RelativePositionContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
 
 const ContentContainer = styled.div`
     display: flex;
@@ -91,6 +91,7 @@ const StyledNavButton = styled(Button)`
 export default function HomePage() {
     const isMobile = useMediaQuery('(max-width:600px)');
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [showDevelopmentHoverMenu, setShowDevelopmentHoverMenu] = useState(false);
 
     function onDappBtnClick() {
         window.location.href = '/swap';
@@ -98,9 +99,19 @@ export default function HomePage() {
 
     const HeaderItems = () => (
         <>
-            <a href='/Swappy whitepaper.pdf' target="_blank" rel="noopener noreferrer">
-                <StyledNavButton>Whitepaper</StyledNavButton>
-            </a>
+            <RelativePositionContainer onMouseEnter={() => setShowDevelopmentHoverMenu(true)} onMouseLeave={() => setShowDevelopmentHoverMenu(false)}>
+                <StyledTabButton isActive={false}>
+                    Development
+                </StyledTabButton>
+                <DropdownHoverMenu show={showDevelopmentHoverMenu} width='170px'>
+                    <DropdownHoverMenuButton isActive={false} onClick={() => window.open('/Swappy whitepaper.pdf', '_blank', 'noopener,noreferrer')}>
+                        Whitepaper
+                    </DropdownHoverMenuButton>
+                    <DropdownHoverMenuButton isActive={false} onClick={() => window.open('https://github.com/vvukelic/swappy', '_blank', 'noopener,noreferrer')}>
+                        Github
+                    </DropdownHoverMenuButton>
+                </DropdownHoverMenu>
+            </RelativePositionContainer>
             {/* <StyledNavButton>Community</StyledNavButton> */}
             <Box sx={{ flexGrow: 1 }} />
             <PrimaryButton onClick={onDappBtnClick} buttonText='Launch app' />
