@@ -92,6 +92,7 @@ export default function HomePage() {
     const isMobile = useMediaQuery('(max-width:600px)');
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [showDevelopmentHoverMenu, setShowDevelopmentHoverMenu] = useState(false);
+    const [showSocialHoverMenu, setShowSocialHoverMenu] = useState(false);
 
     function onDappBtnClick() {
         window.location.href = '/swap';
@@ -112,7 +113,16 @@ export default function HomePage() {
                     </DropdownHoverMenuButton>
                 </DropdownHoverMenu>
             </RelativePositionContainer>
-            {/* <StyledNavButton>Community</StyledNavButton> */}
+            <RelativePositionContainer onMouseEnter={() => setShowSocialHoverMenu(true)} onMouseLeave={() => setShowSocialHoverMenu(false)}>
+                <StyledTabButton isActive={false}>
+                    Social
+                </StyledTabButton>
+                <DropdownHoverMenu show={showSocialHoverMenu} width='170px'>
+                    <DropdownHoverMenuButton isActive={false} onClick={() => window.open('https://x.com/swappy_fi', '_blank', 'noopener,noreferrer')}>
+                        X
+                    </DropdownHoverMenuButton>
+                </DropdownHoverMenu>
+            </RelativePositionContainer>
             <Box sx={{ flexGrow: 1 }} />
             <PrimaryButton onClick={onDappBtnClick} buttonText='Launch app' />
         </>
