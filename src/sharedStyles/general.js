@@ -106,7 +106,7 @@ export const DropdownHoverMenuButton = styled(StyledTabButton)`
 export const DropdownHoverMenu = styled(Box)`
     position: absolute;
     width: ${(props) => props.width};
-    background-color: #1b3a47;
+    background-color: #0f2934;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     padding: 10px;

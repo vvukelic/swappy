@@ -76,7 +76,7 @@ const StyledInfoValues = styled(Grid)`
 `;
 
 function SwapOfferDetails({ hash }) {
-    const { defaultAccount, blockchainUtil, isAccountConnected } = useWalletConnect();
+    const { defaultAccount, blockchainUtil } = useWalletConnect();
     const { txModalOpen, setTxModalOpen, txStatus, txStatusTxt, txErrorTxt, startTransaction, endTransaction } = useTransactionModal();
     const [swapOffer, setSwapOffer] = useState(null);
     const [swapSrcAmount, setSwapSrcAmount] = useState(null);
@@ -294,12 +294,10 @@ function SwapOfferDetails({ hash }) {
     if (!swapOffer) {
         return (
             <MainContentContainer sx={{ width: '100%' }}>
-                {isAccountConnected || !blockchainUtil ?
-                    <CircularProgress color='inherit' /> :
                     <>
                         <p>You need to connect your wallet in order to see the swap offer.</p>
                         <PrimaryButton onClick={handleConnectWallet} buttonText='Connect wallet' />
-                    </>}
+                    </>
             </MainContentContainer>
         );
     }
