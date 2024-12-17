@@ -7,6 +7,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import styled from '@emotion/styled';
+import { QRCode } from 'react-qrcode-logo';
 import { waitForTxToBeMined } from '../utils/general';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import MainContentContainer from './MainContentContainer';
@@ -423,6 +424,21 @@ function SwapOfferDetails({ hash }) {
                             </StyledBox>
                         </StyledInfoValues>
                     </Grid>
+                    <Box sx={{ borderTop: 1, borderColor: 'divider', paddingTop: '8px', marginBottom: '8px', marginTop: '8px', display: 'flex', alignItems: 'center' }}>
+                        <Grid item xs={12} textAlign='center'>
+                        <QRCode
+                            value={window.location.href}
+                            ecLevel='M'
+                            logoImage='/images/swappy_logo.png'
+                            logoWidth='50'
+                            removeQrCodeBehindLogo={true}
+                            logoPaddingStyle='circle'
+                            fgColor='#2e6f85'
+                            qrStyle='fluid'
+                            style={{ borderRadius: '8px' }}
+                        />
+                        </Grid>
+                    </Box>
                 </BorderSection>
 
                 <Grid item sx={{ height: '22px' }} />
