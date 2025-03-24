@@ -188,7 +188,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
             </StyledTabButton>
             <Box flexGrow={1} />
             {isMobile && <Box sx={{ borderTop: 1, color: 'white' }} />}
-            {isAccountConnected ? <SelectNetworkButtonWithMenu /> : null}
+            <SelectNetworkButtonWithMenu />
             {isAccountConnected ? <w3m-button /> : <PrimaryButton onClick={() => open()} buttonText='Connect wallet' />}
         </>
     );
