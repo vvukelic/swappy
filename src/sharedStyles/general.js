@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { Box, Typography, Link } from '@mui/material';
+import { Box, Typography, Link, CardMedia, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 
@@ -17,7 +17,7 @@ export const Truncate = React.forwardRef((props, ref) => <TruncateBase ref={ref}
 
 export const BackgroundBox = styled(Box)`
     min-height: calc(100vh - 100px);
-    background: linear-gradient(to bottom, #1b3a47, #45bbd6);
+    background: linear-gradient(to bottom, #1b2b47, #456ed6);
     padding-top: 3em;
 
     @media (max-width: 600px) {
@@ -25,8 +25,18 @@ export const BackgroundBox = styled(Box)`
     }
 `;
 
+export const SwappyHome = styled(CardMedia)`
+    width: 95px;
+    height: 70px;
+    background-color: transparent;
+
+    &:hover {
+        cursor: pointer !important;
+    }
+`;
+
 export const ModalContent = styled.div`
-    background-color: #358a9f;
+    background-color: #2f50a1;
     padding: 20px;
     border-radius: 10px;
     outline: none;
@@ -55,7 +65,7 @@ export const ModalTitle = styled(Typography)`
 export const FooterContainer = styled(Box)`
     width: 100%;
     padding: 1em 0;
-    background-color: #1b3a47;
+    background-color: #1b2a47;
     color: white;
     text-align: center;
     font-size: 0.9em;
@@ -123,3 +133,25 @@ export const DropdownHoverMenu = styled(Box)`
         width: auto;
     }
 `;
+
+export const textFieldColor = '#7698ea';
+export const StyledTextField = styled(TextField)({
+    '& label': {
+      color: textFieldColor,
+    },
+    '& label.Mui-focused': {
+      color: textFieldColor,
+    },
+    '& .MuiOutlinedInput-root': {
+      color: 'white', // text color
+      '& fieldset': {
+        borderColor: textFieldColor,
+      },
+      '&:hover fieldset': {
+        borderColor: textFieldColor,
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: textFieldColor,
+      },
+    },
+  });

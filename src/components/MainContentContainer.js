@@ -8,8 +8,9 @@ const StyledGrid = styled(Grid)`
     text-align: center;
     margin: auto;
     border-radius: 8px;
+    border: #7698ea solid 1px;
     padding: 2em 0.5em;
-    background-color: #358a9f;
+    background-color: #2f50a1;
     color: white;
 
     @media (max-width: 600px) {

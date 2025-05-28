@@ -7,7 +7,7 @@ import PrimaryButton from '../components/PrimaryButton';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import { BackgroundBox, FooterContainer, RelativePositionContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
+import { BackgroundBox, SwappyHome, FooterContainer, RelativePositionContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
 
 const ContentContainer = styled.div`
     display: flex;
@@ -44,7 +44,7 @@ const TextContainer = styled.div`
     font-size: 1.3em;
 
     p {
-        margin-bottom: 3em;
+        margin-bottom: 1em;
     }
 
     ul {
@@ -66,6 +66,10 @@ const ImageContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-left: 100px;
+    padding-right: 100px;
+    justify-content: space-between;
+    margin-bottom: 1.5em;
 
     @media (max-width: 768px) {
         margin-top: 2em;
@@ -132,21 +136,15 @@ export default function HomePage() {
         <>
             <Box sx={{ flexGrow: 1, padding: 0, margin: 0 }}>
                 <AppBar position='sticky' elevation={0} component='nav'>
-                    <Toolbar sx={{ backgroundColor: '#1B3A47' }}>
+                    <Toolbar sx={{ backgroundColor: '#1b2a47' }}>
                         <Card
                             sx={{
                                 backgroundColor: 'transparent',
                                 boxShadow: 'none',
+                                padding: '0.5em',
                             }}
                         >
-                            <CardMedia
-                                sx={{
-                                    width: '100px',
-                                    height: '100px',
-                                    backgroundColor: 'transparent',
-                                }}
-                                image='/images/swappy_logo.png'
-                            />
+                            <SwappyHome image='/images/swappy-head-1.svg' />
                         </Card>
                         {isMobile ? (
                             <>
@@ -154,7 +152,7 @@ export default function HomePage() {
                                 <IconButton edge='start' color='inherit' aria-label='menu' onClick={() => setDrawerOpen(true)}>
                                     <MenuIcon />
                                 </IconButton>
-                                <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{ '& .MuiPaper-root': { backgroundColor: '#1B3A47' } }}>
+                                <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{ '& .MuiPaper-root': { backgroundColor: '#1b2a47' } }}>
                                     <Box sx={{ width: 250, padding: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                         <HeaderItems />
                                     </Box>
@@ -168,22 +166,24 @@ export default function HomePage() {
             </Box>
             <FrontpageBackgroundBox>
                 <ContentContainer>
-                    <TextContainer>
-                        <h1>What is Swappy?</h1>
+                    <TextContainer style={{ textAlign: 'center' }}>
+                        <h1>Welcome to Swappy!</h1>
                         <p>
                             Swappy is a platform for decentralized, <BoldText>peer-to-peer (P2P)</BoldText> swaps, offering users a trustless environment for <BoldText>over-the-counter (OTC)</BoldText> trading.
                         </p>
+                        <ImageContainer>
+                            <img src='/images/eth-logo.svg' alt='Eth logo' style={{ width: '50px', height: 'auto' }} />
+                            <img src='/images/optimism-logo.svg' alt='Optimism logo' style={{ width: '50px', height: 'auto' }} />
+                            <img src='/images/arbitrum-logo.svg' alt='Arbitrum logo' style={{ width: '50px', height: 'auto' }} />
+                            <img src='/images/matic-logo.svg' alt='Matic logo' style={{ width: '50px', height: 'auto' }} />
+                            <img src='/images/bnb-logo.svg' alt='Bnb logo' style={{ width: '50px', height: 'auto' }} />
+                        </ImageContainer>
                         <PrimaryButton onClick={onDappBtnClick} buttonText='Try it out' />
                     </TextContainer>
-                    {!isMobile && (
-                        <ImageContainer>
-                            <img src='/images/swappy_logo.png' alt='Descriptive Alt Text' style={{ maxWidth: '100%', height: 'auto' }} />
-                        </ImageContainer>
-                    )}
                 </ContentContainer>
                 <ContentContainer>
                     <ImageContainer>
-                        <img src='/images/example.png' alt='Descriptive Alt Text' style={{ maxWidth: '100%', height: 'auto' }} />
+                        <img src='/images/example.png' alt='Example' style={{ maxWidth: '100%', height: 'auto' }} />
                     </ImageContainer>
                     <TextContainer>
                         <h1>How to use Swappy?</h1>
@@ -213,7 +213,7 @@ export default function HomePage() {
                 <ContentContainer>
                     {isMobile && (
                         <ImageContainer>
-                            <img src='/images/swappy_thinking.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
+                            <img src='/images/swappy_playing.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
                         </ImageContainer>
                     )}
                     <TextContainer>
@@ -236,12 +236,12 @@ export default function HomePage() {
                     </TextContainer>
                     {!isMobile && (
                         <ImageContainer>
-                            <img src='/images/swappy_thinking.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
+                            <img src='/images/swappy_playing.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
                         </ImageContainer>
                     )}
                 </ContentContainer>
             </FrontpageBackgroundBox>
-            <FooterContainer>© 2024 Swappy</FooterContainer>
+            <FooterContainer>© 2025 Swappy</FooterContainer>
         </>
     );
 }

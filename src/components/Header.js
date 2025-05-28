@@ -15,13 +15,13 @@ import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getSupportedNetworks } from '../utils/general';
-import { RelativePositionContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
+import { RelativePositionContainer, SwappyHome, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
 import PrimaryButton from './PrimaryButton';
 import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
 
 
 const StyledToolbar = styled(Toolbar)`
-    background-color: #1b3a47;
+    background-color: #1b2a47;
     justify-content: center;
     @media (max-width: 900px) {
         justify-content: space-between;
@@ -63,16 +63,6 @@ const NetworkIcon = styled.img`
     width: 30px;
     height: 30px;
     margin-right: 10px;
-`;
-
-const SwappyHome = styled(CardMedia)`
-    width: 100px;
-    height: 100px;
-    background-color: transparent;
-
-    &:hover {
-        cursor: pointer !important;
-    }
 `;
 
 function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
@@ -202,9 +192,10 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                             sx={{
                                 backgroundColor: 'transparent',
                                 boxShadow: 'none',
+                                padding: '0.5em',
                             }}
                         >
-                            <SwappyHome image='/images/swappy_logo.png' />
+                            <SwappyHome image='/images/swappy-head-1.svg' />
                         </Card>
                     </Link>
                     {isMobile ? (
@@ -213,7 +204,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                             <IconButton edge='start' color='inherit' aria-label='menu' onClick={() => setDrawerOpen(true)}>
                                 <MenuIcon />
                             </IconButton>
-                            <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{ '& .MuiPaper-root': { backgroundColor: '#1B3A47' } }}>
+                            <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{ '& .MuiPaper-root': { backgroundColor: '#1b2a47' } }}>
                                 <Box sx={{ width: 250, padding: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                     <CommonHeaderItems />
                                 </Box>

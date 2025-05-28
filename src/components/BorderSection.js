@@ -6,9 +6,9 @@ const MainContainer = styled.div`
     flex-direction: column;
     width: -webkit-fill-available;
 
-    border-left: 1px solid #286676;
-    border-bottom: 1px solid #286676;
-    border-right: 1px solid #286676;
+    border-left: 1px solid #7698ea;
+    border-bottom: 1px solid #7698ea;
+    border-right: 1px solid #7698ea;
     border-radius: 5px;
     margin-left: 1em;
     margin-right: 1em;
@@ -21,7 +21,7 @@ const Header = styled.div`
 `;
 
 const HeaderBorderBefore = styled.div`
-    border-top: 1px solid #286676;
+    border-top: 1px solid #7698ea;
     width: 1em;
     border-top-left-radius: 5px;
 `;
@@ -43,7 +43,7 @@ const HeaderTitle = styled.div`
 `;
 
 const HeaderBorderAfter = styled.div`
-    border-top: 1px solid #286676;
+    border-top: 1px solid #7698ea;
     width: 1em;
     flex-grow: 2;
     border-top-right-radius: 5px;

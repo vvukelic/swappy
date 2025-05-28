@@ -4,7 +4,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import { Avatar, TextField } from '@mui/material';
+import { Avatar, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
@@ -12,17 +12,21 @@ import styled from '@emotion/styled';
 import { getTokenImageUrl, addCustomToken, getAllTokens, getTokenByAddress } from '../utils/tokens';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
+import { StyledTextField, textFieldColor } from '../sharedStyles/general';
+
 
 const StyledDialog = styled(Dialog)`
     & .MuiPaper-root {
         color: white;
-        background-color: #358a9f;
+        background-color: #2f50a1;
         min-width: 300px;
+        border: #7698ea solid 1px;
     }
 `;
 
 const StyledDialogTitle = styled(DialogTitle)`
     text-align: center;
+    padding-bottom: 0;
 `;
 
 const StyledAvatar = styled(Avatar)`
@@ -38,13 +42,18 @@ const StyledListItem = styled(ListItem)`
     }
 `;
 
-const StyledTextField = styled(TextField)`
+const InputTokenTextField = styled(StyledTextField)`
     width: 275px;
-    margin: 0 auto;
+    margin: 1em auto;
 
     & .MuiFormControl-root {
         padding: 0 0.7em;
     }
+`;
+
+const TitleGroupDiv = styled.div`
+    border-bottom: ${textFieldColor} solid 1px;
+    text-align: center;
 `;
 
 const ScrollableListContainer = styled.div`
@@ -57,6 +66,10 @@ const CustomAddTokenItem = styled(ListItem)`
         background-color: #224e5d;
         cursor: pointer;
     }
+`;
+
+const SecondaryTokenName = styled(Typography)`
+    color: ${textFieldColor};
 `;
 
 const isValidEthereumAddress = (address) => {
@@ -124,15 +137,21 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
 
     return (
         <StyledDialog onClose={onClose} open={open}>
-            <StyledDialogTitle>{title}</StyledDialogTitle>
-            <StyledTextField variant='outlined' label='Search by name or input address' onChange={handleSearchChange} value={searchInput} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+            <TitleGroupDiv>
+                <StyledDialogTitle>{title}</StyledDialogTitle>
+                <InputTokenTextField variant='outlined' label='Search by name or contract address' onChange={handleSearchChange} value={searchInput} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+            </TitleGroupDiv>
+            
             <ScrollableListContainer>
                 <List>
                     {filteredTokens.length > 0 ? (
                         filteredTokens.map((token) => (
                             <StyledListItem onClick={() => selectToken(token)} key={token.address}>
                                 <StyledAvatar src={getTokenImageUrl(token)} />
-                                <ListItemText primary={token.symbol} secondary={token.name} />
+                                <ListItemText 
+                                    primary={token.symbol}
+                                    secondary={<SecondaryTokenName>{token.name}</SecondaryTokenName>} 
+                                />
                             </StyledListItem>
                         ))
                     ) : customToken ? (

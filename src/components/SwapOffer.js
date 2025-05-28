@@ -17,6 +17,7 @@ import useTransactionModal from '../hooks/useTransactionModal';
 import TransactionStatusModal from './TransactionStatusModal';
 import { useNotification } from './NotificationProvider';
 import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
+import { StyledTextField } from '../sharedStyles/general';
 
 
 const StyledSwitch = styled(Switch)`
@@ -391,7 +392,7 @@ function SwapOffer({
                         />
                     </Grid>
                     <Grid item xs={3} sm={4}>
-                        <TextField
+                        <StyledTextField
                             label='Hours'
                             variant='outlined'
                             type='number'
@@ -404,7 +405,7 @@ function SwapOffer({
                         />
                     </Grid>
                     <Grid item xs={3} sm={4}>
-                        <TextField 
+                        <StyledTextField 
                             label='Minutes'
                             variant='outlined'
                             type='number'
@@ -419,7 +420,7 @@ function SwapOffer({
                 </Grid>
 
                 <Grid item xs={12} sx={{ color: 'white', padding: '0 16px' }}>
-                    <TextField
+                    <StyledTextField
                         label='Destination Address (Optional)'
                         variant='outlined'
                         onChange={(e) => setDstAddress(e.target.value)}
