@@ -7,7 +7,8 @@ import PrimaryButton from '../components/PrimaryButton';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import { BackgroundBox, SwappyHome, FooterContainer, RelativePositionContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
+import { BackgroundBox, SwappyHome, FooterContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
+import DropdownElement from '../components/DropdownElement';
 
 const ContentContainer = styled.div`
     display: flex;
@@ -104,7 +105,7 @@ export default function HomePage() {
 
     const HeaderItems = () => (
         <>
-            <RelativePositionContainer onMouseEnter={() => setShowDevelopmentHoverMenu(true)} onMouseLeave={() => setShowDevelopmentHoverMenu(false)}>
+            <DropdownElement setShowHoverMenu={setShowDevelopmentHoverMenu}>
                 <StyledTabButton isActive={false}>
                     Development
                 </StyledTabButton>
@@ -116,8 +117,8 @@ export default function HomePage() {
                         Github
                     </DropdownHoverMenuButton>
                 </DropdownHoverMenu>
-            </RelativePositionContainer>
-            <RelativePositionContainer onMouseEnter={() => setShowSocialHoverMenu(true)} onMouseLeave={() => setShowSocialHoverMenu(false)}>
+            </DropdownElement>
+            <DropdownElement setShowHoverMenu={setShowSocialHoverMenu}>
                 <StyledTabButton isActive={false}>
                     Social
                 </StyledTabButton>
@@ -126,7 +127,7 @@ export default function HomePage() {
                         X / Twitter
                     </DropdownHoverMenuButton>
                 </DropdownHoverMenu>
-            </RelativePositionContainer>
+            </DropdownElement>
             <Box sx={{ flexGrow: 1 }} />
             <PrimaryButton onClick={onDappBtnClick} buttonText='Launch app' />
         </>

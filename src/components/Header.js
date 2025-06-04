@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ethers } from 'ethers';
@@ -15,9 +15,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getSupportedNetworks } from '../utils/general';
-import { RelativePositionContainer, SwappyHome, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
+import { SwappyHome, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
 import PrimaryButton from './PrimaryButton';
 import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
+import DropdownElement from './DropdownElement';
 
 
 const StyledToolbar = styled(Toolbar)`
@@ -75,7 +76,6 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     const [showNetworksHoverMenu, setShowNetworksHoverMenu] = useState(false);
     const { networkWithoutWallet, setNetworkWithoutWallet } = useNetworkWithoutWallet();
     const { open } = useWeb3Modal();
-    const leaveTimeoutRef = useRef(null);
 
     useEffect(() => {
         const fetchBalance = async () => {
@@ -123,21 +123,8 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
         }
     };
 
-    const handleMouseEnter = () => {
-        if (leaveTimeoutRef.current) {
-            clearTimeout(leaveTimeoutRef.current);
-        }
-        setShowSwapOffersHoverMenu(true);
-    };
-
-    const handleMouseLeave = () => {
-        leaveTimeoutRef.current = setTimeout(() => {
-            setShowSwapOffersHoverMenu(false);
-        }, 2000); // 2 seconds delay
-    };
-
     const SwapOffersListsButtonWithMenu = () => (
-        <RelativePositionContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <DropdownElement setShowHoverMenu={setShowSwapOffersHoverMenu}>
             <StyledTabButton isActive={activeTab === 'swapOffersList'} onClick={handleSwapOffersListClick}>
                 Swap Offers
             </StyledTabButton>
@@ -149,7 +136,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                     Swap Offers for You
                 </DropdownHoverMenuButton>
             </DropdownHoverMenu>
-        </RelativePositionContainer>
+        </DropdownElement>
     );
 
     const SelectNetworkButtonWithMenu = () => {
@@ -162,7 +149,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
         const currentNetwork = blockchainUtil?.network ? blockchainUtil.network : networkWithoutWallet;
 
         return (
-            <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
+            <DropdownElement setShowHoverMenu={setShowNetworksHoverMenu}>
                 <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={currentNetwork?.color || 'black'}>
                     <img src={currentNetwork?.logo} alt='' className='network-icon' />
                     {currentNetwork?.uniqueName}
@@ -177,7 +164,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                         );
                     })}
                 </DropdownHoverMenu>
-            </RelativePositionContainer>
+            </DropdownElement>
         );
     };
 

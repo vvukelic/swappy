@@ -92,11 +92,6 @@ export const StyledLink = styled(Link)`
     }
 `;
 
-export const RelativePositionContainer = styled.div`
-    position: relative;
-    display: grid;
-`;
-
 const activeButtonColor = '#3050a1';
 
 export const StyledTabButton = styled(({ isActive, ...props }) => <Button {...props} />)`
