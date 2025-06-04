@@ -97,14 +97,16 @@ export const RelativePositionContainer = styled.div`
     display: grid;
 `;
 
+const activeButtonColor = '#3050a1';
+
 export const StyledTabButton = styled(({ isActive, ...props }) => <Button {...props} />)`
     margin-left: 10px;
     color: white;
-    background-color: ${(props) => (props.isActive ? '#396777' : 'transparent')};
+    background-color: ${(props) => (props.isActive ? activeButtonColor : 'transparent')};
     border: 1px solid transparent;
 
     &:hover {
-        background-color: ${(props) => (props.isActive ? '#396777' : '#396777')};
+        background-color: ${(props) => (props.isActive ? activeButtonColor : activeButtonColor)};
         border-color: #ffffff;
     }
 `;
@@ -116,7 +118,7 @@ export const DropdownHoverMenuButton = styled(StyledTabButton)`
 export const DropdownHoverMenu = styled(Box)`
     position: absolute;
     width: ${(props) => props.width};
-    background-color: #0f2934;
+    background-color: #355ab8;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     padding: 10px;
@@ -125,6 +127,8 @@ export const DropdownHoverMenu = styled(Box)`
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
+    margin-top: 0.5em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.75);
 
     @media (max-width: 900px) {
         position: static;

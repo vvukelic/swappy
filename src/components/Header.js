@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ethers } from 'ethers';
@@ -7,7 +7,7 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
-import { Card, CardMedia } from '@mui/material';
+import { Card } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -75,6 +75,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     const [showNetworksHoverMenu, setShowNetworksHoverMenu] = useState(false);
     const { networkWithoutWallet, setNetworkWithoutWallet } = useNetworkWithoutWallet();
     const { open } = useWeb3Modal();
+    const leaveTimeoutRef = useRef(null);
 
     useEffect(() => {
         const fetchBalance = async () => {
@@ -122,8 +123,21 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
         }
     };
 
+    const handleMouseEnter = () => {
+        if (leaveTimeoutRef.current) {
+            clearTimeout(leaveTimeoutRef.current);
+        }
+        setShowSwapOffersHoverMenu(true);
+    };
+
+    const handleMouseLeave = () => {
+        leaveTimeoutRef.current = setTimeout(() => {
+            setShowSwapOffersHoverMenu(false);
+        }, 2000); // 2 seconds delay
+    };
+
     const SwapOffersListsButtonWithMenu = () => (
-        <RelativePositionContainer onMouseEnter={() => setShowSwapOffersHoverMenu(true)} onMouseLeave={() => setShowSwapOffersHoverMenu(false)}>
+        <RelativePositionContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
             <StyledTabButton isActive={activeTab === 'swapOffersList'} onClick={handleSwapOffersListClick}>
                 Swap Offers
             </StyledTabButton>

@@ -19,7 +19,7 @@ const StyledButton = styled(Button)`
     border-bottom-left-radius: 4px;
 
     &:hover {
-        background-color: #224e5d;
+        background-color: #284175;
     }
 
     @media (max-width: 600px) {

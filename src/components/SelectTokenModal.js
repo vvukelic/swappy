@@ -37,7 +37,7 @@ const StyledAvatar = styled(Avatar)`
 
 const StyledListItem = styled(ListItem)`
     &:hover {
-        background-color: #224e5d;
+        background-color: #284175;
         cursor: pointer;
     }
 `;

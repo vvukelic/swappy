@@ -123,7 +123,7 @@ export default function HomePage() {
                 </StyledTabButton>
                 <DropdownHoverMenu show={showSocialHoverMenu} width='170px'>
                     <DropdownHoverMenuButton isActive={false} onClick={() => window.open('https://x.com/swappy_fi', '_blank', 'noopener,noreferrer')}>
-                        X
+                        X / Twitter
                     </DropdownHoverMenuButton>
                 </DropdownHoverMenu>
             </RelativePositionContainer>

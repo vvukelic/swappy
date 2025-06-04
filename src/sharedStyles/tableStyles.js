@@ -19,16 +19,16 @@ export const StyledTableHead = styled(TableHead)`
 
 export const StyledTableRow = styled(TableRow)`
     &:nth-of-type(odd) {
-        background-color: #328094;
+        background-color: #456ed6;
     }
     &:nth-of-type(even) {
-        background-color: #358a9e;
+        background-color: #3f64b1;
     }
 `;
 
 export const ClicableTableRow = styled(StyledTableRow)`
     &:hover {
-        background-color: #235666;
+        background-color: #284175;
         cursor: pointer;
     }
 `;
