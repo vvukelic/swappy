@@ -8,7 +8,7 @@ const StyledGrid = styled(Grid)`
     text-align: center;
     margin: auto;
     border-radius: 8px;
-    border: #7698ea solid 1px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.75);
     padding: 2em 0.5em;
     background-color: #2f50a1;
     color: white;

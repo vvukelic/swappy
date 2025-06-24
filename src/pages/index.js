@@ -10,6 +10,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { BackgroundBox, SwappyHome, FooterContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
 import DropdownElement from '../components/DropdownElement';
 
+
+const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
+
 const ContentContainer = styled.div`
     display: flex;
     align-items: center;
@@ -136,7 +139,7 @@ export default function HomePage() {
     return (
         <>
             <Box sx={{ flexGrow: 1, padding: 0, margin: 0 }}>
-                <AppBar position='sticky' elevation={0} component='nav'>
+                <AppBar position='fixed' elevation={0} component='nav'>
                     <Toolbar sx={{ backgroundColor: '#1b2a47' }}>
                         <Card
                             sx={{
@@ -164,6 +167,7 @@ export default function HomePage() {
                         )}
                     </Toolbar>
                 </AppBar>
+                <Offset />
             </Box>
             <FrontpageBackgroundBox>
                 <ContentContainer>
@@ -182,7 +186,7 @@ export default function HomePage() {
                         <PrimaryButton onClick={onDappBtnClick} buttonText='Try it out' />
                     </TextContainer>
                 </ContentContainer>
-                <ContentContainer>
+                {/* <ContentContainer>
                     <ImageContainer>
                         <img src='/images/example.png' alt='Example' style={{ maxWidth: '100%', height: 'auto' }} />
                     </ImageContainer>
@@ -240,7 +244,7 @@ export default function HomePage() {
                             <img src='/images/swappy_playing.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
                         </ImageContainer>
                     )}
-                </ContentContainer>
+                </ContentContainer> */}
             </FrontpageBackgroundBox>
             <FooterContainer>© 2025 Swappy</FooterContainer>
         </>

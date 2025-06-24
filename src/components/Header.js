@@ -21,6 +21,8 @@ import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
 import DropdownElement from './DropdownElement';
 
 
+const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
+
 const StyledToolbar = styled(Toolbar)`
     background-color: #1b2a47;
     justify-content: center;
@@ -186,7 +188,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
 
     return (
         <Box sx={{ flexGrow: 1, padding: 0, margin: 0 }}>
-            <AppBar position='sticky' elevation={0} component='nav'>
+            <AppBar position='fixed' elevation={0} component='nav'>
                 <StyledToolbar>
                     <Link href='/' passHref>
                         <Card
@@ -216,6 +218,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                     )}
                 </StyledToolbar>
             </AppBar>
+            <Offset />
         </Box>
     );
 }

@@ -16,7 +16,7 @@ const TruncateBase = styled.div`
 export const Truncate = React.forwardRef((props, ref) => <TruncateBase ref={ref} {...props} />);
 
 export const BackgroundBox = styled(Box)`
-    min-height: calc(100vh - 100px);
+    min-height: 100vh;
     background: linear-gradient(to bottom, #1b2b47, #456ed6);
     padding-top: 3em;
 
@@ -114,7 +114,6 @@ export const DropdownHoverMenu = styled(Box)`
     position: absolute;
     width: ${(props) => props.width};
     background-color: #355ab8;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     padding: 10px;
     display: ${(props) => (props.show ? 'flex' : 'none')};

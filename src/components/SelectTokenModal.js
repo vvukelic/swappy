@@ -20,7 +20,7 @@ const StyledDialog = styled(Dialog)`
         color: white;
         background-color: #2f50a1;
         min-width: 300px;
-        border: #7698ea solid 1px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.75);
     }
 `;
 
@@ -139,7 +139,7 @@ function SelectTokenModal({ open, onClose, handleTokenSelection, title, excludeT
         <StyledDialog onClose={onClose} open={open}>
             <TitleGroupDiv>
                 <StyledDialogTitle>{title}</StyledDialogTitle>
-                <InputTokenTextField variant='outlined' label='Search by name or contract address' onChange={handleSearchChange} value={searchInput} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
+                <InputTokenTextField variant='outlined' label='Token name or contract address' onChange={handleSearchChange} value={searchInput} fullWidth InputLabelProps={{ style: { color: 'white' } }} inputProps={{ style: { color: 'white' } }} />
             </TitleGroupDiv>
             
             <ScrollableListContainer>
