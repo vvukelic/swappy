@@ -429,13 +429,13 @@ function SwapOfferDetails({ hash }) {
                         <QRCode
                             value={window.location.href}
                             ecLevel='M'
-                            logoImage='/images/swappy_logo.png'
+                            logoImage='/images/swappy-head-square.svg'
                             logoWidth='50'
                             removeQrCodeBehindLogo={true}
                             logoPaddingStyle='circle'
-                            fgColor='#2e6f85'
+                            fgColor='#20449e'
                             qrStyle='fluid'
-                            style={{ borderRadius: '8px' }}
+                            style={{ borderRadius: '4px' }}
                         />
                         </Grid>
                     </Box>

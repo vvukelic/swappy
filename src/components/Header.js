@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ethers } from 'ethers';
@@ -7,7 +7,7 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
-import { Card, CardMedia } from '@mui/material';
+import { Card } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -15,13 +15,16 @@ import MenuIcon from '@mui/icons-material/Menu';
 import styled from '@emotion/styled';
 import { useWalletConnect } from '../hooks/useWalletConnect';
 import { getSupportedNetworks } from '../utils/general';
-import { RelativePositionContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
+import { SwappyHome, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
 import PrimaryButton from './PrimaryButton';
 import { useNetworkWithoutWallet } from '../context/NetworkWithoutWallet';
+import DropdownElement from './DropdownElement';
 
+
+const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
 const StyledToolbar = styled(Toolbar)`
-    background-color: #1b3a47;
+    background-color: #1b2a47;
     justify-content: center;
     @media (max-width: 900px) {
         justify-content: space-between;
@@ -63,16 +66,6 @@ const NetworkIcon = styled.img`
     width: 30px;
     height: 30px;
     margin-right: 10px;
-`;
-
-const SwappyHome = styled(CardMedia)`
-    width: 100px;
-    height: 100px;
-    background-color: transparent;
-
-    &:hover {
-        cursor: pointer !important;
-    }
 `;
 
 function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwapOffersListTab }) {
@@ -133,7 +126,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
     };
 
     const SwapOffersListsButtonWithMenu = () => (
-        <RelativePositionContainer onMouseEnter={() => setShowSwapOffersHoverMenu(true)} onMouseLeave={() => setShowSwapOffersHoverMenu(false)}>
+        <DropdownElement setShowHoverMenu={setShowSwapOffersHoverMenu}>
             <StyledTabButton isActive={activeTab === 'swapOffersList'} onClick={handleSwapOffersListClick}>
                 Swap Offers
             </StyledTabButton>
@@ -145,7 +138,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                     Swap Offers for You
                 </DropdownHoverMenuButton>
             </DropdownHoverMenu>
-        </RelativePositionContainer>
+        </DropdownElement>
     );
 
     const SelectNetworkButtonWithMenu = () => {
@@ -158,7 +151,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
         const currentNetwork = blockchainUtil?.network ? blockchainUtil.network : networkWithoutWallet;
 
         return (
-            <RelativePositionContainer onMouseEnter={() => setShowNetworksHoverMenu(true)} onMouseLeave={() => setShowNetworksHoverMenu(false)}>
+            <DropdownElement setShowHoverMenu={setShowNetworksHoverMenu}>
                 <NetworkButton onClick={() => setShowNetworksHoverMenu(!showNetworksHoverMenu)} bgColor={currentNetwork?.color || 'black'}>
                     <img src={currentNetwork?.logo} alt='' className='network-icon' />
                     {currentNetwork?.uniqueName}
@@ -173,7 +166,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                         );
                     })}
                 </DropdownHoverMenu>
-            </RelativePositionContainer>
+            </DropdownElement>
         );
     };
 
@@ -195,16 +188,17 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
 
     return (
         <Box sx={{ flexGrow: 1, padding: 0, margin: 0 }}>
-            <AppBar position='sticky' elevation={0} component='nav'>
+            <AppBar position='fixed' elevation={0} component='nav'>
                 <StyledToolbar>
                     <Link href='/' passHref>
                         <Card
                             sx={{
                                 backgroundColor: 'transparent',
                                 boxShadow: 'none',
+                                padding: '0.5em',
                             }}
                         >
-                            <SwappyHome image='/images/swappy_logo.png' />
+                            <SwappyHome image='/images/swappy-head-1.svg' />
                         </Card>
                     </Link>
                     {isMobile ? (
@@ -213,7 +207,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                             <IconButton edge='start' color='inherit' aria-label='menu' onClick={() => setDrawerOpen(true)}>
                                 <MenuIcon />
                             </IconButton>
-                            <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{ '& .MuiPaper-root': { backgroundColor: '#1B3A47' } }}>
+                            <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{ '& .MuiPaper-root': { backgroundColor: '#1b2a47' } }}>
                                 <Box sx={{ width: 250, padding: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                     <CommonHeaderItems />
                                 </Box>
@@ -224,6 +218,7 @@ function Header({ activeTab, setActiveTab, activeSwapOffersListTab, setActiveSwa
                     )}
                 </StyledToolbar>
             </AppBar>
+            <Offset />
         </Box>
     );
 }

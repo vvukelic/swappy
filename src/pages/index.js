@@ -7,13 +7,17 @@ import PrimaryButton from '../components/PrimaryButton';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import { BackgroundBox, FooterContainer, RelativePositionContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
+import { BackgroundBox, SwappyHome, FooterContainer, StyledTabButton, DropdownHoverMenu, DropdownHoverMenuButton } from '../sharedStyles/general';
+import DropdownElement from '../components/DropdownElement';
+
+
+const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
 const ContentContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 50px;
+    padding: 0 1em;
     gap: 20px;
     max-width: 1300px;
     max-height: 560px;
@@ -21,8 +25,8 @@ const ContentContainer = styled.div`
 
     @media (max-width: 600px) {
         flex-direction: column;
-        padding: 0 15px;
         max-height: 1120px;
+        width: 100%;
     }
 `;
 
@@ -37,14 +41,14 @@ const FrontpageBackgroundBox = styled(BackgroundBox)`
 
 const TextContainer = styled.div`
     margin-top: 2em;
-    padding: 0 2em;
     flex: 1;
     max-width: 600px;
     color: white;
     font-size: 1.3em;
+    text-align: center;
 
     p {
-        margin-bottom: 3em;
+        margin-bottom: 1em;
     }
 
     ul {
@@ -53,8 +57,7 @@ const TextContainer = styled.div`
 
     @media (max-width: 768px) {
         margin-top: 1em;
-        padding: 0 1em;
-        font-size: 1em;
+        font-size: 1.2em;
         p {
             margin-bottom: 2em;
         }
@@ -66,9 +69,27 @@ const ImageContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-left: 100px;
+    padding-right: 100px;
+    justify-content: space-between;
+    margin-bottom: 1.5em;
+    flex-wrap: wrap;
+
+    img {
+        margin: 10px;
+        max-width: 50px;
+        height: auto;
+    }
 
     @media (max-width: 768px) {
         margin-top: 2em;
+        justify-content: center;
+        padding-left: 50px;
+        padding-right: 50px;
+
+        img {
+            flex: 0 1 30%;
+        }
     }
 `;
 
@@ -100,7 +121,7 @@ export default function HomePage() {
 
     const HeaderItems = () => (
         <>
-            <RelativePositionContainer onMouseEnter={() => setShowDevelopmentHoverMenu(true)} onMouseLeave={() => setShowDevelopmentHoverMenu(false)}>
+            <DropdownElement setShowHoverMenu={setShowDevelopmentHoverMenu}>
                 <StyledTabButton isActive={false}>
                     Development
                 </StyledTabButton>
@@ -112,17 +133,17 @@ export default function HomePage() {
                         Github
                     </DropdownHoverMenuButton>
                 </DropdownHoverMenu>
-            </RelativePositionContainer>
-            <RelativePositionContainer onMouseEnter={() => setShowSocialHoverMenu(true)} onMouseLeave={() => setShowSocialHoverMenu(false)}>
+            </DropdownElement>
+            <DropdownElement setShowHoverMenu={setShowSocialHoverMenu}>
                 <StyledTabButton isActive={false}>
                     Social
                 </StyledTabButton>
                 <DropdownHoverMenu show={showSocialHoverMenu} width='170px'>
                     <DropdownHoverMenuButton isActive={false} onClick={() => window.open('https://x.com/swappy_fi', '_blank', 'noopener,noreferrer')}>
-                        X
+                        X / Twitter
                     </DropdownHoverMenuButton>
                 </DropdownHoverMenu>
-            </RelativePositionContainer>
+            </DropdownElement>
             <Box sx={{ flexGrow: 1 }} />
             <PrimaryButton onClick={onDappBtnClick} buttonText='Launch app' />
         </>
@@ -131,22 +152,16 @@ export default function HomePage() {
     return (
         <>
             <Box sx={{ flexGrow: 1, padding: 0, margin: 0 }}>
-                <AppBar position='sticky' elevation={0} component='nav'>
-                    <Toolbar sx={{ backgroundColor: '#1B3A47' }}>
+                <AppBar position='fixed' elevation={0} component='nav'>
+                    <Toolbar sx={{ backgroundColor: '#1b2a47' }}>
                         <Card
                             sx={{
                                 backgroundColor: 'transparent',
                                 boxShadow: 'none',
+                                padding: '0.5em',
                             }}
                         >
-                            <CardMedia
-                                sx={{
-                                    width: '100px',
-                                    height: '100px',
-                                    backgroundColor: 'transparent',
-                                }}
-                                image='/images/swappy_logo.png'
-                            />
+                            <SwappyHome image='/images/swappy-head-1.svg' />
                         </Card>
                         {isMobile ? (
                             <>
@@ -154,7 +169,7 @@ export default function HomePage() {
                                 <IconButton edge='start' color='inherit' aria-label='menu' onClick={() => setDrawerOpen(true)}>
                                     <MenuIcon />
                                 </IconButton>
-                                <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{ '& .MuiPaper-root': { backgroundColor: '#1B3A47' } }}>
+                                <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{ '& .MuiPaper-root': { backgroundColor: '#1b2a47' } }}>
                                     <Box sx={{ width: 250, padding: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                         <HeaderItems />
                                     </Box>
@@ -165,25 +180,28 @@ export default function HomePage() {
                         )}
                     </Toolbar>
                 </AppBar>
+                <Offset />
             </Box>
             <FrontpageBackgroundBox>
                 <ContentContainer>
                     <TextContainer>
-                        <h1>What is Swappy?</h1>
+                        <h1>Welcome to Swappy!</h1>
                         <p>
                             Swappy is a platform for decentralized, <BoldText>peer-to-peer (P2P)</BoldText> swaps, offering users a trustless environment for <BoldText>over-the-counter (OTC)</BoldText> trading.
                         </p>
+                        <ImageContainer>
+                            <img src='/images/optimism-logo.svg' alt='Optimism logo' style={{ width: '50px', height: 'auto' }} />
+                            <img src='/images/arbitrum-logo.svg' alt='Arbitrum logo' style={{ width: '50px', height: 'auto' }} />
+                            <img src='/images/eth-logo.svg' alt='Eth logo' style={{ width: '50px', height: 'auto' }} />
+                            <img src='/images/matic-logo.svg' alt='Matic logo' style={{ width: '50px', height: 'auto' }} />
+                            <img src='/images/bnb-logo.svg' alt='Bnb logo' style={{ width: '50px', height: 'auto' }} />
+                        </ImageContainer>
                         <PrimaryButton onClick={onDappBtnClick} buttonText='Try it out' />
                     </TextContainer>
-                    {!isMobile && (
-                        <ImageContainer>
-                            <img src='/images/swappy_logo.png' alt='Descriptive Alt Text' style={{ maxWidth: '100%', height: 'auto' }} />
-                        </ImageContainer>
-                    )}
                 </ContentContainer>
-                <ContentContainer>
+                {/* <ContentContainer>
                     <ImageContainer>
-                        <img src='/images/example.png' alt='Descriptive Alt Text' style={{ maxWidth: '100%', height: 'auto' }} />
+                        <img src='/images/example.png' alt='Example' style={{ maxWidth: '100%', height: 'auto' }} />
                     </ImageContainer>
                     <TextContainer>
                         <h1>How to use Swappy?</h1>
@@ -213,7 +231,7 @@ export default function HomePage() {
                 <ContentContainer>
                     {isMobile && (
                         <ImageContainer>
-                            <img src='/images/swappy_thinking.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
+                            <img src='/images/swappy_playing.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
                         </ImageContainer>
                     )}
                     <TextContainer>
@@ -236,12 +254,12 @@ export default function HomePage() {
                     </TextContainer>
                     {!isMobile && (
                         <ImageContainer>
-                            <img src='/images/swappy_thinking.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
+                            <img src='/images/swappy_playing.png' alt='Descriptive Alt Text' style={{ maxWidth: '75%', height: 'auto' }} />
                         </ImageContainer>
                     )}
-                </ContentContainer>
+                </ContentContainer> */}
             </FrontpageBackgroundBox>
-            <FooterContainer>© 2024 Swappy</FooterContainer>
+            <FooterContainer>© 2025 Swappy</FooterContainer>
         </>
     );
 }

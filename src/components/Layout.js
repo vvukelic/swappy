@@ -8,7 +8,7 @@ export default ({ children, activeTab, setActiveTab, activeSwapOffersListTab, se
         <>
             <Header activeTab={activeTab} setActiveTab={setActiveTab} activeSwapOffersListTab={activeSwapOffersListTab} setActiveSwapOffersListTab={setActiveSwapOffersListTab} />
             <BackgroundBox>
-                <div style={{ paddingBottom: '2em' }}>
+                <div style={{ paddingBottom: '2em', paddingTop: '1em' }}>
                     {children}
                 </div>
             </BackgroundBox>

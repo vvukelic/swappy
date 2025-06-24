@@ -9,7 +9,7 @@ function SwapOfferPercentageFilledLabel({ percentage }) {
                 <CircularProgress
                     variant='determinate'
                     value={100}
-                    sx={{ color: '#2b6d80', position: 'absolute', zIndex: 1 }}
+                    sx={{ color: '#22365e', position: 'absolute', zIndex: 1 }}
                 />
                 <CircularProgress
                     variant='determinate'
