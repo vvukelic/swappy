@@ -17,7 +17,7 @@ const ContentContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 50px;
+    padding: 0 1em;
     gap: 20px;
     max-width: 1300px;
     max-height: 560px;
@@ -25,8 +25,8 @@ const ContentContainer = styled.div`
 
     @media (max-width: 600px) {
         flex-direction: column;
-        padding: 0 15px;
         max-height: 1120px;
+        width: 100%;
     }
 `;
 
@@ -41,11 +41,11 @@ const FrontpageBackgroundBox = styled(BackgroundBox)`
 
 const TextContainer = styled.div`
     margin-top: 2em;
-    padding: 0 2em;
     flex: 1;
     max-width: 600px;
     color: white;
     font-size: 1.3em;
+    text-align: center;
 
     p {
         margin-bottom: 1em;
@@ -57,8 +57,7 @@ const TextContainer = styled.div`
 
     @media (max-width: 768px) {
         margin-top: 1em;
-        padding: 0 1em;
-        font-size: 1em;
+        font-size: 1.2em;
         p {
             margin-bottom: 2em;
         }
@@ -74,9 +73,23 @@ const ImageContainer = styled.div`
     padding-right: 100px;
     justify-content: space-between;
     margin-bottom: 1.5em;
+    flex-wrap: wrap;
+
+    img {
+        margin: 10px;
+        max-width: 50px;
+        height: auto;
+    }
 
     @media (max-width: 768px) {
         margin-top: 2em;
+        justify-content: center;
+        padding-left: 50px;
+        padding-right: 50px;
+
+        img {
+            flex: 0 1 30%;
+        }
     }
 `;
 
@@ -171,15 +184,15 @@ export default function HomePage() {
             </Box>
             <FrontpageBackgroundBox>
                 <ContentContainer>
-                    <TextContainer style={{ textAlign: 'center' }}>
+                    <TextContainer>
                         <h1>Welcome to Swappy!</h1>
                         <p>
                             Swappy is a platform for decentralized, <BoldText>peer-to-peer (P2P)</BoldText> swaps, offering users a trustless environment for <BoldText>over-the-counter (OTC)</BoldText> trading.
                         </p>
                         <ImageContainer>
-                            <img src='/images/eth-logo.svg' alt='Eth logo' style={{ width: '50px', height: 'auto' }} />
                             <img src='/images/optimism-logo.svg' alt='Optimism logo' style={{ width: '50px', height: 'auto' }} />
                             <img src='/images/arbitrum-logo.svg' alt='Arbitrum logo' style={{ width: '50px', height: 'auto' }} />
+                            <img src='/images/eth-logo.svg' alt='Eth logo' style={{ width: '50px', height: 'auto' }} />
                             <img src='/images/matic-logo.svg' alt='Matic logo' style={{ width: '50px', height: 'auto' }} />
                             <img src='/images/bnb-logo.svg' alt='Bnb logo' style={{ width: '50px', height: 'auto' }} />
                         </ImageContainer>
