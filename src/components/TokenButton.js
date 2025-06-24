@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 
 const StyledButton = styled(Button)`
     color: white;
-    background-color: #225e6d;
+    background-color: #233864;
     border-radius: 0;
     width: 100%;
     display: flex;
@@ -19,7 +19,7 @@ const StyledButton = styled(Button)`
     border-bottom-left-radius: 4px;
 
     &:hover {
-        background-color: #224e5d;
+        background-color: #284175;
     }
 
     @media (max-width: 600px) {

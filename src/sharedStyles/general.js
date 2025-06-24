@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { Box, Typography, Link } from '@mui/material';
+import { Box, Typography, Link, CardMedia, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 
@@ -16,8 +16,8 @@ const TruncateBase = styled.div`
 export const Truncate = React.forwardRef((props, ref) => <TruncateBase ref={ref} {...props} />);
 
 export const BackgroundBox = styled(Box)`
-    min-height: calc(100vh - 100px);
-    background: linear-gradient(to bottom, #1b3a47, #45bbd6);
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #1b2b47, #456ed6);
     padding-top: 3em;
 
     @media (max-width: 600px) {
@@ -25,8 +25,18 @@ export const BackgroundBox = styled(Box)`
     }
 `;
 
+export const SwappyHome = styled(CardMedia)`
+    width: 95px;
+    height: 70px;
+    background-color: transparent;
+
+    &:hover {
+        cursor: pointer !important;
+    }
+`;
+
 export const ModalContent = styled.div`
-    background-color: #358a9f;
+    background-color: #2f50a1;
     padding: 20px;
     border-radius: 10px;
     outline: none;
@@ -55,7 +65,7 @@ export const ModalTitle = styled(Typography)`
 export const FooterContainer = styled(Box)`
     width: 100%;
     padding: 1em 0;
-    background-color: #1b3a47;
+    background-color: #1b2a47;
     color: white;
     text-align: center;
     font-size: 0.9em;
@@ -82,19 +92,16 @@ export const StyledLink = styled(Link)`
     }
 `;
 
-export const RelativePositionContainer = styled.div`
-    position: relative;
-    display: grid;
-`;
+const activeButtonColor = '#3050a1';
 
 export const StyledTabButton = styled(({ isActive, ...props }) => <Button {...props} />)`
     margin-left: 10px;
     color: white;
-    background-color: ${(props) => (props.isActive ? '#396777' : 'transparent')};
+    background-color: ${(props) => (props.isActive ? activeButtonColor : 'transparent')};
     border: 1px solid transparent;
 
     &:hover {
-        background-color: ${(props) => (props.isActive ? '#396777' : '#396777')};
+        background-color: ${(props) => (props.isActive ? activeButtonColor : activeButtonColor)};
         border-color: #ffffff;
     }
 `;
@@ -106,8 +113,7 @@ export const DropdownHoverMenuButton = styled(StyledTabButton)`
 export const DropdownHoverMenu = styled(Box)`
     position: absolute;
     width: ${(props) => props.width};
-    background-color: #0f2934;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #355ab8;
     border-radius: 4px;
     padding: 10px;
     display: ${(props) => (props.show ? 'flex' : 'none')};
@@ -115,6 +121,8 @@ export const DropdownHoverMenu = styled(Box)`
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
+    margin-top: 0.5em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.75);
 
     @media (max-width: 900px) {
         position: static;
@@ -123,3 +131,25 @@ export const DropdownHoverMenu = styled(Box)`
         width: auto;
     }
 `;
+
+export const textFieldColor = '#7698ea';
+export const StyledTextField = styled(TextField)({
+    '& label': {
+      color: textFieldColor,
+    },
+    '& label.Mui-focused': {
+      color: textFieldColor,
+    },
+    '& .MuiOutlinedInput-root': {
+      color: 'white', // text color
+      '& fieldset': {
+        borderColor: textFieldColor,
+      },
+      '&:hover fieldset': {
+        borderColor: textFieldColor,
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: textFieldColor,
+      },
+    },
+  });
